@@ -124,6 +124,7 @@ namespace Orion.Window
             this.pSaveWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pEntryValue = new System.Windows.Forms.Label();
             this.pTextData = new ScintillaNET.Scintilla();
+            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pImageData)).BeginInit();
             this.pImagePanel.SuspendLayout();
@@ -213,6 +214,7 @@ namespace Orion.Window
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addToolStripMenuItem,
+            this.addFolderToolStripMenuItem,
             this.removeToolStripMenuItem,
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem,
@@ -227,8 +229,8 @@ namespace Orion.Window
             this.addToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.addToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
-            this.addToolStripMenuItem.Text = "Add";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addToolStripMenuItem.Text = "Add item";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.OnAddFile);
             // 
             // removeToolStripMenuItem
@@ -237,7 +239,7 @@ namespace Orion.Window
             this.removeToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
             this.removeToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeToolStripMenuItem.Text = "Remove";
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.OnRemoveFile);
             // 
@@ -247,7 +249,7 @@ namespace Orion.Window
             this.copyToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.OnCopyNode);
             // 
@@ -257,7 +259,7 @@ namespace Orion.Window
             this.pasteToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.OnPasteNode);
             // 
@@ -269,7 +271,7 @@ namespace Orion.Window
             this.collapseToolStripMenuItem});
             this.allNodesToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.allNodesToolStripMenuItem.Text = "All Nodes";
             // 
             // expandToolStripMenuItem
@@ -297,7 +299,7 @@ namespace Orion.Window
             this.searchToolStripMenuItem});
             this.toolsToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // exportToolStripMenuItem
@@ -437,6 +439,15 @@ namespace Orion.Window
             this.pTextData.TabIndex = 9;
             this.pTextData.Visible = false;
             // 
+            // addFolderToolStripMenuItem
+            // 
+            this.addFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.addFolderToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
+            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addFolderToolStripMenuItem.Text = "Add folder";
+            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.OnAddFolder);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -499,6 +510,7 @@ namespace Orion.Window
         private System.ComponentModel.BackgroundWorker pSaveWorkerThread;
         private Label pEntryValue;
         private ScintillaNET.Scintilla pTextData;
+        private ToolStripMenuItem addFolderToolStripMenuItem;
     }
 }
 

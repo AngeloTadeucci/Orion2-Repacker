@@ -375,6 +375,40 @@ namespace Orion.Window
             pEntry.Name = pChild.Path;
         } // Add
 
+        private void OnAddFolder(object sender, EventArgs e)
+        {
+            if (pNodeList == null)
+            {
+                NotifyMessage("Please load an file first.", MessageBoxIcon.Information);
+                return;
+            }
+
+            PackNode pNode = pTreeView.SelectedNode as PackNode;
+            if (pNode == null)
+            {
+                return;
+            }
+
+            if (pNode.Tag is PackFileEntry)
+            {
+                NotifyMessage("Please select a directory to add into!", MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            PackNodeList pList = pNode.Tag as PackNodeList;
+
+            string nodeName = ShowDialog("Type the folder name");
+            if (string.IsNullOrEmpty(nodeName))
+            {
+                return;
+            }
+            nodeName += "/";
+            PackNodeList newNodeList = new PackNodeList(nodeName);
+            PackNode pChild = new PackNode(newNodeList, nodeName);
+            pList.Children.Add(nodeName, newNodeList);
+            pNode.Nodes.Add(pChild);
+        }
+
         private void OnRemoveFile(object sender, EventArgs e)
         {
             if (pTreeView.SelectedNode is PackNode pNode)
@@ -1498,5 +1532,25 @@ namespace Orion.Window
             }
         }
         #endregion
+
+        public static string ShowDialog(string caption)
+        {
+            Form prompt = new Form()
+            {
+                Width = 290,
+                Height = 80,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            TextBox textBox = new TextBox() { Left = 10, Top = 10, Width = 200 };
+            Button confirmation = new Button() { Text = "Ok", Left = 220, Width = 50, Top = 9, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.AcceptButton = confirmation;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
     }
 }
