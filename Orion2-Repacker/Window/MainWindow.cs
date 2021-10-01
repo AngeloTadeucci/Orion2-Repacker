@@ -42,6 +42,7 @@ namespace Orion.Window
         private PackNodeList pNodeList;
         private MemoryMappedFile pDataMappedMemFile;
         private ProgressWindow pProgress;
+        private string selectedFolder;
 
         public MainWindow()
         {
@@ -354,7 +355,7 @@ namespace Orion.Window
             PackFileEntry pEntry = new PackFileEntry()
             {
                 Name = sHeaderName,
-                Hash = CreateHash(sHeaderUOL),
+                Hash = Helpers.CreateHash(sHeaderUOL),
                 Index = 1,
                 Changed = true,
                 TreeName = sHeaderName,
@@ -708,6 +709,41 @@ namespace Orion.Window
         {
             LoadSearchForm(sender, e);
         } // Search
+
+        private void OnCreateItem(object sender, EventArgs e)
+        {
+            NotifyMessage("Its recommended to make a backup of your files before. Also please move Xml.m2d, Item.m2d, Image.m2d and Textures.m2d to an single folder.");
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
+            {
+                Description = "Select the folder where your Xml.m2d, Item.m2d, Image.m2d and Textures.m2d files are."
+            };
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                selectedFolder = folderBrowserDialog.SelectedPath;
+            }
+            else
+            {
+                selectedFolder = string.Empty;
+            }
+
+            if (selectedFolder == string.Empty)
+            {
+                NotifyMessage("Please select the folder before continuing.");
+                return;
+            }
+
+            string[] files = Directory.GetFiles(selectedFolder);
+            if (!files.Any(x => x.Contains("Xml.m2d")) || !files.Any(x => x.Contains("Item.m2d")) || !files.Any(x => x.Contains("Image.m2d")) || !files.Any(x => x.Contains("Textures.m2d")))
+            {
+                NotifyMessage("Couldn't find all required files. Please have Xml.m2d, Item.m2d, Image.m2d and Textures.m2d files in the same folder");
+                return;
+            }
+
+            CreateItem dialog = new CreateItem(files);
+
+            dialog.ShowDialog();
+        }
         #endregion
 
         #region About
@@ -726,23 +762,6 @@ namespace Orion.Window
         private void NotifyMessage(string sText, MessageBoxIcon eIcon = MessageBoxIcon.None)
         {
             MessageBox.Show(this, sText, Text, MessageBoxButtons.OK, eIcon);
-        }
-
-        private static string CreateHash(string sHeaderUOL)
-        {
-            if (!File.Exists(sHeaderUOL))
-            {
-                return "";
-            }
-
-            using (MD5 md5 = MD5.Create())
-            {
-                using (FileStream stream = File.OpenRead(sHeaderUOL))
-                {
-                    byte[] hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
         }
 
         private void OnChangeImage(object sender, EventArgs e)

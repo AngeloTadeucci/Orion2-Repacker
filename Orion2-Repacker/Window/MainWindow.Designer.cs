@@ -15,6 +15,7 @@
  *      You should have received a copy of the GNU General Public License
  */
 
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -104,6 +105,7 @@ namespace Orion.Window
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,6 +115,7 @@ namespace Orion.Window
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTreeView = new System.Windows.Forms.TreeView();
@@ -124,7 +127,6 @@ namespace Orion.Window
             this.pSaveWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pEntryValue = new System.Windows.Forms.Label();
             this.pTextData = new ScintillaNET.Scintilla();
-            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pImageData)).BeginInit();
             this.pImagePanel.SuspendLayout();
@@ -164,7 +166,7 @@ namespace Orion.Window
             this.pOpenMenuItem.Name = "pOpenMenuItem";
             this.pOpenMenuItem.ShortcutKeyDisplayString = "Ctrl+O";
             this.pOpenMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.pOpenMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.pOpenMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pOpenMenuItem.Text = "Open";
             this.pOpenMenuItem.Click += new System.EventHandler(this.OnLoadFile);
             // 
@@ -175,7 +177,7 @@ namespace Orion.Window
             this.pSaveMenuItem.Name = "pSaveMenuItem";
             this.pSaveMenuItem.ShortcutKeyDisplayString = "Ctrl+S";
             this.pSaveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.pSaveMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.pSaveMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pSaveMenuItem.Text = "Save";
             this.pSaveMenuItem.Click += new System.EventHandler(this.OnSaveFile);
             // 
@@ -186,7 +188,7 @@ namespace Orion.Window
             this.pReloadMenuItem.Name = "pReloadMenuItem";
             this.pReloadMenuItem.ShortcutKeyDisplayString = "Ctrl+R";
             this.pReloadMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.pReloadMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.pReloadMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pReloadMenuItem.Text = "Reload";
             this.pReloadMenuItem.Click += new System.EventHandler(this.OnReloadFile);
             // 
@@ -197,7 +199,7 @@ namespace Orion.Window
             this.pUnloadMenuItem.Name = "pUnloadMenuItem";
             this.pUnloadMenuItem.ShortcutKeyDisplayString = "Ctrl+U";
             this.pUnloadMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
-            this.pUnloadMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.pUnloadMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pUnloadMenuItem.Text = "Unload";
             this.pUnloadMenuItem.Click += new System.EventHandler(this.OnUnloadFile);
             // 
@@ -206,7 +208,7 @@ namespace Orion.Window
             this.exitToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.exitToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExit);
             // 
@@ -229,9 +231,18 @@ namespace Orion.Window
             this.addToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.addToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.addToolStripMenuItem.Text = "Add item";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.OnAddFile);
+            // 
+            // addFolderToolStripMenuItem
+            // 
+            this.addFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.addFolderToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
+            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.addFolderToolStripMenuItem.Text = "Add folder";
+            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.OnAddFolder);
             // 
             // removeToolStripMenuItem
             // 
@@ -239,7 +250,7 @@ namespace Orion.Window
             this.removeToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
             this.removeToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.removeToolStripMenuItem.Text = "Remove";
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.OnRemoveFile);
             // 
@@ -249,7 +260,7 @@ namespace Orion.Window
             this.copyToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.OnCopyNode);
             // 
@@ -259,7 +270,7 @@ namespace Orion.Window
             this.pasteToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.OnPasteNode);
             // 
@@ -271,7 +282,7 @@ namespace Orion.Window
             this.collapseToolStripMenuItem});
             this.allNodesToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.allNodesToolStripMenuItem.Text = "All Nodes";
             // 
             // expandToolStripMenuItem
@@ -296,7 +307,8 @@ namespace Orion.Window
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exportToolStripMenuItem,
-            this.searchToolStripMenuItem});
+            this.searchToolStripMenuItem,
+            this.createItemToolStripMenuItem});
             this.toolsToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
@@ -307,7 +319,7 @@ namespace Orion.Window
             this.exportToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.exportToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.OnExport);
             // 
@@ -318,9 +330,18 @@ namespace Orion.Window
             this.searchToolStripMenuItem.Name = "searchToolStripMenuItem";
             this.searchToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+F";
             this.searchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.searchToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.searchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.searchToolStripMenuItem.Text = "Search";
             this.searchToolStripMenuItem.Click += new System.EventHandler(this.OnSearch);
+            // 
+            // createItemToolStripMenuItem
+            // 
+            this.createItemToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.createItemToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
+            this.createItemToolStripMenuItem.Name = "testToolStripMenuItem";
+            this.createItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.createItemToolStripMenuItem.Text = "Add item helper";
+            this.createItemToolStripMenuItem.Click += new System.EventHandler(this.OnCreateItem);
             // 
             // helpToolStripMenuItem
             // 
@@ -439,15 +460,6 @@ namespace Orion.Window
             this.pTextData.TabIndex = 9;
             this.pTextData.Visible = false;
             // 
-            // addFolderToolStripMenuItem
-            // 
-            this.addFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.addFolderToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
-            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addFolderToolStripMenuItem.Text = "Add folder";
-            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.OnAddFolder);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -511,6 +523,7 @@ namespace Orion.Window
         private Label pEntryValue;
         private ScintillaNET.Scintilla pTextData;
         private ToolStripMenuItem addFolderToolStripMenuItem;
+        private ToolStripMenuItem createItemToolStripMenuItem;
     }
 }
 
