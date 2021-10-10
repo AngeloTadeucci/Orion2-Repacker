@@ -354,7 +354,7 @@ namespace Orion.Window
             PackFileEntry pEntry = new PackFileEntry()
             {
                 Name = sHeaderName,
-                Hash = CreateHash(sHeaderUOL),
+                Hash = Helpers.CreateHash(sHeaderUOL),
                 Index = 1,
                 Changed = true,
                 TreeName = sHeaderName,
@@ -383,8 +383,7 @@ namespace Orion.Window
                 return;
             }
 
-            PackNode pNode = pTreeView.SelectedNode as PackNode;
-            if (pNode == null)
+            if (!(pTreeView.SelectedNode is PackNode pNode))
             {
                 return;
             }
@@ -708,6 +707,69 @@ namespace Orion.Window
         {
             LoadSearchForm(sender, e);
         } // Search
+
+        private void OnCreateItem(object sender, EventArgs e)
+        {
+            string xmlFilePath;
+            NotifyMessage("Its recommended to make a backup of your files before continuing!");
+            OpenFileDialog folderBrowserDialog = new OpenFileDialog()
+            {
+                Title = "Select the Xml.m2d file",
+                Filter = "MapleStory2 Files|*.m2d",
+                Multiselect = false
+            };
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                xmlFilePath = folderBrowserDialog.FileName;
+            }
+            else
+            {
+                xmlFilePath = string.Empty;
+            }
+
+            if (xmlFilePath == string.Empty)
+            {
+                NotifyMessage("Please select the folder before continuing.");
+                return;
+            }
+
+            if (!xmlFilePath.Contains("Xml.m2d"))
+            {
+                NotifyMessage("Couldn't find Xml.m2d");
+                return;
+            }
+
+            string basePath = xmlFilePath.Replace("Xml.m2d", "");
+            string baseResourcePath = basePath + "Resource\\";
+            string baseModelPath = baseResourcePath + "Model\\";
+
+            string imageFilePath = baseResourcePath + "Image.m2d";
+            string itemFilePath = baseModelPath + "Item.m2d";
+            string textureFilePath = baseModelPath + "Textures.m2d";
+
+            if (!File.Exists(imageFilePath))
+            {
+                NotifyMessage("Couldn't find Image.m2d");
+                return;
+            }
+
+            if (!File.Exists(itemFilePath))
+            {
+                NotifyMessage("Couldn't find Item.m2d");
+                return;
+            }
+
+            if (!File.Exists(textureFilePath))
+            {
+                NotifyMessage("Couldn't find Textures.m2d");
+                return;
+            }
+
+            CreateItem dialog = new CreateItem(xmlFilePath, imageFilePath, itemFilePath, textureFilePath);
+
+            dialog.ShowDialog();
+        }
         #endregion
 
         #region About
@@ -726,23 +788,6 @@ namespace Orion.Window
         private void NotifyMessage(string sText, MessageBoxIcon eIcon = MessageBoxIcon.None)
         {
             MessageBox.Show(this, sText, Text, MessageBoxButtons.OK, eIcon);
-        }
-
-        private static string CreateHash(string sHeaderUOL)
-        {
-            if (!File.Exists(sHeaderUOL))
-            {
-                return "";
-            }
-
-            using (MD5 md5 = MD5.Create())
-            {
-                using (FileStream stream = File.OpenRead(sHeaderUOL))
-                {
-                    byte[] hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
         }
 
         private void OnChangeImage(object sender, EventArgs e)
