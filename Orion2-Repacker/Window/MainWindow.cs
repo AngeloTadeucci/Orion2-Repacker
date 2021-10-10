@@ -42,7 +42,6 @@ namespace Orion.Window
         private PackNodeList pNodeList;
         private MemoryMappedFile pDataMappedMemFile;
         private ProgressWindow pProgress;
-        private string selectedFolder;
 
         public MainWindow()
         {
@@ -384,8 +383,7 @@ namespace Orion.Window
                 return;
             }
 
-            PackNode pNode = pTreeView.SelectedNode as PackNode;
-            if (pNode == null)
+            if (!(pTreeView.SelectedNode is PackNode pNode))
             {
                 return;
             }
@@ -712,35 +710,63 @@ namespace Orion.Window
 
         private void OnCreateItem(object sender, EventArgs e)
         {
-            NotifyMessage("Its recommended to make a backup of your files before. Also please move Xml.m2d, Item.m2d, Image.m2d and Textures.m2d to an single folder.");
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
+            string xmlFilePath;
+            NotifyMessage("Its recommended to make a backup of your files before continuing!");
+            OpenFileDialog folderBrowserDialog = new OpenFileDialog()
             {
-                Description = "Select the folder where your Xml.m2d, Item.m2d, Image.m2d and Textures.m2d files are."
+                Title = "Select the Xml.m2d file",
+                Filter = "MapleStory2 Files|*.m2d",
+                Multiselect = false
             };
 
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                selectedFolder = folderBrowserDialog.SelectedPath;
+                xmlFilePath = folderBrowserDialog.FileName;
             }
             else
             {
-                selectedFolder = string.Empty;
+                xmlFilePath = string.Empty;
             }
 
-            if (selectedFolder == string.Empty)
+            if (xmlFilePath == string.Empty)
             {
                 NotifyMessage("Please select the folder before continuing.");
                 return;
             }
 
-            string[] files = Directory.GetFiles(selectedFolder);
-            if (!files.Any(x => x.Contains("Xml.m2d")) || !files.Any(x => x.Contains("Item.m2d")) || !files.Any(x => x.Contains("Image.m2d")) || !files.Any(x => x.Contains("Textures.m2d")))
+            if (!xmlFilePath.Contains("Xml.m2d"))
             {
-                NotifyMessage("Couldn't find all required files. Please have Xml.m2d, Item.m2d, Image.m2d and Textures.m2d files in the same folder");
+                NotifyMessage("Couldn't find Xml.m2d");
                 return;
             }
 
-            CreateItem dialog = new CreateItem(files);
+            string basePath = xmlFilePath.Replace("Xml.m2d", "");
+            string baseResourcePath = basePath + "Resource\\";
+            string baseModelPath = baseResourcePath + "Model\\";
+
+            string imageFilePath = baseResourcePath + "Image.m2d";
+            string itemFilePath = baseModelPath + "Item.m2d";
+            string textureFilePath = baseModelPath + "Textures.m2d";
+
+            if (!File.Exists(imageFilePath))
+            {
+                NotifyMessage("Couldn't find Image.m2d");
+                return;
+            }
+
+            if (!File.Exists(itemFilePath))
+            {
+                NotifyMessage("Couldn't find Item.m2d");
+                return;
+            }
+
+            if (!File.Exists(textureFilePath))
+            {
+                NotifyMessage("Couldn't find Textures.m2d");
+                return;
+            }
+
+            CreateItem dialog = new CreateItem(xmlFilePath, imageFilePath, itemFilePath, textureFilePath);
 
             dialog.ShowDialog();
         }

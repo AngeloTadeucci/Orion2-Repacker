@@ -16,17 +16,23 @@ namespace Orion.Window
 {
     public partial class CreateItem : Form
     {
-        private readonly string[] filePaths;
-        private string itemXmlFilePath;
-        private string maleNifFilePath;
-        private string femaleNifFilePath;
-        private string[] maleTexturePaths = new string[0];
-        private string[] femaleTexturePaths = new string[0];
-        private string slotIconFilePath;
+        private readonly string XmlFilePath;
+        private readonly string ImageFilePath;
+        private readonly string ItemFilePath;
+        private readonly string TexturesFilePath;
+        private string ItemXmlFilePath;
+        private string MaleNifFilePath;
+        private string FemaleNifFilePath;
+        private string[] MaleTexturePaths = new string[0];
+        private string[] FemaleTexturePaths = new string[0];
+        private string SlotIconFilePath;
 
-        public CreateItem(string[] files)
+        public CreateItem(string xmlFilePath, string imageFilePath, string itemFilePath, string texturesFilePath)
         {
-            filePaths = files;
+            XmlFilePath = xmlFilePath;
+            ImageFilePath = imageFilePath;
+            ItemFilePath = itemFilePath;
+            TexturesFilePath = texturesFilePath;
             InitializeComponent();
         }
 
@@ -37,7 +43,7 @@ namespace Orion.Window
                 return;
             }
 
-            List<PackFileEntry> xmlEntries = GetEntriesForFile("Xml.m2d", out IPackStreamVerBase xmlStream, out MemoryMappedFile xmlMemFile);
+            List<PackFileEntry> xmlEntries = GetEntriesForFile(XmlFilePath, out IPackStreamVerBase xmlStream, out MemoryMappedFile xmlMemFile);
             if (xmlEntries is null)
             {
                 return;
@@ -59,15 +65,15 @@ namespace Orion.Window
 
             SaveFile(xmlStream, xmlMemFile, "Xml.m2d");
 
-            List<PackFileEntry> itemEntries = GetEntriesForFile("Item.m2d", out IPackStreamVerBase itemStream, out MemoryMappedFile itemMemFile);
+            List<PackFileEntry> itemEntries = GetEntriesForFile(ItemFilePath, out IPackStreamVerBase itemStream, out MemoryMappedFile itemMemFile);
             if (itemEntries is null)
             {
                 return;
             }
 
-            if (!string.IsNullOrEmpty(maleNifFilePath))
+            if (!string.IsNullOrEmpty(MaleNifFilePath))
             {
-                string fileName = maleNifFilePath.Substring(maleNifFilePath.LastIndexOf('\\') + 1);
+                string fileName = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
 
                 if (itemEntries.Any(x => x.Name.Contains(fileName)))
                 {
@@ -76,9 +82,9 @@ namespace Orion.Window
                 }
             }
 
-            if (!string.IsNullOrEmpty(maleNifFilePath))
+            if (!string.IsNullOrEmpty(MaleNifFilePath))
             {
-                string fileName = femaleNifFilePath.Substring(femaleNifFilePath.LastIndexOf('\\') + 1);
+                string fileName = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
 
                 if (itemEntries.Any(x => x.Name.Contains(fileName)))
                 {
@@ -91,7 +97,7 @@ namespace Orion.Window
 
             SaveFile(itemStream, itemMemFile, "Item.m2d");
 
-            List<PackFileEntry> imageEntries = GetEntriesForFile("Image.m2d", out IPackStreamVerBase imageStream, out MemoryMappedFile imageMemFile);
+            List<PackFileEntry> imageEntries = GetEntriesForFile(ImageFilePath, out IPackStreamVerBase imageStream, out MemoryMappedFile imageMemFile);
             if (imageEntries is null)
             {
                 return;
@@ -107,13 +113,13 @@ namespace Orion.Window
 
             SaveFile(imageStream, imageMemFile, "Image.m2d");
 
-            List<PackFileEntry> textureEntries = GetEntriesForFile("Textures.m2d", out IPackStreamVerBase textureStream, out MemoryMappedFile textureMemFile);
+            List<PackFileEntry> textureEntries = GetEntriesForFile(TexturesFilePath, out IPackStreamVerBase textureStream, out MemoryMappedFile textureMemFile);
             if (textureEntries is null)
             {
                 return;
             }
 
-            foreach (string path in maleTexturePaths)
+            foreach (string path in MaleTexturePaths)
             {
                 string maleTextureFileName = path.Substring(path.LastIndexOf('\\') + 1);
 
@@ -124,7 +130,7 @@ namespace Orion.Window
                 }
             }
 
-            foreach (string path in femaleTexturePaths)
+            foreach (string path in FemaleTexturePaths)
             {
                 string femaleTextureFileName = path.Substring(path.LastIndexOf('\\') + 1);
 
@@ -144,13 +150,13 @@ namespace Orion.Window
 
         private void AddIconFile(IPackStreamVerBase imageStream)
         {
-            byte[] pData = File.ReadAllBytes(slotIconFilePath);
-            string fileName = slotIconFilePath.Substring(slotIconFilePath.LastIndexOf('\\') + 1);
+            byte[] pData = File.ReadAllBytes(SlotIconFilePath);
+            string fileName = SlotIconFilePath.Substring(SlotIconFilePath.LastIndexOf('\\') + 1);
 
             PackFileEntry pEntry = new PackFileEntry()
             {
                 Name = "item/icon/" + fileName,
-                Hash = Helpers.CreateHash(slotIconFilePath),
+                Hash = Helpers.CreateHash(SlotIconFilePath),
                 Index = 1,
                 Changed = true,
                 TreeName = "item/icon/" + fileName,
@@ -161,8 +167,8 @@ namespace Orion.Window
 
         private void AddItemXmlButton(IPackStreamVerBase xmlStream)
         {
-            byte[] pData = File.ReadAllBytes(itemXmlFilePath);
-            string fileName = itemXmlFilePath.Substring(itemXmlFilePath.LastIndexOf('\\') + 1);
+            byte[] pData = File.ReadAllBytes(ItemXmlFilePath);
+            string fileName = ItemXmlFilePath.Substring(ItemXmlFilePath.LastIndexOf('\\') + 1);
             string itemId = fileName.Split('.').First();
 
             string firstDigit = itemId.Substring(0, 1);
@@ -171,7 +177,7 @@ namespace Orion.Window
             PackFileEntry pEntry = new PackFileEntry()
             {
                 Name = $"{firstDigit}/{next2Digits}/{fileName}",
-                Hash = Helpers.CreateHash(itemXmlFilePath),
+                Hash = Helpers.CreateHash(ItemXmlFilePath),
                 Index = 1,
                 Changed = true,
                 TreeName = $"{firstDigit}/{next2Digits}/{fileName}",
@@ -182,7 +188,7 @@ namespace Orion.Window
 
         private void AddTextures(IPackStreamVerBase textureStream)
         {
-            foreach (string path in maleTexturePaths)
+            foreach (string path in MaleTexturePaths)
             {
                 byte[] pData = File.ReadAllBytes(path);
                 string fileName = path.Substring(path.LastIndexOf('\\') + 1);
@@ -204,7 +210,7 @@ namespace Orion.Window
                 textureStream.GetFileList().Add(pEntry);
             }
 
-            foreach (string path in femaleTexturePaths)
+            foreach (string path in FemaleTexturePaths)
             {
                 byte[] pData = File.ReadAllBytes(path);
                 string fileName = path.Substring(path.LastIndexOf('\\') + 1);
@@ -275,10 +281,10 @@ namespace Orion.Window
 
         private void AddNifs(IPackStreamVerBase itemStream)
         {
-            if (!string.IsNullOrEmpty(maleNifFilePath))
+            if (!string.IsNullOrEmpty(MaleNifFilePath))
             {
-                byte[] pData = File.ReadAllBytes(maleNifFilePath);
-                string fileName = maleNifFilePath.Substring(maleNifFilePath.LastIndexOf('\\') + 1);
+                byte[] pData = File.ReadAllBytes(MaleNifFilePath);
+                string fileName = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
                 string itemId = fileName.Split('_').First();
 
                 string firstDigit = itemId.Substring(0, 1);
@@ -287,7 +293,7 @@ namespace Orion.Window
                 PackFileEntry pEntry = new PackFileEntry()
                 {
                     Name = firstDigit + "/" + next2Digits + "/" + fileName,
-                    Hash = Helpers.CreateHash(maleNifFilePath),
+                    Hash = Helpers.CreateHash(MaleNifFilePath),
                     Index = 1,
                     Changed = true,
                     TreeName = firstDigit + "/" + next2Digits + "/" + fileName,
@@ -296,10 +302,10 @@ namespace Orion.Window
                 itemStream.GetFileList().Add(pEntry);
             }
 
-            if (!string.IsNullOrEmpty(femaleNifFilePath))
+            if (!string.IsNullOrEmpty(FemaleNifFilePath))
             {
-                byte[] pData = File.ReadAllBytes(femaleNifFilePath);
-                string fileName = femaleNifFilePath.Substring(femaleNifFilePath.LastIndexOf('\\') + 1);
+                byte[] pData = File.ReadAllBytes(FemaleNifFilePath);
+                string fileName = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
                 string itemId = fileName.Split('_').First();
 
                 string firstDigit = itemId.Substring(0, 1);
@@ -308,7 +314,7 @@ namespace Orion.Window
                 PackFileEntry pEntry = new PackFileEntry()
                 {
                     Name = firstDigit + "/" + next2Digits + "/" + fileName,
-                    Hash = Helpers.CreateHash(femaleNifFilePath),
+                    Hash = Helpers.CreateHash(FemaleNifFilePath),
                     Index = 1,
                     Changed = true,
                     TreeName = firstDigit + "/" + next2Digits + "/" + fileName,
@@ -442,11 +448,10 @@ namespace Orion.Window
             }
         }
 
-        private List<PackFileEntry> GetEntriesForFile(string fileName, out IPackStreamVerBase pStream, out MemoryMappedFile pDataMappedMemFile)
+        private List<PackFileEntry> GetEntriesForFile(string filePath, out IPackStreamVerBase pStream, out MemoryMappedFile pDataMappedMemFile)
         {
             pStream = null;
             pDataMappedMemFile = null;
-            string filePath = filePaths.First(x => x.Contains(fileName));
             string m2hPath = filePath.Replace(".m2d", ".m2h");
 
             if (!File.Exists(m2hPath))
@@ -701,7 +706,7 @@ namespace Orion.Window
                 return false;
             }
 
-            if (string.IsNullOrEmpty(itemXmlFilePath))
+            if (string.IsNullOrEmpty(ItemXmlFilePath))
             {
                 NotifyMessage("Please add an item xml file.");
                 return false;
@@ -713,43 +718,43 @@ namespace Orion.Window
                 return false;
             }
 
-            if (string.IsNullOrEmpty(slotIconFilePath))
+            if (string.IsNullOrEmpty(SlotIconFilePath))
             {
                 NotifyMessage("Please add an slot icon image.");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(maleNifFilePath) && string.IsNullOrEmpty(femaleNifFilePath))
+            if (string.IsNullOrEmpty(MaleNifFilePath) && string.IsNullOrEmpty(FemaleNifFilePath))
             {
                 NotifyMessage("Add at least one nif file for one of the genders");
                 return false;
             }
 
-            if (maleTexturePaths.Length == 0 && femaleTexturePaths.Length == 0)
+            if (MaleTexturePaths.Length == 0 && FemaleTexturePaths.Length == 0)
             {
                 NotifyMessage("Add at least one texture file for one of the genders");
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(maleNifFilePath) && maleTexturePaths.Length == 0)
+            if (!string.IsNullOrEmpty(MaleNifFilePath) && MaleTexturePaths.Length == 0)
             {
                 NotifyMessage("You have an male nif file but not textures for it.");
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(femaleNifFilePath) && femaleTexturePaths.Length == 0)
+            if (!string.IsNullOrEmpty(FemaleNifFilePath) && FemaleTexturePaths.Length == 0)
             {
                 NotifyMessage("You have an female nif file but not textures for it.");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(maleNifFilePath) && maleTexturePaths.Length != 0)
+            if (string.IsNullOrEmpty(MaleNifFilePath) && MaleTexturePaths.Length != 0)
             {
                 NotifyMessage("You have male texture files but no nif for it.");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(femaleNifFilePath) && femaleTexturePaths.Length != 0)
+            if (string.IsNullOrEmpty(FemaleNifFilePath) && FemaleTexturePaths.Length != 0)
             {
                 NotifyMessage("You have female texture files but no nif for it.");
                 return false;
@@ -777,9 +782,9 @@ namespace Orion.Window
                 return;
             }
 
-            maleNifFilePath = pDialog.FileName;
+            MaleNifFilePath = pDialog.FileName;
 
-            maleNifFileStatus.Text = maleNifFilePath.Substring(maleNifFilePath.LastIndexOf('\\') + 1);
+            maleNifFileStatus.Text = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
         }
 
         private void OnFindFemaleNifFile(object sender, EventArgs e)
@@ -795,9 +800,9 @@ namespace Orion.Window
             {
                 return;
             }
-            femaleNifFilePath = pDialog.FileName;
+            FemaleNifFilePath = pDialog.FileName;
 
-            femaleNifFileStatus.Text = femaleNifFilePath.Substring(femaleNifFilePath.LastIndexOf('\\') + 1);
+            femaleNifFileStatus.Text = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
         }
 
         private void OnFindMaleTextureFiles(object sender, EventArgs e)
@@ -813,10 +818,10 @@ namespace Orion.Window
             {
                 return;
             }
-            maleTexturePaths = pDialog.FileNames;
+            MaleTexturePaths = pDialog.FileNames;
 
             List<string> filenames = new List<string>();
-            foreach (string path in maleTexturePaths)
+            foreach (string path in MaleTexturePaths)
             {
                 filenames.Add(path.Substring(path.LastIndexOf('\\') + 1));
             }
@@ -836,10 +841,10 @@ namespace Orion.Window
             {
                 return;
             }
-            femaleTexturePaths = pDialog.FileNames;
+            FemaleTexturePaths = pDialog.FileNames;
 
             List<string> filenames = new List<string>();
-            foreach (string path in femaleTexturePaths)
+            foreach (string path in FemaleTexturePaths)
             {
                 filenames.Add(path.Substring(path.LastIndexOf('\\') + 1));
             }
@@ -859,39 +864,39 @@ namespace Orion.Window
             {
                 return;
             }
-            slotIconFilePath = pDialog.FileName;
+            SlotIconFilePath = pDialog.FileName;
 
-            slotIconFileStatus.Text = slotIconFilePath.Substring(slotIconFilePath.LastIndexOf('\\') + 1);
+            slotIconFileStatus.Text = SlotIconFilePath.Substring(SlotIconFilePath.LastIndexOf('\\') + 1);
             slotIconFileStatus.Visible = true;
         }
 
         private void OnRemoveMaleNifFile(object sender, EventArgs e)
         {
-            maleNifFilePath = "";
+            MaleNifFilePath = "";
             maleNifFileStatus.Text = "";
         }
 
         private void OnRemoveFemaleNifFile(object sender, EventArgs e)
         {
-            femaleNifFilePath = "";
+            FemaleNifFilePath = "";
             femaleNifFileStatus.Text = "";
         }
 
         private void OnRemoveMaleTextureFiles(object sender, EventArgs e)
         {
-            maleTexturePaths = new string[0];
+            MaleTexturePaths = new string[0];
             maleTextureStatus.Text = "";
         }
 
         private void OnRemoveFemaleTextureFiles(object sender, EventArgs e)
         {
-            femaleTexturePaths = new string[0];
+            FemaleTexturePaths = new string[0];
             femaleTextureStatus.Text = "";
         }
 
         private void OnRemoveSlotIconFile(object sender, EventArgs e)
         {
-            slotIconFilePath = "";
+            SlotIconFilePath = "";
             slotIconFileStatus.Text = "";
             slotIconFileStatus.Visible = false;
         }
@@ -909,14 +914,14 @@ namespace Orion.Window
             {
                 return;
             }
-            itemXmlFilePath = pDialog.FileName;
+            ItemXmlFilePath = pDialog.FileName;
 
-            itemXmlStatus.Text = itemXmlFilePath.Substring(itemXmlFilePath.LastIndexOf('\\') + 1);
+            itemXmlStatus.Text = ItemXmlFilePath.Substring(ItemXmlFilePath.LastIndexOf('\\') + 1);
         }
 
         private void OnRemoveItemXmlButton(object sender, EventArgs e)
         {
-            itemXmlFilePath = "";
+            ItemXmlFilePath = "";
             itemXmlStatus.Text = "";
         }
     }

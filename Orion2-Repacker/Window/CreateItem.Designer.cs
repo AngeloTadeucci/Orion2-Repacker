@@ -63,6 +63,8 @@
             this.findFemaleTextureButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
             this.itemXmlStatus = new System.Windows.Forms.TextBox();
@@ -70,15 +72,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.addItemXmlButton = new System.Windows.Forms.Button();
             this.removeItemXmlButton = new System.Windows.Forms.Button();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.groupBox8.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.groupBox8.SuspendLayout();
             this.SuspendLayout();
             // 
             // itemIdLabel
@@ -214,7 +214,7 @@
             // 
             this.createItemButton.Location = new System.Drawing.Point(443, 12);
             this.createItemButton.Name = "createItemButton";
-            this.createItemButton.Size = new System.Drawing.Size(75, 23);
+            this.createItemButton.Size = new System.Drawing.Size(110, 23);
             this.createItemButton.TabIndex = 24;
             this.createItemButton.Text = "Create item";
             this.createItemButton.UseVisualStyleBackColor = true;
@@ -421,6 +421,34 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Xml.m2d";
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.tooltipDescriptionLabel);
+            this.groupBox6.Controls.Add(this.tooltipDescriptionTextBox);
+            this.groupBox6.Controls.Add(this.guideDescriptionLabel);
+            this.groupBox6.Controls.Add(this.guideDescriptionTextBox);
+            this.groupBox6.Location = new System.Drawing.Point(176, 19);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(242, 124);
+            this.groupBox6.TabIndex = 1;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "string/en/koritemdescription";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.itemIdLabel);
+            this.groupBox5.Controls.Add(this.itemIdTextBox);
+            this.groupBox5.Controls.Add(this.classLabel);
+            this.groupBox5.Controls.Add(this.nameLabel);
+            this.groupBox5.Controls.Add(this.classTextBox);
+            this.groupBox5.Controls.Add(this.nameTextBox);
+            this.groupBox5.Location = new System.Drawing.Point(6, 19);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(160, 124);
+            this.groupBox5.TabIndex = 0;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "string/en/itemname";
+            // 
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.label7);
@@ -492,34 +520,6 @@
             this.removeItemXmlButton.UseVisualStyleBackColor = true;
             this.removeItemXmlButton.Click += new System.EventHandler(this.OnRemoveItemXmlButton);
             // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.tooltipDescriptionLabel);
-            this.groupBox6.Controls.Add(this.tooltipDescriptionTextBox);
-            this.groupBox6.Controls.Add(this.guideDescriptionLabel);
-            this.groupBox6.Controls.Add(this.guideDescriptionTextBox);
-            this.groupBox6.Location = new System.Drawing.Point(176, 19);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(242, 124);
-            this.groupBox6.TabIndex = 1;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "string/en/koritemdescription";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.itemIdLabel);
-            this.groupBox5.Controls.Add(this.itemIdTextBox);
-            this.groupBox5.Controls.Add(this.classLabel);
-            this.groupBox5.Controls.Add(this.nameLabel);
-            this.groupBox5.Controls.Add(this.classTextBox);
-            this.groupBox5.Controls.Add(this.nameTextBox);
-            this.groupBox5.Location = new System.Drawing.Point(6, 19);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(160, 124);
-            this.groupBox5.TabIndex = 0;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "string/en/itemname";
-            // 
             // CreateItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -543,12 +543,12 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox4.ResumeLayout(false);
-            this.groupBox8.ResumeLayout(false);
-            this.groupBox8.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.groupBox8.ResumeLayout(false);
+            this.groupBox8.PerformLayout();
             this.ResumeLayout(false);
 
         }
