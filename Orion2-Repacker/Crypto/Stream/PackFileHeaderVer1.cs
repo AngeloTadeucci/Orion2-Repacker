@@ -15,69 +15,53 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Common;
 using System.IO;
+using Orion.Crypto.Common;
 
 namespace Orion.Crypto.Stream
 {
     public class PackFileHeaderVer1 : IPackFileHeaderVerBase
     {
         private readonly byte[] aPackingDef; //A "Packing Definition", unused.
-        private int nFileIndex;
-        private uint dwBufferFlag;
         private readonly int[] Reserved;
-        private ulong uOffset;
-        private uint uEncodedFileSize;
+        private uint dwBufferFlag;
+        private int nFileIndex;
         private ulong uCompressedFileSize;
+        private uint uEncodedFileSize;
         private ulong uFileSize;
+        private ulong uOffset;
 
         private PackFileHeaderVer1()
         {
-            this.aPackingDef = new byte[4];
-            this.Reserved = new int[2];
+            aPackingDef = new byte[4];
+            Reserved = new int[2];
         }
 
         public PackFileHeaderVer1(BinaryReader pReader)
             : this()
         {
-            this.aPackingDef = pReader.ReadBytes(4);         //[ecx+16]
-            this.nFileIndex = pReader.ReadInt32();           //[ecx+20]
-            this.dwBufferFlag = pReader.ReadUInt32();        //[ecx+24]
-            this.Reserved[0] = pReader.ReadInt32();          //[ecx+28]
-            this.uOffset = pReader.ReadUInt64();             //[ecx+32] | [ecx+36]
-            this.uEncodedFileSize = pReader.ReadUInt32();    //[ecx+40]
-            this.Reserved[1] = pReader.ReadInt32();          //[ecx+44]
-            this.uCompressedFileSize = pReader.ReadUInt64(); //[ecx+48] | [ecx+52]
-            this.uFileSize = pReader.ReadUInt64();           //[ecx+56] | [ecx+60]
-        }
-
-        public static PackFileHeaderVer1 CreateHeader(int nIndex, uint dwFlag, ulong uOffset, byte[] pData)
-        {
-
-            CryptoMan.Encrypt(PackVer.MS2F, pData, dwFlag, out uint uLen, out uint uCompressedLen, out uint uEncodedLen);
-
-            return new PackFileHeaderVer1
-            {
-                nFileIndex = nIndex,
-                dwBufferFlag = dwFlag,
-                uOffset = uOffset,
-                uEncodedFileSize = uEncodedLen,
-                uCompressedFileSize = uCompressedLen,
-                uFileSize = uLen
-            };
+            aPackingDef = pReader.ReadBytes(4); //[ecx+16]
+            nFileIndex = pReader.ReadInt32(); //[ecx+20]
+            dwBufferFlag = pReader.ReadUInt32(); //[ecx+24]
+            Reserved[0] = pReader.ReadInt32(); //[ecx+28]
+            uOffset = pReader.ReadUInt64(); //[ecx+32] | [ecx+36]
+            uEncodedFileSize = pReader.ReadUInt32(); //[ecx+40]
+            Reserved[1] = pReader.ReadInt32(); //[ecx+44]
+            uCompressedFileSize = pReader.ReadUInt64(); //[ecx+48] | [ecx+52]
+            uFileSize = pReader.ReadUInt64(); //[ecx+56] | [ecx+60]
         }
 
         public void Encode(BinaryWriter pWriter)
         {
-            pWriter.Write(this.aPackingDef);
-            pWriter.Write(this.nFileIndex);
-            pWriter.Write(this.dwBufferFlag);
-            pWriter.Write(this.Reserved[0]);
-            pWriter.Write(this.uOffset);
-            pWriter.Write(this.uEncodedFileSize);
-            pWriter.Write(this.Reserved[1]);
-            pWriter.Write(this.uCompressedFileSize);
-            pWriter.Write(this.uFileSize);
+            pWriter.Write(aPackingDef);
+            pWriter.Write(nFileIndex);
+            pWriter.Write(dwBufferFlag);
+            pWriter.Write(Reserved[0]);
+            pWriter.Write(uOffset);
+            pWriter.Write(uEncodedFileSize);
+            pWriter.Write(Reserved[1]);
+            pWriter.Write(uCompressedFileSize);
+            pWriter.Write(uFileSize);
         }
 
         public uint GetVer()
@@ -117,7 +101,7 @@ namespace Orion.Crypto.Stream
 
         public void SetFileIndex(int nIndex)
         {
-            this.nFileIndex = nIndex;
+            nFileIndex = nIndex;
         }
 
         public void SetOffset(ulong uOffset)
@@ -127,17 +111,32 @@ namespace Orion.Crypto.Stream
 
         public void SetEncodedFileSize(uint uEncoded)
         {
-            this.uEncodedFileSize = uEncoded;
+            uEncodedFileSize = uEncoded;
         }
 
         public void SetCompressedFileSize(ulong uCompressed)
         {
-            this.uCompressedFileSize = uCompressed;
+            uCompressedFileSize = uCompressed;
         }
 
         public void SetFileSize(ulong uSize)
         {
-            this.uFileSize = uSize;
+            uFileSize = uSize;
+        }
+
+        public static PackFileHeaderVer1 CreateHeader(int nIndex, uint dwFlag, ulong uOffset, byte[] pData)
+        {
+            CryptoMan.Encrypt(PackVer.MS2F, pData, dwFlag, out uint uLen, out uint uCompressedLen, out uint uEncodedLen);
+
+            return new PackFileHeaderVer1
+            {
+                nFileIndex = nIndex,
+                dwBufferFlag = dwFlag,
+                uOffset = uOffset,
+                uEncodedFileSize = uEncodedLen,
+                uCompressedFileSize = uCompressedLen,
+                uFileSize = uLen
+            };
         }
     }
 }

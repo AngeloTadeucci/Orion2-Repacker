@@ -60,61 +60,55 @@
 //
 // -----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Orion.Crypto.Stream.zlib
 {
     /// <summary>
-    /// A bunch of constants used in the Zlib interface.
+    ///     A bunch of constants used in the Zlib interface.
     /// </summary>
     public static class ZlibConstants
     {
         /// <summary>
-        /// The maximum number of window bits for the Deflate algorithm.
+        ///     The maximum number of window bits for the Deflate algorithm.
         /// </summary>
         public const int WindowBitsMax = 15; // 32K LZ77 window
 
         /// <summary>
-        /// The default number of window bits for the Deflate algorithm.
+        ///     The default number of window bits for the Deflate algorithm.
         /// </summary>
         public const int WindowBitsDefault = WindowBitsMax;
 
         /// <summary>
-        /// indicates everything is A-OK
+        ///     indicates everything is A-OK
         /// </summary>
         public const int Z_OK = 0;
 
         /// <summary>
-        /// Indicates that the last operation reached the end of the stream.
+        ///     Indicates that the last operation reached the end of the stream.
         /// </summary>
         public const int Z_STREAM_END = 1;
 
         /// <summary>
-        /// The operation ended in need of a dictionary. 
+        ///     The operation ended in need of a dictionary.
         /// </summary>
         public const int Z_NEED_DICT = 2;
 
         /// <summary>
-        /// There was an error with the stream - not enough data, not open and readable, etc.
+        ///     There was an error with the stream - not enough data, not open and readable, etc.
         /// </summary>
         public const int Z_STREAM_ERROR = -2;
 
         /// <summary>
-        /// There was an error with the data - not enough data, bad data, etc.
+        ///     There was an error with the data - not enough data, bad data, etc.
         /// </summary>
         public const int Z_DATA_ERROR = -3;
 
         /// <summary>
-        /// There was an error with the working buffer.
+        ///     There was an error with the working buffer.
         /// </summary>
         public const int Z_BUF_ERROR = -5;
 
         /// <summary>
-        /// The size of the working buffer used in the ZlibCodec class. Defaults to 8192 bytes.
+        ///     The size of the working buffer used in the ZlibCodec class. Defaults to 8192 bytes.
         /// </summary>
 #if NETCF
         public const int WorkingBufferSizeDefault = 8192;
@@ -122,7 +116,7 @@ namespace Orion.Crypto.Stream.zlib
         public const int WorkingBufferSizeDefault = 16384;
 #endif
         /// <summary>
-        /// The minimum size of the working buffer used in the ZlibCodec class.  Currently it is 128 bytes.
+        ///     The minimum size of the working buffer used in the ZlibCodec class.  Currently it is 128 bytes.
         /// </summary>
         public const int WorkingBufferSizeMin = 1024;
     }

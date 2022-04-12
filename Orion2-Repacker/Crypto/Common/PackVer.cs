@@ -15,20 +15,20 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Stream;
 using System;
 using System.IO;
+using Orion.Crypto.Stream;
 
 namespace Orion.Crypto.Common
 {
     public class PackVer
     {
         public const uint
-            MS2F = 0x4632534D,  //Ver1
-            NS2F = 0x4632534E,  //Ver2
-            OS2F = 0x4632534F,  //Ver3
-            PS2F = 0x46325350   //Ver3
-        ;
+            MS2F = 0x4632534D, //Ver1
+            NS2F = 0x4632534E, //Ver2
+            OS2F = 0x4632534F, //Ver3
+            PS2F = 0x46325350 //Ver3
+            ;
 
         /*
          * Creates a new packed stream based on the type of version.
@@ -43,16 +43,16 @@ namespace Orion.Crypto.Common
             uint uVer = pHeader.ReadUInt32();
             switch (uVer)
             {
-                case PackVer.MS2F:
+                case MS2F:
                     return PackStreamVer1.ParseHeader(pHeader);
-                case PackVer.NS2F:
+                case NS2F:
                     return PackStreamVer2.ParseHeader(pHeader);
-                case PackVer.OS2F:
-                case PackVer.PS2F:
+                case OS2F:
+                case PS2F:
                     return PackStreamVer3.ParseHeader(pHeader, uVer);
             }
 
-            throw new Exception(string.Format("Unknown file version read from stream ({0})", uVer));
+            throw new Exception($"Unknown file version read from stream ({uVer})");
         }
     }
 }

@@ -15,51 +15,37 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Common;
 using System.Collections.Generic;
 using System.IO;
+using Orion.Crypto.Common;
 
 namespace Orion.Crypto.Stream
 {
     public class PackStreamVer2 : IPackStreamVerBase
     {
-        private uint dwFileListCount;
-        private ulong dwCompressedDataSize;
-        private ulong dwEncodedDataSize;
-        private ulong dwHeaderSize;
-        private ulong dwCompressedHeaderSize;
-        private ulong dwEncodedHeaderSize;
-        private ulong dwDataSize;
         private readonly List<PackFileEntry> aFileList;
+        private ulong dwCompressedDataSize;
+        private ulong dwCompressedHeaderSize;
+        private ulong dwDataSize;
+        private ulong dwEncodedDataSize;
+        private ulong dwEncodedHeaderSize;
+        private uint dwFileListCount;
+        private ulong dwHeaderSize;
 
         private PackStreamVer2()
         {
-            this.aFileList = new List<PackFileEntry>();
-        }
-
-        public static PackStreamVer2 ParseHeader(BinaryReader pReader)
-        {
-            return new PackStreamVer2
-            {
-                dwFileListCount = pReader.ReadUInt32(),
-                dwCompressedDataSize = pReader.ReadUInt64(),
-                dwEncodedDataSize = pReader.ReadUInt64(),
-                dwHeaderSize = pReader.ReadUInt64(),
-                dwCompressedHeaderSize = pReader.ReadUInt64(),
-                dwEncodedHeaderSize = pReader.ReadUInt64(),
-                dwDataSize = pReader.ReadUInt64()
-            };
+            aFileList = new List<PackFileEntry>();
         }
 
         public void Encode(BinaryWriter pWriter)
         {
-            pWriter.Write(this.dwFileListCount);
-            pWriter.Write(this.dwCompressedDataSize);
-            pWriter.Write(this.dwEncodedDataSize);
-            pWriter.Write(this.dwHeaderSize);
-            pWriter.Write(this.dwCompressedHeaderSize);
-            pWriter.Write(this.dwEncodedHeaderSize);
-            pWriter.Write(this.dwDataSize);
+            pWriter.Write(dwFileListCount);
+            pWriter.Write(dwCompressedDataSize);
+            pWriter.Write(dwEncodedDataSize);
+            pWriter.Write(dwHeaderSize);
+            pWriter.Write(dwCompressedHeaderSize);
+            pWriter.Write(dwEncodedHeaderSize);
+            pWriter.Write(dwDataSize);
         }
 
         public uint GetVer()
@@ -109,37 +95,51 @@ namespace Orion.Crypto.Stream
 
         public void SetCompressedHeaderSize(ulong uCompressed)
         {
-            this.dwCompressedHeaderSize = uCompressed;
+            dwCompressedHeaderSize = uCompressed;
         }
 
         public void SetEncodedHeaderSize(ulong uEncoded)
         {
-            this.dwEncodedHeaderSize = uEncoded;
+            dwEncodedHeaderSize = uEncoded;
         }
 
         public void SetHeaderSize(ulong uSize)
         {
-            this.dwHeaderSize = uSize;
+            dwHeaderSize = uSize;
         }
 
         public void SetCompressedDataSize(ulong uCompressed)
         {
-            this.dwCompressedDataSize = uCompressed;
+            dwCompressedDataSize = uCompressed;
         }
 
         public void SetEncodedDataSize(ulong uEncoded)
         {
-            this.dwEncodedDataSize = uEncoded;
+            dwEncodedDataSize = uEncoded;
         }
 
         public void SetDataSize(ulong uSize)
         {
-            this.dwDataSize = uSize;
+            dwDataSize = uSize;
         }
 
         public void SetFileListCount(ulong uCount)
         {
-            this.dwFileListCount = (uint)uCount;
+            dwFileListCount = (uint) uCount;
+        }
+
+        public static PackStreamVer2 ParseHeader(BinaryReader pReader)
+        {
+            return new PackStreamVer2
+            {
+                dwFileListCount = pReader.ReadUInt32(),
+                dwCompressedDataSize = pReader.ReadUInt64(),
+                dwEncodedDataSize = pReader.ReadUInt64(),
+                dwHeaderSize = pReader.ReadUInt64(),
+                dwCompressedHeaderSize = pReader.ReadUInt64(),
+                dwEncodedHeaderSize = pReader.ReadUInt64(),
+                dwDataSize = pReader.ReadUInt64()
+            };
         }
     }
 }

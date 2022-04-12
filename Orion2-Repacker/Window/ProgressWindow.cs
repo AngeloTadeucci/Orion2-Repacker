@@ -15,55 +15,52 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Stream;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Orion.Crypto.Stream;
 
 namespace Orion.Window
 {
     public partial class ProgressWindow : Form
     {
-        private string sPath;
         private Stopwatch pStopWatch;
-
-        public string FileName { get; set; }
-        public IPackStreamVerBase Stream { get; set; }
-        public long ElapsedTime { get; set; }
+        private string sPath;
 
         public ProgressWindow()
         {
             InitializeComponent();
         }
 
+        public string FileName { get; set; }
+        public IPackStreamVerBase Stream { get; set; }
+        public long ElapsedTime { get; set; }
+
+        public string Path
+        {
+            get => sPath;
+            set
+            {
+                sPath = value;
+
+                FileName = sPath.Substring(sPath.LastIndexOf('/') + 1).Split('.')[0];
+            }
+        }
+
         public void UpdateProgressBar(int nProgress)
         {
-            this.pProgressBar.Value = nProgress;
-            this.pSaveInfo.Text = string.Format("Saving {0} ... {1}%", this.FileName, this.pProgressBar.Value);
+            pProgressBar.Value = nProgress;
+            pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
         }
 
         public void Start()
         {
-            this.pStopWatch = Stopwatch.StartNew();
+            pStopWatch = Stopwatch.StartNew();
         }
 
         public void Finish()
         {
-            this.ElapsedTime = this.pStopWatch.ElapsedMilliseconds;
-            this.pStopWatch.Stop();
-        }
-
-        public string Path
-        {
-            get
-            {
-                return sPath;
-            }
-            set
-            {
-                this.sPath = value;
-
-                this.FileName = this.sPath.Substring(this.sPath.LastIndexOf('/') + 1).Split('.')[0];
-            }
+            ElapsedTime = pStopWatch.ElapsedMilliseconds;
+            pStopWatch.Stop();
         }
     }
 }

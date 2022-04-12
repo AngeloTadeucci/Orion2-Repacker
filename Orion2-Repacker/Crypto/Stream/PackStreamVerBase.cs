@@ -15,15 +15,14 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Common;
 using System.Collections.Generic;
 using System.IO;
+using Orion.Crypto.Common;
 
 namespace Orion.Crypto.Stream
 {
     public interface IPackStreamVerBase
     {
-
         uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 
         ulong GetCompressedHeaderSize(); // The total compressed size of the (raw) file list
