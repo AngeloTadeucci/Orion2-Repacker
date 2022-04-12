@@ -127,6 +127,7 @@ namespace Orion.Window
             this.pSaveWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pEntryValue = new System.Windows.Forms.Label();
             this.pTextData = new ScintillaNET.Scintilla();
+            this.extractWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pImageData)).BeginInit();
             this.pImagePanel.SuspendLayout();
@@ -338,8 +339,8 @@ namespace Orion.Window
             // 
             this.createItemToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.createItemToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
-            this.createItemToolStripMenuItem.Name = "testToolStripMenuItem";
             this.createItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.createItemToolStripMenuItem.Name = "createItemToolStripMenuItem";
             this.createItemToolStripMenuItem.Text = "Add item helper";
             this.createItemToolStripMenuItem.Click += new System.EventHandler(this.OnCreateItem);
             // 
@@ -460,6 +461,12 @@ namespace Orion.Window
             this.pTextData.TabIndex = 9;
             this.pTextData.Visible = false;
             // 
+            // extractWorkerThread
+            // 
+            this.extractWorkerThread.DoWork += new System.ComponentModel.DoWorkEventHandler(this.extractWorkerThread_DoWork);
+            this.extractWorkerThread.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.OnSaveProgress);
+            this.extractWorkerThread.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.OnSaveComplete);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -524,6 +531,7 @@ namespace Orion.Window
         private ScintillaNET.Scintilla pTextData;
         private ToolStripMenuItem addFolderToolStripMenuItem;
         private ToolStripMenuItem createItemToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker extractWorkerThread;
     }
 }
 
