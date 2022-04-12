@@ -1,6 +1,7 @@
 ## This fork changes:
  * Add folder and item button working;
  * Search button working;
+ * Exporting progress bar. No more "App is not responding"
 
 # Orion2 Repacker
 Orion2 Repacker - A HaRepacker for MapleStory2!
