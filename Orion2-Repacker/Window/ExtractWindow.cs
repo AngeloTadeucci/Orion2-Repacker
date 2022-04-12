@@ -23,12 +23,12 @@ namespace Orion.Window
 {
     public partial class ExtractWindow : Form
     {
-        private string sPath;
         private Stopwatch pStopWatch;
 
-        public string FileName { get; set; }
         public PackNode PackNode { get; set; }
         public long ElapsedTime { get; set; }
+        public string Path { get; set; }
+
 
         public ExtractWindow()
         {
@@ -57,20 +57,6 @@ namespace Orion.Window
             pProgressBar.Maximum = size;
             pProgressBar.Step = 1;
             pProgressBar.Value = 0;
-        }
-
-        public string Path
-        {
-            get
-            {
-                return sPath;
-            }
-            set
-            {
-                this.sPath = value;
-
-                this.FileName = this.sPath.Substring(this.sPath.LastIndexOf('/') + 1).Split('.')[0];
-            }
         }
     }
 }
