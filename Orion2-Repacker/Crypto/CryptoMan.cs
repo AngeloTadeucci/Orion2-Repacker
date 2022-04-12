@@ -28,14 +28,14 @@ namespace Orion.Crypto
     {
         public class BufferManipulation
         {
-            public const uint 
+            public const uint
                 /*
                  * Standard crypto: Base64 Encoded + AES Encrypted buffers.
                  * 
                  * mov  [dwBufferFlag], 0
                  * mov  byte ptr [dwBufferFlag+3], 0xEE
                 */
-                AES         = 0xEE000000,
+                AES = 0xEE000000,
                 /*
                  * AES buffers who have been additionally compressed with zlib.
                  * NOTE: The first bit is the level of compression used.
@@ -44,14 +44,14 @@ namespace Orion.Crypto
                  * mov  byte ptr [dwBufferFlag], 9
                  * mov  byte ptr [dwBufferFlag+3], 0xEE
                 */
-                AES_ZLIB    = AES | 9,
+                AES_ZLIB = AES | 9,
                 /*
                  * Alternative crypto: XOR Encrypted buffers.
                  * 
                  * mov  [dwBufferFlag], 0
                  * mov  byte ptr [dwBufferFlag+3], 0xFF
                 */
-                XOR         = 0xFF000000,
+                XOR = 0xFF000000,
                 /*
                  * XOR buffers who have been additionally compressed with zlib.
                  * NOTE: The first bit is the level of compression used.
@@ -60,7 +60,7 @@ namespace Orion.Crypto
                  * mov  byte ptr [dwBufferFlag], 9
                  * mov  byte ptr [dwBufferFlag+3], 0xFF
                 */
-                XOR_ZLIB    = XOR | 9
+                XOR_ZLIB = XOR | 9
             ;
         }
 
@@ -129,7 +129,8 @@ namespace Orion.Crypto
                 // Decrypt the AES encrypted block
                 AESCipher pCipher = new AESCipher(aKey, aIV);
                 pCipher.TransformBlock(pSrc, 0, uLen, pSrc, 0);
-            } else
+            }
+            else
             {
                 // Decrypt the XOR encrypted block
                 pSrc = EncryptXOR(uVer, pSrc, uLen);
@@ -152,14 +153,15 @@ namespace Orion.Crypto
             if (bits[0] != 0)
             {
                 pEncrypted = ZlibStream.CompressBuffer(pSrc);
-            } else
+            }
+            else
             {
                 pEncrypted = new byte[pSrc.Length];
                 Buffer.BlockCopy(pSrc, 0, pEncrypted, 0, pSrc.Length);
             }
 
-            uLen = (uint) pSrc.Length;
-            uLenCompressed = (uint) pEncrypted.Length;
+            uLen = (uint)pSrc.Length;
+            uLenCompressed = (uint)pEncrypted.Length;
 
             if (!((bits[3] & 1) != 0))
             {
@@ -172,18 +174,20 @@ namespace Orion.Crypto
 
                 // Encode the encrypted data into a base64 encoded string
                 pEncrypted = Encoding.UTF8.GetBytes(Convert.ToBase64String(pEncrypted));
-            } else
+            }
+            else
             {
                 // Perform XOR block encryption
                 pEncrypted = EncryptXOR(uVer, pEncrypted, uLen);
             }
-            
-            uLenEncoded = (uint) pEncrypted.Length;
+
+            uLenEncoded = (uint)pEncrypted.Length;
 
             return pEncrypted;
         }
 
-        private static byte[] EncryptXOR(uint uVer, byte[] pSrc, uint uLen) {
+        private static byte[] EncryptXOR(uint uVer, byte[] pSrc, uint uLen)
+        {
 
             CipherKeys.GetXORKey(uVer, out byte[] aKey);
 

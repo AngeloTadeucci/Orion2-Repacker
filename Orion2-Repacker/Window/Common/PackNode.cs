@@ -25,7 +25,7 @@ namespace Orion.Window.Common
     {
         private byte[] pData;
 
-        public PackNode(object pItem, string sName) 
+        public PackNode(object pItem, string sName)
             : base()
         {
             this.Name = sName;
@@ -70,7 +70,8 @@ namespace Orion.Window.Common
                 if (this.Tag is PackFileEntry)
                 {
                     return (this.Tag as PackFileEntry).Data;
-                } else
+                }
+                else
                 {
                     return pData;
                 }
@@ -80,7 +81,8 @@ namespace Orion.Window.Common
                 if (this.Tag is PackFileEntry)
                 {
                     (this.Tag as PackFileEntry).Data = value;
-                } else
+                }
+                else
                 {
                     this.pData = value;
                 }

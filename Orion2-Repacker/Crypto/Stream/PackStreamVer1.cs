@@ -52,7 +52,7 @@ namespace Orion.Crypto.Stream
                 dwDataSize = pReader.ReadUInt64()
             };
         }
-        
+
         public void Encode(BinaryWriter pWriter)
         {
             pWriter.Write(this.uReserved);

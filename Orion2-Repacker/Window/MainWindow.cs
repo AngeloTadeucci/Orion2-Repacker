@@ -27,11 +27,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
-using System.Linq;
-using System.Reflection;
 using static Orion.Crypto.CryptoMan;
 
 namespace Orion.Window
@@ -42,6 +39,7 @@ namespace Orion.Window
         private PackNodeList pNodeList;
         private MemoryMappedFile pDataMappedMemFile;
         private ProgressWindow pProgress;
+        private ExtractWindow extractWindow;
 
         public MainWindow()
         {
@@ -629,36 +627,21 @@ namespace Orion.Window
                             Directory.CreateDirectory(sPath.ToString());
                         }
 
-                        foreach (PackNode pRootChild in pNode.Nodes)
+                        extractWindow = new ExtractWindow
                         {
-                            if (pRootChild.Tag != null && pRootChild.Tag is PackNodeList)
-                            {
-                                OnExportNodeList(sPath.ToString() + pRootChild.Name, pRootChild.Tag as PackNodeList);
-                            }
-                            else if (pRootChild.Tag != null && pRootChild.Tag is PackFileEntry)
-                            {
-                                PackFileEntry pEntry = pRootChild.Tag as PackFileEntry;
-                                IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
-                                if (pFileHeader != null)
-                                {
-                                    PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
-                                    if (pChild.Data == null)
-                                    {
-                                        pChild.Data = CryptoMan.DecryptData(pFileHeader, pDataMappedMemFile);
-                                        File.WriteAllBytes(sPath + pChild.Name, pChild.Data);
+                            Path = sPath.ToString(),
+                            PackNode = pNode
+                        };
 
-                                        // Nullify the data as it was previously.
-                                        pChild.Data = null;
-                                    }
-                                    else
-                                    {
-                                        File.WriteAllBytes(sPath + pChild.Name, pChild.Data);
-                                    }
-                                }
-                            }
-                        }
+                        extractWindow.Show(this);
+                        // Why do you make this so complicated C#? 
+                        int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
+                        int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
+                        extractWindow.SetDesktopLocation(x, y);
+                        extractWindow.SetProgressBarSize(pNode.Nodes.Count);
 
-                        NotifyMessage(string.Format("Successfully exported to {0}", sPath), MessageBoxIcon.Information);
+                        extractWorkerThread.WorkerReportsProgress = true;
+                        extractWorkerThread.RunWorkerAsync();
                     }
                 }
                 else if (pNode.Tag is PackFileEntry)
@@ -1290,13 +1273,13 @@ namespace Orion.Window
         {
             if (e.Error != null)
             {
-                MessageBox.Show(pProgress, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(extractWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            pProgress.Finish();
-            pProgress.Close();
+            extractWindow.Finish();
+            extractWindow.Close();
 
-            TimeSpan pInterval = TimeSpan.FromMilliseconds(pProgress.ElapsedTime);
-            NotifyMessage(string.Format("Successfully saved in {0} minutes and {1} seconds!", pInterval.Minutes, pInterval.Seconds), MessageBoxIcon.Information);
+            TimeSpan pInterval = TimeSpan.FromMilliseconds(extractWindow.ElapsedTime);
+            NotifyMessage(string.Format("Successfully exported in {0} minutes and {1} seconds!", pInterval.Minutes, pInterval.Seconds), MessageBoxIcon.Information);
 
             // Perform heavy cleanup
             System.GC.Collect();
@@ -1304,7 +1287,7 @@ namespace Orion.Window
 
         private void OnSaveProgress(object sender, ProgressChangedEventArgs e)
         {
-            pProgress.UpdateProgressBar(e.ProgressPercentage);
+            extractWindow.UpdateProgressBar(e.ProgressPercentage);
         }
 
         private void SaveData(string sDataPath, List<PackFileEntry> aEntry)
@@ -1501,42 +1484,87 @@ namespace Orion.Window
         #endregion
 
         #region Helpers - Export
-        private void OnExportNodeList(string sDir, PackNodeList pList)
+        private void OnExportNodeList(string extractPath, PackNodeList nodeList)
         {
-            if (!Directory.Exists(sDir))
-            {
-                Directory.CreateDirectory(sDir);
-            }
+            Directory.CreateDirectory(extractPath);
 
-            foreach (KeyValuePair<string, PackNodeList> pChild in pList.Children)
+            foreach (KeyValuePair<string, PackNodeList> pChild in nodeList.Children)
             {
                 //PackNode pGrandChild = new PackNode(pChild.Value, pChild.Key);
-                if (!Directory.Exists(sDir + pChild.Key))
-                {
-                    Directory.CreateDirectory(sDir + pChild.Key);
-                }
-                OnExportNodeList(sDir + pChild.Key, pChild.Value);
+
+                Directory.CreateDirectory(extractPath + pChild.Key);
+                OnExportNodeList(extractPath + pChild.Key, pChild.Value);
             }
 
-            foreach (PackFileEntry pEntry in pList.Entries.Values)
+            foreach (PackFileEntry pEntry in nodeList.Entries.Values)
             {
                 IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
-                if (pFileHeader != null)
+                if (pFileHeader == null)
                 {
-                    PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
-                    if (pChild.Data == null)
+                    continue;
+                }
+
+                PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
+                if (pChild.Data == null)
+                {
+                    pChild.Data = CryptoMan.DecryptData(pFileHeader, pDataMappedMemFile);
+                    File.WriteAllBytes(extractPath + pChild.Name, pChild.Data);
+
+                    // Nullify the data as it was previously.
+                    pChild.Data = null;
+                }
+                else
+                {
+                    File.WriteAllBytes(extractPath + pChild.Name, pChild.Data);
+                }
+            }
+        }
+
+        private void extractWorkerThread_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (!(sender is BackgroundWorker))
+            {
+                return;
+            }
+
+            string sPath = extractWindow.Path;
+            PackNode pNode = extractWindow.PackNode;
+            if (pNode is null)
+            {
+                return;
+            }
+
+            extractWindow.Start();
+            int i = 0;
+            foreach (PackNode pRootChild in pNode.Nodes)
+            {
+                if (pRootChild.Tag != null && pRootChild.Tag is PackNodeList nodeList)
+                {
+                    OnExportNodeList(sPath.ToString() + pRootChild.Name, nodeList);
+                }
+                else if (pRootChild.Tag != null && pRootChild.Tag is PackFileEntry fileEntry)
+                {
+
+                    IPackFileHeaderVerBase pFileHeader = fileEntry.FileHeader;
+                    if (pFileHeader == null)
+                    {
+                        continue;
+                    }
+
+                    PackNode pChild = new PackNode(fileEntry, fileEntry.TreeName);
+                    if (pChild.Data is null)
                     {
                         pChild.Data = CryptoMan.DecryptData(pFileHeader, pDataMappedMemFile);
-                        File.WriteAllBytes(sDir + pChild.Name, pChild.Data);
+                        File.WriteAllBytes(sPath + pChild.Name, pChild.Data);
 
                         // Nullify the data as it was previously.
                         pChild.Data = null;
+                        continue;
                     }
-                    else
-                    {
-                        File.WriteAllBytes(sDir + pChild.Name, pChild.Data);
-                    }
+                    File.WriteAllBytes(sPath + pChild.Name, pChild.Data);
                 }
+
+                extractWorkerThread.ReportProgress(i++);
             }
         }
         #endregion

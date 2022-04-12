@@ -144,7 +144,7 @@ namespace Orion.Crypto.Stream
 
         public void SetFileListCount(ulong uCount)
         {
-            this.dwFileListCount = (uint) uCount;
+            this.dwFileListCount = (uint)uCount;
         }
     }
 }
