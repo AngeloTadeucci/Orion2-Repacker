@@ -15,9 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Window.Common;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Orion.Window.Common;
 
 namespace Orion.Window
 {
@@ -25,31 +25,30 @@ namespace Orion.Window
     {
         private Stopwatch pStopWatch;
 
-        public PackNode PackNode { get; set; }
-        public long ElapsedTime { get; set; }
-        public string Path { get; set; }
-
-
         public ExtractWindow()
         {
             InitializeComponent();
         }
 
+        public PackNode PackNode { get; set; }
+        public long ElapsedTime { get; private set; }
+        public string Path { get; set; }
+
         public void UpdateProgressBar(int nProgress)
         {
-            this.pProgressBar.Value = nProgress;
-            this.pSaveInfo.Text = string.Format("Extracting ...");
+            pProgressBar.Value = nProgress;
+            pSaveInfo.Text = "Extracting ...";
         }
 
         public void Start()
         {
-            this.pStopWatch = Stopwatch.StartNew();
+            pStopWatch = Stopwatch.StartNew();
         }
 
         public void Finish()
         {
-            this.ElapsedTime = this.pStopWatch.ElapsedMilliseconds;
-            this.pStopWatch.Stop();
+            ElapsedTime = pStopWatch.ElapsedMilliseconds;
+            pStopWatch.Stop();
         }
 
         public void SetProgressBarSize(int size)

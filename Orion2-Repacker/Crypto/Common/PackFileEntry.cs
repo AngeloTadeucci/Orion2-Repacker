@@ -15,9 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Stream;
 using System;
 using System.Collections.Generic;
+using Orion.Crypto.Stream;
 
 namespace Orion.Crypto.Common
 {
@@ -34,6 +34,13 @@ namespace Orion.Crypto.Common
         public byte[] Data { get; set; } // The raw, decrypted, and current data buffer of the file
         public bool Changed { get; set; } // If the data has been modified in the repacker
 
+        public int CompareTo(PackFileEntry pObj)
+        {
+            if (Index == pObj.Index) return 0;
+
+            return Index > pObj.Index ? 1 : -1;
+        }
+
         public PackFileEntry CreateCopy(byte[] pData = null)
         {
             return new PackFileEntry
@@ -43,28 +50,15 @@ namespace Orion.Crypto.Common
                 Name = Name,
                 TreeName = TreeName,
                 //FileHeader = FileHeader,
-                Data = (pData ?? Data),
+                Data = pData ?? Data,
                 Changed = true
             };
         }
 
-        public int CompareTo(PackFileEntry pObj)
-        {
-            if (Index == pObj.Index)
-            {
-                return 0;
-            }
-
-            return Index > pObj.Index ? 1 : -1;
-        }
-
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(Hash))
-            {
-                return string.Format("{0},{1}\r\n", Index, Name);
-            }
-            return string.Format("{0},{1},{2}\r\n", Index, Hash, Name);
+            if (string.IsNullOrEmpty(Hash)) return $"{Index},{Name}\r\n";
+            return $"{Index},{Hash},{Name}\r\n";
         }
 
         /*
@@ -79,15 +73,16 @@ namespace Orion.Crypto.Common
         {
             List<PackFileEntry> aFileList = new List<PackFileEntry>();
 
-            string[] aEntries = sFileString.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] aEntries = sFileString.Split(new[]
+            {
+                "\r\n"
+            }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string sEntry in aEntries)
             {
                 int nProperties = 0;
                 foreach (char c in sEntry)
-                {
                     if (c == ',')
                         ++nProperties;
-                }
 
                 string sIndex, sName;
                 if (nProperties == 1)

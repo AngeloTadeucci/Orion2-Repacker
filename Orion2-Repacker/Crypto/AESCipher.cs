@@ -25,8 +25,6 @@ namespace Orion.Crypto
         private readonly SymmetricAlgorithm pAlgorithm;
         private readonly ICryptoTransform pCounterEncryptor;
 
-        public int BlockSize { get { return pAlgorithm.BlockSize / 8; } }
-
         /*
          * Constructs a new AES-CTR cipher.
          * 
@@ -36,16 +34,18 @@ namespace Orion.Crypto
         */
         public AESCipher(byte[] aUserKey, byte[] aIV)
         {
-            this.aCounter = aIV;
+            aCounter = aIV;
 
-            this.pAlgorithm = new AesManaged
+            pAlgorithm = new AesManaged
             {
                 Mode = CipherMode.ECB,
                 Padding = PaddingMode.None
             };
 
-            this.pCounterEncryptor = pAlgorithm.CreateEncryptor(aUserKey, new byte[BlockSize]);
+            pCounterEncryptor = pAlgorithm.CreateEncryptor(aUserKey, new byte[BlockSize]);
         }
+
+        private int BlockSize => pAlgorithm.BlockSize / 8;
 
         /*
          * Transforms a block, encrypting/decrypting the specified data.
@@ -69,11 +69,8 @@ namespace Orion.Crypto
 
                 for (int j = 0; j < pXORBlock.Length; j++)
                 {
-                    if ((i + j) >= pDest.Length)
-                    {
-                        break;
-                    }
-                    pDest[Dst + i + j] = (byte)(pSrc[uOffset + i + j] ^ pXORBlock[j]);
+                    if (i + j >= pDest.Length) break;
+                    pDest[Dst + i + j] = (byte) (pSrc[uOffset + i + j] ^ pXORBlock[j]);
                 }
             }
 
@@ -87,10 +84,8 @@ namespace Orion.Crypto
         private void IncrementCounter()
         {
             for (int i = aCounter.Length - 1; i >= 0; i--)
-            {
                 if (++aCounter[i] != 0)
                     break;
-            }
         }
     }
 }

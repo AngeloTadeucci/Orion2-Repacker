@@ -15,9 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Common;
 using System;
 using System.Collections.Generic;
+using Orion.Crypto.Common;
 
 namespace Orion.Window.Common
 {
@@ -26,19 +26,16 @@ namespace Orion.Window.Common
     {
         public const string DATA_FORMAT = "Pack.Node.FileList";
 
-        private readonly Dictionary<string, PackNodeList> mChildren; // <directory, list of nodes>
-        private readonly Dictionary<string, PackFileEntry> mEntries; // <file name, file entry>
-
-        public Dictionary<string, PackNodeList> Children { get { return mChildren; } }
-        public Dictionary<string, PackFileEntry> Entries { get { return mEntries; } }
-        public string Directory { get; private set; }
-
         public PackNodeList(string sDir)
         {
-            this.Directory = sDir;
-            this.mChildren = new Dictionary<string, PackNodeList>();
-            this.mEntries = new Dictionary<string, PackFileEntry>();
+            Directory = sDir;
+            Children = new Dictionary<string, PackNodeList>();
+            Entries = new Dictionary<string, PackFileEntry>();
         }
+
+        public Dictionary<string, PackNodeList> Children { get; }
+        public Dictionary<string, PackFileEntry> Entries { get; }
+        public string Directory { get; private set; }
 
         /*
          * Recursively clear all children/entries within this node list.
@@ -46,13 +43,10 @@ namespace Orion.Window.Common
         */
         public void InternalRelease()
         {
-            mEntries.Clear();
+            Entries.Clear();
 
-            foreach (PackNodeList pChild in mChildren.Values)
-            {
-                pChild.InternalRelease();
-            }
-            mChildren.Clear();
+            foreach (PackNodeList pChild in Children.Values) pChild.InternalRelease();
+            Children.Clear();
         }
     }
 }

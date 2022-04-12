@@ -1659,21 +1659,18 @@ namespace Orion.Crypto.Common
                     aIV = PS2F_IV_CHAIN;
                     break;
                 default:
-                    {
-                        throw new Exception("ERROR generating Key/IV: the specified package version does not exist!");
-                    }
+                {
+                    throw new Exception("ERROR generating Key/IV: the specified package version does not exist!");
+                }
             }
 
             aUserKey = new byte[KEY_LEN];
             aIVChain = new byte[IV_LEN];
             for (int i = 0; i < KEY_LEN; i++)
             {
-                aUserKey[i] = aKey[(uKeyOffset & 0x7F), i];
+                aUserKey[i] = aKey[uKeyOffset & 0x7F, i];
 
-                if (i < IV_LEN)
-                {
-                    aIVChain[i] = aIV[(uKeyOffset & 0x7F), i];
-                }
+                if (i < IV_LEN) aIVChain[i] = aIV[uKeyOffset & 0x7F, i];
             }
         }
 
@@ -1701,11 +1698,9 @@ namespace Orion.Crypto.Common
                     aKey = PS2F_XOR_KEY;
                     break;
                 default:
-                    {
-                        // Nexon always defaults to MS2F here.
-                        aKey = MS2F_XOR_KEY;
-                        break;
-                    }
+                    // Nexon always defaults to MS2F here.
+                    aKey = MS2F_XOR_KEY;
+                    break;
             }
         }
     }

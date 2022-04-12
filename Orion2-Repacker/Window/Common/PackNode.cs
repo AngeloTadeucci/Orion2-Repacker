@@ -15,9 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using Orion.Crypto.Common;
 using System.Text;
 using System.Windows.Forms;
+using Orion.Crypto.Common;
 
 namespace Orion.Window.Common
 {
@@ -26,11 +26,10 @@ namespace Orion.Window.Common
         private byte[] pData;
 
         public PackNode(object pItem, string sName)
-            : base()
         {
-            this.Name = sName;
-            this.Text = sName;
-            this.Tag = pItem;
+            Name = sName;
+            Text = sName;
+            Tag = pItem;
         }
 
         /* Generate the full current path of this node within the tree */
@@ -38,7 +37,7 @@ namespace Orion.Window.Common
         {
             get
             {
-                string[] aPath = new string[this.Level];
+                string[] aPath = new string[Level];
 
                 TreeNode pNode = this;
                 for (int i = 0; i < aPath.Length; i++)
@@ -46,17 +45,11 @@ namespace Orion.Window.Common
                     aPath[i] = pNode.Name;
 
                     pNode = pNode.Parent;
-                    if (pNode == null)
-                    {
-                        break;
-                    }
+                    if (pNode == null) break;
                 }
 
                 StringBuilder sPath = new StringBuilder();
-                for (int i = aPath.Length - 1; i >= 0; i--)
-                {
-                    sPath.Append(aPath[i]);
-                }
+                for (int i = aPath.Length - 1; i >= 0; i--) sPath.Append(aPath[i]);
 
                 return sPath.ToString();
             }
@@ -65,27 +58,13 @@ namespace Orion.Window.Common
         /* Return the decrypted data block from the entry */
         public byte[] Data
         {
-            get
-            {
-                if (this.Tag is PackFileEntry)
-                {
-                    return (this.Tag as PackFileEntry).Data;
-                }
-                else
-                {
-                    return pData;
-                }
-            }
+            get => Tag is PackFileEntry ? (Tag as PackFileEntry).Data : pData;
             set
             {
-                if (this.Tag is PackFileEntry)
-                {
-                    (this.Tag as PackFileEntry).Data = value;
-                }
+                if (Tag is PackFileEntry)
+                    (Tag as PackFileEntry).Data = value;
                 else
-                {
-                    this.pData = value;
-                }
+                    pData = value;
             }
         }
     }

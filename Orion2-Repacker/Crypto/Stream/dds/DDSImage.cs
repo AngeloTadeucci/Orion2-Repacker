@@ -1,19 +1,14 @@
-﻿using Pfim;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Pfim;
+using ImageFormat = Pfim.ImageFormat;
 
 namespace Orion.Crypto.Stream.DDS
 {
     public class DDSImage : IDisposable
     {
         private readonly IImage _image;
-        private Bitmap _bitmap;
-
-        public Bitmap BitmapImage
-        {
-            get { return _bitmap; }
-        }
 
         public DDSImage(byte[] ddsImage)
         {
@@ -39,12 +34,14 @@ namespace Orion.Crypto.Stream.DDS
             Parse();
         }
 
+        public Bitmap BitmapImage { get; private set; }
+
         public void Dispose()
         {
-            if (_bitmap != null)
+            if (BitmapImage != null)
             {
-                _bitmap.Dispose();
-                _bitmap = null;
+                BitmapImage.Dispose();
+                BitmapImage = null;
             }
         }
 
@@ -56,20 +53,20 @@ namespace Orion.Crypto.Stream.DDS
             if (_image.Compressed)
                 _image.Decompress();
 
-            _bitmap = CreateBitmap(_image);
+            BitmapImage = CreateBitmap(_image);
         }
 
         private Bitmap CreateBitmap(IImage image)
         {
-            var pxFormat = PixelFormat.Format24bppRgb;
-            if (image.Format == Pfim.ImageFormat.Rgba32)
+            PixelFormat pxFormat = PixelFormat.Format24bppRgb;
+            if (image.Format == ImageFormat.Rgba32)
                 pxFormat = PixelFormat.Format32bppArgb;
 
             unsafe
             {
                 fixed (byte* bytePtr = image.Data)
                 {
-                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr)bytePtr);
+                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr) bytePtr);
                 }
             }
         }

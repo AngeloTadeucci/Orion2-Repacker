@@ -24,56 +24,39 @@ namespace Orion.Crypto.Stream
         private readonly uint uVer;
         private uint dwBufferFlag;
         private int nFileIndex;
-        private uint uEncodedFileSize;
-        private int[] Reserved;
+        private readonly int[] Reserved;
         private ulong uCompressedFileSize;
+        private uint uEncodedFileSize;
         private ulong uFileSize;
         private ulong uOffset;
 
         private PackFileHeaderVer3(uint uVer)
         {
             this.uVer = uVer;
-            this.Reserved = new int[1];
+            Reserved = new int[1];
         }
 
         public PackFileHeaderVer3(uint uVer, BinaryReader pReader)
             : this(uVer)
         {
-            this.dwBufferFlag = pReader.ReadUInt32();        //[ecx+8]
-            this.nFileIndex = pReader.ReadInt32();           //[ecx+12]
-            this.uEncodedFileSize = pReader.ReadUInt32();    //[ecx+16]
-            this.Reserved[0] = pReader.ReadInt32();          //[ecx+20]
-            this.uCompressedFileSize = pReader.ReadUInt64(); //[ecx+24] | [ecx+28]
-            this.uFileSize = pReader.ReadUInt64();           //[ecx+32] | [ecx+36]
-            this.uOffset = pReader.ReadUInt64();             //[ecx+40] | [ecx+44]
-        }
-
-        public static PackFileHeaderVer3 CreateHeader(uint uVer, int nIndex, uint dwFlag, ulong uOffset, byte[] pData)
-        {
-            uint uLen, uCompressedLen, uEncodedLen;
-
-            CryptoMan.Encrypt(uVer, pData, dwFlag, out uLen, out uCompressedLen, out uEncodedLen);
-
-            return new PackFileHeaderVer3(uVer)
-            {
-                dwBufferFlag = dwFlag,
-                nFileIndex = nIndex,
-                uEncodedFileSize = uEncodedLen,
-                uCompressedFileSize = uCompressedLen,
-                uFileSize = uLen,
-                uOffset = uOffset
-            };
+            dwBufferFlag = pReader.ReadUInt32(); //[ecx+8]
+            nFileIndex = pReader.ReadInt32(); //[ecx+12]
+            uEncodedFileSize = pReader.ReadUInt32(); //[ecx+16]
+            Reserved[0] = pReader.ReadInt32(); //[ecx+20]
+            uCompressedFileSize = pReader.ReadUInt64(); //[ecx+24] | [ecx+28]
+            uFileSize = pReader.ReadUInt64(); //[ecx+32] | [ecx+36]
+            uOffset = pReader.ReadUInt64(); //[ecx+40] | [ecx+44]
         }
 
         public void Encode(BinaryWriter pWriter)
         {
-            pWriter.Write(this.dwBufferFlag);
-            pWriter.Write(this.nFileIndex);
-            pWriter.Write(this.uEncodedFileSize);
-            pWriter.Write(this.Reserved[0]);
-            pWriter.Write(this.uCompressedFileSize);
-            pWriter.Write(this.uFileSize);
-            pWriter.Write(this.uOffset);
+            pWriter.Write(dwBufferFlag);
+            pWriter.Write(nFileIndex);
+            pWriter.Write(uEncodedFileSize);
+            pWriter.Write(Reserved[0]);
+            pWriter.Write(uCompressedFileSize);
+            pWriter.Write(uFileSize);
+            pWriter.Write(uOffset);
         }
 
         public uint GetVer()
@@ -113,7 +96,7 @@ namespace Orion.Crypto.Stream
 
         public void SetFileIndex(int nIndex)
         {
-            this.nFileIndex = nIndex;
+            nFileIndex = nIndex;
         }
 
         public void SetOffset(ulong uOffset)
@@ -123,17 +106,34 @@ namespace Orion.Crypto.Stream
 
         public void SetEncodedFileSize(uint uEncoded)
         {
-            this.uEncodedFileSize = uEncoded;
+            uEncodedFileSize = uEncoded;
         }
 
         public void SetCompressedFileSize(ulong uCompressed)
         {
-            this.uCompressedFileSize = uCompressed;
+            uCompressedFileSize = uCompressed;
         }
 
         public void SetFileSize(ulong uSize)
         {
-            this.uFileSize = uSize;
+            uFileSize = uSize;
+        }
+
+        public static PackFileHeaderVer3 CreateHeader(uint uVer, int nIndex, uint dwFlag, ulong uOffset, byte[] pData)
+        {
+            uint uLen, uCompressedLen, uEncodedLen;
+
+            CryptoMan.Encrypt(uVer, pData, dwFlag, out uLen, out uCompressedLen, out uEncodedLen);
+
+            return new PackFileHeaderVer3(uVer)
+            {
+                dwBufferFlag = dwFlag,
+                nFileIndex = nIndex,
+                uEncodedFileSize = uEncodedLen,
+                uCompressedFileSize = uCompressedLen,
+                uFileSize = uLen,
+                uOffset = uOffset
+            };
         }
     }
 }
