@@ -50,7 +50,8 @@ namespace Orion.Crypto.Common
 
         public int CompareTo(PackFileEntry pObj)
         {
-            if (Index == pObj.Index) {
+            if (Index == pObj.Index)
+            {
                 return 0;
             }
 
@@ -99,7 +100,8 @@ namespace Orion.Crypto.Common
                         Index = int.Parse(sIndex), //atoi(sIndex)
                         Name = sName
                     });
-                } else if (nProperties == 2)
+                }
+                else if (nProperties == 2)
                 {
                     sIndex = sEntry.Split(',')[0]; //strtok(pStr, ",")
                     sName = sEntry.Split(',')[2]; //if (nPropertyIdx == 1)

@@ -69,7 +69,7 @@ namespace Orion.Crypto.Stream.DDS
             {
                 fixed (byte* bytePtr = image.Data)
                 {
-                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr) bytePtr);
+                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr)bytePtr);
                 }
             }
         }

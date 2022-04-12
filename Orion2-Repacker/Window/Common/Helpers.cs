@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Orion.Window.Common
 {
     public static class Helpers
-    { 
+    {
         public static string CreateHash(string sHeaderUOL)
         {
             if (!File.Exists(sHeaderUOL))
