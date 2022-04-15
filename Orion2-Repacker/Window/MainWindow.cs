@@ -1271,7 +1271,27 @@ namespace Orion.Window
             pEntry.Changed = true;
         }
 
+        private void OnSaveProgress(object sender, ProgressChangedEventArgs e)
+        {
+            pProgress.UpdateProgressBar(e.ProgressPercentage);
+        }
+
         private void OnSaveComplete(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null) MessageBox.Show(pProgress, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            pProgress.Finish();
+            pProgress.Close();
+
+            TimeSpan pInterval = TimeSpan.FromMilliseconds(pProgress.ElapsedTime);
+            NotifyMessage($"Successfully saved in {pInterval.Minutes} minutes and {pInterval.Seconds} seconds!",
+                MessageBoxIcon.Information);
+
+            // Perform heavy cleanup
+            GC.Collect();
+        }
+
+        private void OnExtractComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error != null) MessageBox.Show(extractWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -1286,7 +1306,7 @@ namespace Orion.Window
             GC.Collect();
         }
 
-        private void OnSaveProgress(object sender, ProgressChangedEventArgs e)
+        private void OnExtractProgress(object sender, ProgressChangedEventArgs e)
         {
             extractWindow.UpdateProgressBar(e.ProgressPercentage);
         }

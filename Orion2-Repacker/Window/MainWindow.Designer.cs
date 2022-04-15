@@ -464,8 +464,8 @@ namespace Orion.Window
             // extractWorkerThread
             // 
             this.extractWorkerThread.DoWork += new System.ComponentModel.DoWorkEventHandler(this.extractWorkerThread_DoWork);
-            this.extractWorkerThread.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.OnSaveProgress);
-            this.extractWorkerThread.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.OnSaveComplete);
+            this.extractWorkerThread.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.OnExtractProgress);
+            this.extractWorkerThread.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.OnExtractComplete);
             // 
             // MainWindow
             // 
