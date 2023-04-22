@@ -1,17 +1,17 @@
 ﻿/*
  *      This file is part of Orion2, a MapleStory2 Packaging Library Project.
  *      Copyright (C) 2018 Eric Smith <notericsoft@gmail.com>
- * 
+ *
  *      This program is free software: you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation, either version 3 of the License, or
  *      (at your option) any later version.
- * 
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU General Public License
  */
 
@@ -118,19 +118,25 @@ namespace Orion.Window
             this.createItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editorSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.themeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.wordWrapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTreeView = new System.Windows.Forms.TreeView();
             this.pEntryName = new System.Windows.Forms.TextBox();
             this.pImageData = new System.Windows.Forms.PictureBox();
             this.pImagePanel = new System.Windows.Forms.Panel();
+            this.webView = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.pUpdateDataBtn = new System.Windows.Forms.Button();
             this.pChangeImageBtn = new System.Windows.Forms.Button();
             this.pSaveWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pEntryValue = new System.Windows.Forms.Label();
-            this.pTextData = new ScintillaNET.Scintilla();
             this.extractWorkerThread = new System.ComponentModel.BackgroundWorker();
             this.pMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pImageData)).BeginInit();
             this.pImagePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).BeginInit();
             this.SuspendLayout();
             // 
             // pMenuStrip
@@ -140,10 +146,11 @@ namespace Orion.Window
             this.pFileMenuStripItem,
             this.editToolStripMenuItem,
             this.toolsToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.helpToolStripMenuItem,
+            this.editorSettingsToolStripMenuItem});
             this.pMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.pMenuStrip.Name = "pMenuStrip";
-            this.pMenuStrip.Size = new System.Drawing.Size(1045, 24);
+            this.pMenuStrip.Size = new System.Drawing.Size(1039, 24);
             this.pMenuStrip.TabIndex = 0;
             this.pMenuStrip.Text = "menuStrip1";
             // 
@@ -167,7 +174,7 @@ namespace Orion.Window
             this.pOpenMenuItem.Name = "pOpenMenuItem";
             this.pOpenMenuItem.ShortcutKeyDisplayString = "Ctrl+O";
             this.pOpenMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.pOpenMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pOpenMenuItem.Size = new System.Drawing.Size(154, 22);
             this.pOpenMenuItem.Text = "Open";
             this.pOpenMenuItem.Click += new System.EventHandler(this.OnLoadFile);
             // 
@@ -178,7 +185,7 @@ namespace Orion.Window
             this.pSaveMenuItem.Name = "pSaveMenuItem";
             this.pSaveMenuItem.ShortcutKeyDisplayString = "Ctrl+S";
             this.pSaveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.pSaveMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pSaveMenuItem.Size = new System.Drawing.Size(154, 22);
             this.pSaveMenuItem.Text = "Save";
             this.pSaveMenuItem.Click += new System.EventHandler(this.OnSaveFile);
             // 
@@ -189,7 +196,7 @@ namespace Orion.Window
             this.pReloadMenuItem.Name = "pReloadMenuItem";
             this.pReloadMenuItem.ShortcutKeyDisplayString = "Ctrl+R";
             this.pReloadMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.pReloadMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pReloadMenuItem.Size = new System.Drawing.Size(154, 22);
             this.pReloadMenuItem.Text = "Reload";
             this.pReloadMenuItem.Click += new System.EventHandler(this.OnReloadFile);
             // 
@@ -200,7 +207,7 @@ namespace Orion.Window
             this.pUnloadMenuItem.Name = "pUnloadMenuItem";
             this.pUnloadMenuItem.ShortcutKeyDisplayString = "Ctrl+U";
             this.pUnloadMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
-            this.pUnloadMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pUnloadMenuItem.Size = new System.Drawing.Size(154, 22);
             this.pUnloadMenuItem.Text = "Unload";
             this.pUnloadMenuItem.Click += new System.EventHandler(this.OnUnloadFile);
             // 
@@ -209,7 +216,7 @@ namespace Orion.Window
             this.exitToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.exitToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExit);
             // 
@@ -232,8 +239,8 @@ namespace Orion.Window
             this.addToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.addToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.addToolStripMenuItem.Text = "Add item";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addToolStripMenuItem.Text = "Add items";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.OnAddFile);
             // 
             // addFolderToolStripMenuItem
@@ -241,7 +248,7 @@ namespace Orion.Window
             this.addFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.addFolderToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFolderToolStripMenuItem.Text = "Add folder";
             this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.OnAddFolder);
             // 
@@ -251,7 +258,7 @@ namespace Orion.Window
             this.removeToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
             this.removeToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeToolStripMenuItem.Text = "Remove";
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.OnRemoveFile);
             // 
@@ -261,7 +268,7 @@ namespace Orion.Window
             this.copyToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.OnCopyNode);
             // 
@@ -271,7 +278,7 @@ namespace Orion.Window
             this.pasteToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.OnPasteNode);
             // 
@@ -283,7 +290,7 @@ namespace Orion.Window
             this.collapseToolStripMenuItem});
             this.allNodesToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.allNodesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.allNodesToolStripMenuItem.Text = "All Nodes";
             // 
             // expandToolStripMenuItem
@@ -320,7 +327,7 @@ namespace Orion.Window
             this.exportToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.exportToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.OnExport);
             // 
@@ -331,7 +338,7 @@ namespace Orion.Window
             this.searchToolStripMenuItem.Name = "searchToolStripMenuItem";
             this.searchToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+F";
             this.searchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.searchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.searchToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.searchToolStripMenuItem.Text = "Search";
             this.searchToolStripMenuItem.Click += new System.EventHandler(this.OnSearch);
             // 
@@ -339,8 +346,8 @@ namespace Orion.Window
             // 
             this.createItemToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.createItemToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
-            this.createItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.createItemToolStripMenuItem.Name = "createItemToolStripMenuItem";
+            this.createItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.createItemToolStripMenuItem.Text = "Add item helper";
             this.createItemToolStripMenuItem.Click += new System.EventHandler(this.OnCreateItem);
             // 
@@ -358,9 +365,51 @@ namespace Orion.Window
             this.aboutToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.aboutToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.OnAbout);
+            // 
+            // editorSettingsToolStripMenuItem
+            // 
+            this.editorSettingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.themeToolStripMenuItem,
+            this.wordWrapToolStripMenuItem});
+            this.editorSettingsToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
+            this.editorSettingsToolStripMenuItem.Name = "editorSettingsToolStripMenuItem";
+            this.editorSettingsToolStripMenuItem.Size = new System.Drawing.Size(95, 20);
+            this.editorSettingsToolStripMenuItem.Text = "Editor Settings";
+            // 
+            // themeToolStripMenuItem
+            // 
+            this.themeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lightToolStripMenuItem,
+            this.darkToolStripMenuItem});
+            this.themeToolStripMenuItem.Name = "themeToolStripMenuItem";
+            this.themeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.themeToolStripMenuItem.Text = "Themes";
+            // 
+            // lightToolStripMenuItem
+            // 
+            this.lightToolStripMenuItem.Name = "lightToolStripMenuItem";
+            this.lightToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.lightToolStripMenuItem.Text = "Light";
+            this.lightToolStripMenuItem.Click += new System.EventHandler(this.lightToolStripMenuItem_Click);
+            // 
+            // darkToolStripMenuItem
+            // 
+            this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.darkToolStripMenuItem.Text = "Dark";
+            this.darkToolStripMenuItem.Click += new System.EventHandler(this.darkToolStripMenuItem_Click);
+            // 
+            // wordWrapToolStripMenuItem
+            // 
+            this.wordWrapToolStripMenuItem.Checked = true;
+            this.wordWrapToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.wordWrapToolStripMenuItem.Name = "wordWrapToolStripMenuItem";
+            this.wordWrapToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.wordWrapToolStripMenuItem.Text = "Word Wrap";
+            this.wordWrapToolStripMenuItem.Click += new System.EventHandler(this.wordWrapToolStripMenuItem_Click);
             // 
             // pTreeView
             // 
@@ -387,7 +436,6 @@ namespace Orion.Window
             // 
             // pImageData
             // 
-            this.pImageData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pImageData.Location = new System.Drawing.Point(0, 0);
             this.pImageData.Name = "pImageData";
             this.pImageData.Size = new System.Drawing.Size(580, 579);
@@ -403,6 +451,17 @@ namespace Orion.Window
             this.pImagePanel.Name = "pImagePanel";
             this.pImagePanel.Size = new System.Drawing.Size(580, 579);
             this.pImagePanel.TabIndex = 5;
+            // 
+            // webView
+            // 
+            this.webView.AllowExternalDrop = true;
+            this.webView.CreationProperties = null;
+            this.webView.DefaultBackgroundColor = System.Drawing.Color.White;
+            this.webView.Location = new System.Drawing.Point(455, 53);
+            this.webView.Name = "webView";
+            this.webView.Size = new System.Drawing.Size(575, 579);
+            this.webView.TabIndex = 20;
+            this.webView.ZoomFactor = 1D;
             // 
             // pUpdateDataBtn
             // 
@@ -450,17 +509,6 @@ namespace Orion.Window
             this.pEntryValue.Text = "Empty";
             this.pEntryValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // pTextData
-            // 
-            this.pTextData.CaretForeColor = System.Drawing.Color.White;
-            this.pTextData.IndentationGuides = ScintillaNET.IndentView.LookBoth;
-            this.pTextData.Location = new System.Drawing.Point(453, 53);
-            this.pTextData.Name = "pTextData";
-            this.pTextData.ScrollWidth = 580;
-            this.pTextData.Size = new System.Drawing.Size(580, 579);
-            this.pTextData.TabIndex = 9;
-            this.pTextData.Visible = false;
-            // 
             // extractWorkerThread
             // 
             this.extractWorkerThread.DoWork += new System.ComponentModel.DoWorkEventHandler(this.extractWorkerThread_DoWork);
@@ -472,12 +520,12 @@ namespace Orion.Window
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.ClientSize = new System.Drawing.Size(1045, 644);
+            this.ClientSize = new System.Drawing.Size(1039, 644);
+            this.Controls.Add(this.webView);
             this.Controls.Add(this.pEntryValue);
             this.Controls.Add(this.pChangeImageBtn);
             this.Controls.Add(this.pUpdateDataBtn);
             this.Controls.Add(this.pImagePanel);
-            this.Controls.Add(this.pTextData);
             this.Controls.Add(this.pEntryName);
             this.Controls.Add(this.pTreeView);
             this.Controls.Add(this.pMenuStrip);
@@ -492,6 +540,7 @@ namespace Orion.Window
             ((System.ComponentModel.ISupportInitialize)(this.pImageData)).EndInit();
             this.pImagePanel.ResumeLayout(false);
             this.pImagePanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -528,10 +577,15 @@ namespace Orion.Window
         private Button pChangeImageBtn;
         private System.ComponentModel.BackgroundWorker pSaveWorkerThread;
         private Label pEntryValue;
-        private ScintillaNET.Scintilla pTextData;
         private ToolStripMenuItem addFolderToolStripMenuItem;
         private ToolStripMenuItem createItemToolStripMenuItem;
         private System.ComponentModel.BackgroundWorker extractWorkerThread;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView;
+        private ToolStripMenuItem editorSettingsToolStripMenuItem;
+        private ToolStripMenuItem wordWrapToolStripMenuItem;
+        private ToolStripMenuItem themeToolStripMenuItem;
+        private ToolStripMenuItem lightToolStripMenuItem;
+        private ToolStripMenuItem darkToolStripMenuItem;
     }
 }
 
