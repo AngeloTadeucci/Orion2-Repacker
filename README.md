@@ -1,12 +1,14 @@
 ## This fork changes:
- * Add folder and item button working;
- * Search button working;
- * Exporting progress bar. No more "App is not responding"
+ * Add folder and item button;
+ * VS Code Editor instead of ScintillaNET;
+ * Exporting progress bar. No more "App is not responding";
+ * .NET 7 instead of .NET Framework.
 
 # Orion2 Repacker
 Orion2 Repacker - A HaRepacker for MapleStory2!
 
-[![N|Solid](https://i.imgur.com/C6A3d2j.png)](https://github.com/EricSoftTM/Orion2-Repacker)
+[![N|Solid](https://user-images.githubusercontent.com/15664821/233808955-e1bb6e6e-f72f-4666-961b-16221c826d1d.png)](https://github.com/AngeloTadeucci/Orion2-Repacker)
+
 ----------------------------------------------------------------------
 ## General Features
  * Supports all MS2 file formats (MS2F, NS2F, OS2F, and PS2F)
@@ -34,5 +36,5 @@ The following are currently unable to be rendered, but these external applicatio
  * Gamebryo NIF/KF Files (.nif, .kf, .kfm) - [Noesis](https://richwhitehouse.com/index.php?content=inc_projects.php&showproject=91)
 ## Dependencies
 The Orion2 Repacker utilizes these great libraries:
- * [ScintillaNET](https://github.com/jacobslusser/ScintillaNET) WinForm wrapper of the Scintilla source code editor
+ * [Monaco Editor](https://github.com/microsoft/monaco-editor) The Monaco Editor is the code editor that powers VS Code.
  * [Pfim](https://github.com/nickbabcock/Pfim) DDS decoder
