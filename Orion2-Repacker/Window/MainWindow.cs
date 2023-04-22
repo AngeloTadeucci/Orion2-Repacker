@@ -1,17 +1,17 @@
 ﻿/*
  *      This file is part of Orion2, a MapleStory2 Packaging Library Project.
  *      Copyright (C) 2018 Eric Smith <notericsoft@gmail.com>
- * 
+ *
  *      This program is free software: you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation, either version 3 of the License, or
  *      (at your option) any later version.
- * 
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU General Public License
  */
 
@@ -23,11 +23,13 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Orion.Crypto.Common;
 using Orion.Crypto.Stream;
 using Orion.Crypto.Stream.DDS;
 using Orion.Window.Common;
-using ScintillaNET;
 using static Orion.Crypto.CryptoMan;
 
 namespace Orion.Window
@@ -60,6 +62,60 @@ namespace Orion.Window
             pProgress = null;
 
             UpdatePanel("Empty", null);
+
+            Properties.Settings.Default.Reload();
+            wordWrapToolStripMenuItem.Checked = Properties.Settings.Default.EditorWordWrap;
+            if (Properties.Settings.Default.EditorTheme == "vs")
+            {
+                lightToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                darkToolStripMenuItem.Checked = true;
+            }
+
+            InitializeWebViewAsync();
+        }
+
+        async void InitializeWebViewAsync()
+        {
+            await webView.EnsureCoreWebView2Async(null);
+            webView.CoreWebView2.WebMessageReceived += SaveFile;
+
+
+            await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"window.chrome.webview.addEventListener('message', (event) => {
+                try {
+                    if (event.data.type == 'updateContent') {
+                        editor.setValue(event.data.content);
+                    } else if (event.data.type == 'theme') {
+                        editor.updateOptions({theme: event.data.theme});
+                    } else if (event.data.type == 'wordWrap') {
+                        editor.updateOptions({wordWrap: event.data.wordWrap});
+                    } else if (event.data.type == 'updateSettings') {
+                        delete event.data.type;
+                        editor.updateOptions(event.data);
+                    } else if (event.data.type == 'saveFile') {
+                        window.chrome.webview.postMessage(editor.getValue());
+                    }
+                } catch (error) {
+                    alert(error);
+                }
+            });");
+            webView.Source = new Uri(Path.Combine(Application.StartupPath, @"MonacoEditor\index.html"));
+        }
+
+        private void SaveFile(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Data == null) return;
+
+            if (!(pNode.Tag is PackFileEntry pEntry)) return;
+
+            string sData = e.TryGetWebMessageAsString();
+            byte[] pData = Encoding.UTF8.GetBytes(sData.ToCharArray());
+            if (pNode.Data == pData) return;
+
+            pEntry.Data = pData;
+            pEntry.Changed = true;
         }
 
         private void InitializeTree(IPackStreamVerBase pStream)
@@ -220,12 +276,15 @@ namespace Orion.Window
             string sDataUOL = Dir_BackSlashToSlash(pDialog.FileName);
             sHeaderUOL = sDataUOL.Replace(".m2d", ".m2h");
 
+            string fileName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
             if (!File.Exists(sHeaderUOL))
             {
-                string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
-                NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
+                NotifyMessage($"Unable to load the {fileName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
                 return;
             }
+
+            // Window title
+            Text = "Orion2 Repacker | " + pDialog.FileName;
 
             IPackStreamVerBase pStream;
             using (BinaryReader pHeader = new BinaryReader(File.OpenRead(sHeaderUOL)))
@@ -304,7 +363,7 @@ namespace Orion.Window
                     Stream = pNode.Tag as IPackStreamVerBase
                 };
                 pProgress.Show(this);
-                // Why do you make this so complicated C#? 
+                // Why do you make this so complicated C#?
                 int x = DesktopBounds.Left + (Width - pProgress.Width) / 2;
                 int y = DesktopBounds.Top + (Height - pProgress.Height) / 2;
                 pProgress.SetDesktopLocation(x, y);
@@ -346,6 +405,7 @@ namespace Orion.Window
                 pNodeList = null;
 
                 sHeaderUOL = "";
+                Text = "Orion2 Repacker";
 
                 if (pDataMappedMemFile != null)
                 {
@@ -375,7 +435,7 @@ namespace Orion.Window
         {
             if (pNodeList is null)
             {
-                NotifyMessage("Please load an file first.", MessageBoxIcon.Information);
+                NotifyMessage("Please load a file first.", MessageBoxIcon.Information);
                 return;
             }
 
@@ -388,58 +448,61 @@ namespace Orion.Window
 
             OpenFileDialog pDialog = new OpenFileDialog
             {
-                Title = "Select the file to add",
+                Title = "Select files to add",
                 Filter = "MapleStory2 Files|*",
-                Multiselect = false
+                Multiselect = true
             };
 
             if (pDialog.ShowDialog() != DialogResult.OK) return;
 
-            sHeaderUOL = Dir_BackSlashToSlash(pDialog.FileName);
-
-            string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
-
-            if (!File.Exists(sHeaderUOL))
+            foreach (string fileName in pDialog.FileNames)
             {
-                NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
-                    MessageBoxIcon.Error);
-                return;
+                string sHeaderUOL = Dir_BackSlashToSlash(fileName);
+                string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
+
+                if (!File.Exists(sHeaderUOL))
+                {
+                    NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                PackNodeList pList;
+                if (pNode.Level == 0)
+                    // If they're trying to add to the root of the file,
+                    // then just use the root node list of this tree.
+                    pList = pNodeList;
+                else
+                    pList = pNode.Tag as PackNodeList;
+
+                byte[] pData = File.ReadAllBytes(fileName);
+
+                PackFileEntry pEntry = new PackFileEntry
+                {
+                    Name = sHeaderName,
+                    Hash = Helpers.CreateHash(sHeaderUOL),
+                    Index = 1,
+                    Changed = true,
+                    TreeName = sHeaderName,
+                    Data = pData
+                };
+
+                if (pList.Entries.ContainsKey(pEntry.TreeName))
+                {
+                    NotifyMessage($"The file '{pEntry.TreeName}' already exists in the directory.", MessageBoxIcon.Exclamation);
+                    continue;
+                }
+
+                AddFileEntry(pEntry);
+                pList.Entries.Add(pEntry.TreeName, pEntry);
+
+                PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
+                pNode.Nodes.Add(pChild);
+
+                pEntry.Name = pChild.Path;
             }
-
-            PackNodeList pList;
-            if (pNode.Level == 0)
-                // If they're trying to add to the root of the file,
-                // then just use the root node list of this tree.
-                pList = pNodeList;
-            else
-                pList = pNode.Tag as PackNodeList;
-
-            byte[] pData = File.ReadAllBytes(pDialog.FileName);
-
-            PackFileEntry pEntry = new PackFileEntry
-            {
-                Name = sHeaderName,
-                Hash = Helpers.CreateHash(sHeaderUOL),
-                Index = 1,
-                Changed = true,
-                TreeName = sHeaderName,
-                Data = pData
-            };
-
-            if (pList.Entries.ContainsKey(pEntry.TreeName))
-            {
-                NotifyMessage("File name already exists in directory.", MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            AddFileEntry(pEntry);
-            pList.Entries.Add(pEntry.TreeName, pEntry);
-
-            PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
-            pNode.Nodes.Add(pChild);
-
-            pEntry.Name = pChild.Path;
         } // Add
+
 
         private void OnAddFolder(object sender, EventArgs e)
         {
@@ -485,32 +548,32 @@ namespace Orion.Window
             switch (pNode.Tag)
             {
                 case PackFileEntry pEntry:
-                {
-                    pStream.GetFileList().Remove(pEntry);
-                    if (pNode.Parent == pRoot)
-                        pNodeList.Entries.Remove(pEntry.TreeName);
-                    else
-                        (pNode.Parent.Tag as PackNodeList).Entries.Remove(pEntry.TreeName);
-                    pNode.Parent.Nodes.Remove(pNode);
-                    break;
-                }
-                case PackNodeList _:
-                {
-                    const string sWarning = "WARNING: You are about to delete an entire directory!" +
-                                            "\r\nBy deleting this directory, all inner directories and entries will also be removed." +
-                                            "\r\n\r\nAre you sure you want to continue?";
-                    if (MessageBox.Show(this, sWarning, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
-                        RemoveDirectory(pNode, pStream);
+                        pStream.GetFileList().Remove(pEntry);
                         if (pNode.Parent == pRoot)
-                            pNodeList.Children.Remove(pNode.Name);
+                            pNodeList.Entries.Remove(pEntry.TreeName);
                         else
-                            (pNode.Parent.Tag as PackNodeList).Children.Remove(pNode.Name);
-                        pNode.Remove();
+                            (pNode.Parent.Tag as PackNodeList).Entries.Remove(pEntry.TreeName);
+                        pNode.Parent.Nodes.Remove(pNode);
+                        break;
                     }
+                case PackNodeList _:
+                    {
+                        const string sWarning = "WARNING: You are about to delete an entire directory!" +
+                                                "\r\nBy deleting this directory, all inner directories and entries will also be removed." +
+                                                "\r\n\r\nAre you sure you want to continue?";
+                        if (MessageBox.Show(this, sWarning, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        {
+                            RemoveDirectory(pNode, pStream);
+                            if (pNode.Parent == pRoot)
+                                pNodeList.Children.Remove(pNode.Name);
+                            else
+                                (pNode.Parent.Tag as PackNodeList).Children.Remove(pNode.Name);
+                            pNode.Remove();
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
         } // Remove
 
@@ -531,18 +594,18 @@ namespace Orion.Window
                     Clipboard.SetData(PackFileEntry.DATA_FORMAT, pEntry.CreateCopy());
                     break;
                 case PackNodeList pList:
-                {
-                    PackNodeList pListCopy = new PackNodeList(pList.Directory);
-                    foreach (PackFileEntry pChild in pList.Entries.Values)
                     {
-                        byte[] pBlock = DecryptData(pChild.FileHeader, pDataMappedMemFile);
-                        pListCopy.Entries.Add(pChild.TreeName, pChild.CreateCopy(pBlock));
-                    }
+                        PackNodeList pListCopy = new PackNodeList(pList.Directory);
+                        foreach (PackFileEntry pChild in pList.Entries.Values)
+                        {
+                            byte[] pBlock = DecryptData(pChild.FileHeader, pDataMappedMemFile);
+                            pListCopy.Entries.Add(pChild.TreeName, pChild.CreateCopy(pBlock));
+                        }
 
-                    Clipboard.Clear();
-                    Clipboard.SetData(PackNodeList.DATA_FORMAT, pListCopy);
-                    break;
-                }
+                        Clipboard.Clear();
+                        Clipboard.SetData(PackNodeList.DATA_FORMAT, pListCopy);
+                        break;
+                    }
             }
         } // Copy
 
@@ -562,11 +625,11 @@ namespace Orion.Window
             object pObj;
             if (pData.GetDataPresent(PackFileEntry.DATA_FORMAT))
             {
-                pObj = (PackFileEntry) pData.GetData(PackFileEntry.DATA_FORMAT);
+                pObj = (PackFileEntry)pData.GetData(PackFileEntry.DATA_FORMAT);
             }
             else if (pData.GetDataPresent(PackNodeList.DATA_FORMAT))
             {
-                pObj = (PackNodeList) pData.GetData(PackNodeList.DATA_FORMAT);
+                pObj = (PackNodeList)pData.GetData(PackNodeList.DATA_FORMAT);
             }
             else
             {
@@ -586,39 +649,39 @@ namespace Orion.Window
             switch (pObj)
             {
                 case PackFileEntry obj:
-                {
-                    if (pList.Entries.ContainsKey(obj.TreeName))
                     {
-                        NotifyMessage("File name already exists in directory.", MessageBoxIcon.Exclamation);
-                        return;
+                        if (pList.Entries.ContainsKey(obj.TreeName))
+                        {
+                            NotifyMessage("File name already exists in directory.", MessageBoxIcon.Exclamation);
+                            return;
+                        }
+
+                        AddFileEntry(obj);
+                        pList.Entries.Add(obj.TreeName, obj);
+
+                        PackNode pChild = new PackNode(obj, obj.TreeName);
+                        pNode.Nodes.Add(pChild);
+
+                        obj.Name = pChild.Path;
+                        break;
                     }
-
-                    AddFileEntry(obj);
-                    pList.Entries.Add(obj.TreeName, obj);
-
-                    PackNode pChild = new PackNode(obj, obj.TreeName);
-                    pNode.Nodes.Add(pChild);
-
-                    obj.Name = pChild.Path;
-                    break;
-                }
                 case PackNodeList obj:
-                {
-                    PackNode pChild = new PackNode(obj, obj.Directory);
-                    pList.Children.Add(obj.Directory, obj);
-                    pNode.Nodes.Add(pChild);
-
-                    foreach (PackFileEntry pEntry in obj.Entries.Values)
                     {
-                        AddFileEntry(pEntry);
-                        PackNode pListNode = new PackNode(pEntry, pEntry.TreeName);
-                        pChild.Nodes.Add(pListNode);
+                        PackNode pChild = new PackNode(obj, obj.Directory);
+                        pList.Children.Add(obj.Directory, obj);
+                        pNode.Nodes.Add(pChild);
 
-                        pEntry.Name = pListNode.Path;
+                        foreach (PackFileEntry pEntry in obj.Entries.Values)
+                        {
+                            AddFileEntry(pEntry);
+                            PackNode pListNode = new PackNode(pEntry, pEntry.TreeName);
+                            pChild.Nodes.Add(pListNode);
+
+                            pEntry.Name = pListNode.Path;
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
             }
         } // Paste
 
@@ -641,106 +704,109 @@ namespace Orion.Window
             switch (pNode.Tag)
             {
                 case PackNodeList tag:
-                {
-                    FolderBrowserDialog pDialog = new FolderBrowserDialog
                     {
-                        Description = "Select the destination folder to export to"
-                    };
-
-                    if (pDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath)).Append("/");
-                        PackNode pParent = pNode.Parent as PackNode;
-                        while (pParent?.Tag is PackNodeList)
+                        FolderBrowserDialog pDialog = new FolderBrowserDialog
                         {
-                            sPath.Append(pParent.Name);
-
-                            pParent = pParent.Parent as PackNode;
-                        }
-
-                        sPath.Append(pNode.Name);
-
-                        OnExportNodeList(sPath.ToString(), tag);
-
-                        NotifyMessage($"Successfully exported to {sPath}", MessageBoxIcon.Information);
-                    }
-
-                    break;
-                }
-                case IPackStreamVerBase _:
-                {
-                    FolderBrowserDialog pDialog = new FolderBrowserDialog
-                    {
-                        Description = "Select the destination folder to export to"
-                    };
-
-                    if (pDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
-                        sPath.Append("/");
-                        sPath.Append(pNode.Name);
-                        sPath.Append("/");
-                        // Create root directory
-                        if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
-
-                        extractWindow = new ExtractWindow
-                        {
-                            Path = sPath.ToString(),
-                            PackNode = pNode
+                            Description = "Select the destination folder to export to"
                         };
 
-                        extractWindow.Show(this);
-                        // Why do you make this so complicated C#? 
-                        int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
-                        int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
-                        extractWindow.SetDesktopLocation(x, y);
-                        extractWindow.SetProgressBarSize(pNode.Nodes.Count);
-
-                        extractWorkerThread.WorkerReportsProgress = true;
-                        extractWorkerThread.RunWorkerAsync();
-                    }
-
-                    break;
-                }
-                case PackFileEntry tag:
-                {
-                    string sName = tag.TreeName.Split('.')[0];
-                    string sExtension = tag.TreeName.Split('.')[1];
-
-                    SaveFileDialog pDialog = new SaveFileDialog
-                    {
-                        Title = "Select the destination to export the file",
-                        FileName = sName,
-                        Filter = $"{sExtension.ToUpper()} File|*.{sExtension}"
-                    };
-
-                    if (pDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        IPackFileHeaderVerBase pFileHeader = tag.FileHeader;
-                        if (pFileHeader != null)
+                        if (pDialog.ShowDialog() == DialogResult.OK)
                         {
-                            if (pNode.Data == null)
+                            StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath)).Append("/");
+                            PackNode pParent = pNode.Parent as PackNode;
+                            while (pParent?.Tag is PackNodeList)
                             {
-                                pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
-                                File.WriteAllBytes(pDialog.FileName, pNode.Data);
+                                sPath.Append(pParent.Name);
 
-                                // Nullify the data as it was previously.
-                                pNode.Data = null;
-                                return;
+                                pParent = pParent.Parent as PackNode;
                             }
 
-                            File.WriteAllBytes(pDialog.FileName, pNode.Data);
+                            sPath.Append(pNode.Name);
+
+                            OnExportNodeList(sPath.ToString(), tag);
+
+                            NotifyMessage($"Successfully exported to {sPath}", MessageBoxIcon.Information);
                         }
 
-                        NotifyMessage($"Successfully exported to {pDialog.FileName}", MessageBoxIcon.Information);
+                        break;
                     }
+                case IPackStreamVerBase _:
+                    {
+                        FolderBrowserDialog pDialog = new FolderBrowserDialog
+                        {
+                            Description = "Select the destination folder to export to"
+                        };
 
-                    break;
-                }
+                        if (pDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
+                            sPath.Append("/");
+                            sPath.Append(pNode.Name);
+                            sPath.Append("/");
+                            // Create root directory
+                            if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
+
+                            extractWindow = new ExtractWindow
+                            {
+                                Path = sPath.ToString(),
+                                PackNode = pNode
+                            };
+
+                            extractWindow.Show(this);
+                            // Why do you make this so complicated C#?
+                            int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
+                            int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
+                            extractWindow.SetDesktopLocation(x, y);
+                            extractWindow.SetProgressBarSize(pNode.Nodes.Count);
+
+                            extractWorkerThread.WorkerReportsProgress = true;
+                            extractWorkerThread.RunWorkerAsync();
+                        }
+
+                        break;
+                    }
+                case PackFileEntry tag:
+                    {
+                        string sName = tag.TreeName.Split('.')[0];
+                        string sExtension = tag.TreeName.Split('.')[1];
+
+                        SaveFileDialog pDialog = new SaveFileDialog
+                        {
+                            Title = "Select the destination to export the file",
+                            FileName = sName,
+                            Filter = $"{sExtension.ToUpper()} File|*.{sExtension}"
+                        };
+
+                        if (pDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            IPackFileHeaderVerBase pFileHeader = tag.FileHeader;
+                            if (pFileHeader != null)
+                            {
+                                if (pNode.Data == null)
+                                {
+                                    pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
+                                    File.WriteAllBytes(pDialog.FileName, pNode.Data);
+
+                                    // Nullify the data as it was previously.
+                                    pNode.Data = null;
+                                    return;
+                                }
+
+                                File.WriteAllBytes(pDialog.FileName, pNode.Data);
+                            }
+
+                            NotifyMessage($"Successfully exported to {pDialog.FileName}", MessageBoxIcon.Information);
+                        }
+
+                        break;
+                    }
             }
         } // Export
 
-        private void OnSearch(object sender, EventArgs e) => LoadSearchForm(sender, e); // Search
+        private void OnSearch(object sender, EventArgs e)
+        {
+            NotifyMessage("TODO: Search all files for string?");
+        }
 
         private void OnCreateItem(object sender, EventArgs e)
         {
@@ -837,10 +903,10 @@ namespace Orion.Window
             int nHeight = Size.Height - pPrevSize.Height;
             int nWidth = Size.Width - pPrevSize.Width;
 
-            pTextData.Size = new Size
+            webView.Size = new Size
             {
-                Height = pTextData.Height + nHeight,
-                Width = pTextData.Width + nWidth
+                Height = webView.Height + nHeight,
+                Width = webView.Width + nWidth
             };
 
             pImagePanel.Size = new Size
@@ -977,27 +1043,60 @@ namespace Orion.Window
             {
                 pEntryValue.Text = sExtension;
                 pEntryName.Visible = false;
-                pTextData.Visible = false;
                 pUpdateDataBtn.Visible = false;
                 pImagePanel.Visible = false;
                 pChangeImageBtn.Visible = false;
+                webView.Visible = false;
             }
             else
             {
                 pEntryValue.Text = $"{sExtension.ToUpper()} File";
                 pEntryName.Visible = true;
 
-                pTextData.Visible = sExtension.Equals("ini") || sExtension.Equals("nt") || sExtension.Equals("lua")
-                                    || sExtension.Equals("xml") || sExtension.Equals("flat") || sExtension.Equals("xblock")
-                                    || sExtension.Equals("diagram") || sExtension.Equals("preset") || sExtension.Equals("emtproj");
-                pUpdateDataBtn.Visible = pTextData.Visible;
+                bool isText = sExtension.Equals("ini") || sExtension.Equals("nt") || sExtension.Equals("lua")
+                                                    || sExtension.Equals("xml") || sExtension.Equals("flat") || sExtension.Equals("xblock")
+                                                    || sExtension.Equals("diagram") || sExtension.Equals("preset") || sExtension.Equals("emtproj");
+                webView.Visible = isText;
+                pUpdateDataBtn.Visible = isText;
 
                 pImagePanel.Visible = sExtension.Equals("png") || sExtension.Equals("dds");
                 pChangeImageBtn.Visible = pImagePanel.Visible;
 
-                if (pTextData.Visible)
+                if (isText)
                 {
-                    pTextData.Text = Encoding.UTF8.GetString(pBuffer);
+                    Properties.Settings.Default.Reload();
+                    string editorTheme = Properties.Settings.Default.EditorTheme;
+                    string wordWrap = Properties.Settings.Default.EditorWordWrap ? "on" : "off";
+                    string language = "xml";
+                    switch (sExtension)
+                    {
+                        case "ini":
+                            language = "ini";
+                            break;
+                        case "nt":
+                            language = "txt";
+                            break;
+                        case "lua":
+                            language = "lua";
+                            break;
+                        default:
+                            break;
+                    }
+                    JObject json = new JObject
+                    {
+                        { "type", "updateSettings" },
+                        { "theme", editorTheme },
+                        { "wordWrap", wordWrap },
+                        { "language", language }
+                    };
+                    webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+
+                    json = new JObject
+                    {
+                        { "type", "updateContent" },
+                        { "content", Encoding.UTF8.GetString(pBuffer) }
+                    };
+                    webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
                 }
                 else if (pImagePanel.Visible)
                 {
@@ -1027,166 +1126,7 @@ namespace Orion.Window
              * Precompiled/luapack.o - object files?
             */
 
-            UpdateStyle(sExtension);
             RenderImageData(false);
-        }
-
-        private void UpdateStyle(string sExtension)
-        {
-            switch (sExtension)
-            {
-                case "ini":
-                case "nt":
-                    // Set the Styles to replicate Sublime
-                    pTextData.StyleResetDefault();
-                    pTextData.Styles[Style.Default].Font = "Consolas";
-                    pTextData.Styles[Style.Default].Size = 10;
-                    pTextData.Styles[Style.Default].BackColor = Color.FromArgb(0x282923);
-                    pTextData.Styles[Style.Default].ForeColor = Color.White;
-                    pTextData.StyleClearAll();
-                    break;
-                case "lua":
-                    // Extracted from the Lua Scintilla lexer and SciTE .properties file
-
-                    const string sAlpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                    const string sNumeric = "0123456789";
-                    const string sAccented = "ŠšŒœŸÿÀàÁáÂâÃãÄäÅåÆæÇçÈèÉéÊêËëÌìÍíÎîÏïÐðÑñÒòÓóÔôÕõÖØøÙùÚúÛûÜüÝýÞþßö";
-
-                    // Configuring the default style with properties
-                    // we have common to every lexer style saves time.
-                    pTextData.StyleResetDefault();
-                    pTextData.Styles[Style.Default].Font = "Consolas";
-                    pTextData.Styles[Style.Default].Size = 10;
-                    pTextData.Styles[Style.Default].BackColor = Color.FromArgb(0x282923);
-                    pTextData.Styles[Style.Default].ForeColor = Color.White;
-                    pTextData.StyleClearAll();
-
-                    // Configure the Lua lexer styles
-                    pTextData.Styles[Style.Lua.Default].ForeColor = Color.Silver;
-                    pTextData.Styles[Style.Lua.Comment].ForeColor = Color.FromArgb(0xD8D8D8);
-                    pTextData.Styles[Style.Lua.CommentLine].ForeColor = Color.FromArgb(0xD8D8D8);
-                    pTextData.Styles[Style.Lua.Number].ForeColor = Color.FromArgb(0xC48CFF);
-                    pTextData.Styles[Style.Lua.Word].ForeColor = Color.FromArgb(0xFF007F);
-                    pTextData.Styles[Style.Lua.Word2].ForeColor = Color.BlueViolet;
-                    pTextData.Styles[Style.Lua.Word3].ForeColor = Color.FromArgb(0x52E3F6);
-                    pTextData.Styles[Style.Lua.Word4].ForeColor = Color.FromArgb(0x52E3F6);
-                    pTextData.Styles[Style.Lua.String].ForeColor = Color.FromArgb(0xECE47E);
-                    pTextData.Styles[Style.Lua.Character].ForeColor = Color.FromArgb(0xECE47E);
-                    pTextData.Styles[Style.Lua.LiteralString].ForeColor = Color.FromArgb(0xECE47E);
-                    pTextData.Styles[Style.Lua.StringEol].BackColor = Color.Pink;
-                    pTextData.Styles[Style.Lua.Operator].ForeColor = Color.White;
-                    pTextData.Styles[Style.Lua.Preprocessor].ForeColor = Color.Maroon;
-                    pTextData.Lexer = Lexer.Lua;
-                    pTextData.WordChars = sAlpha + sNumeric + sAccented;
-
-                    // Keywords
-                    pTextData.SetKeywords(0,
-                        "and break do else elseif end for function if in local nil not or repeat return then until while" + " false true" + " goto");
-                    // Basic Functions
-                    pTextData.SetKeywords(1,
-                        "assert collectgarbage dofile error _G getmetatable ipairs loadfile next pairs pcall print rawequal rawget rawset setmetatable tonumber tostring type _VERSION xpcall string table math coroutine io os debug" +
-                        " getfenv gcinfo load loadlib loadstring require select setfenv unpack _LOADED LUA_PATH _REQUIREDNAME package rawlen package bit32 utf8 _ENV");
-                    // String Manipulation & Mathematical
-                    pTextData.SetKeywords(2,
-                        "string.byte string.char string.dump string.find string.format string.gsub string.len string.lower string.rep string.sub string.upper table.concat table.insert table.remove table.sort math.abs math.acos math.asin math.atan math.atan2 math.ceil math.cos math.deg math.exp math.floor math.frexp math.ldexp math.log math.max math.min math.pi math.pow math.rad math.random math.randomseed math.sin math.sqrt math.tan" +
-                        " string.gfind string.gmatch string.match string.reverse string.pack string.packsize string.unpack table.foreach table.foreachi table.getn table.setn table.maxn table.pack table.unpack table.move math.cosh math.fmod math.huge math.log10 math.modf math.mod math.sinh math.tanh math.maxinteger math.mininteger math.tointeger math.type math.ult" +
-                        " bit32.arshift bit32.band bit32.bnot bit32.bor bit32.btest bit32.bxor bit32.extract bit32.replace bit32.lrotate bit32.lshift bit32.rrotate bit32.rshift" +
-                        " utf8.char utf8.charpattern utf8.codes utf8.codepoint utf8.len utf8.offset");
-                    // Input and Output Facilities and System Facilities
-                    pTextData.SetKeywords(3,
-                        "coroutine.create coroutine.resume coroutine.status coroutine.wrap coroutine.yield io.close io.flush io.input io.lines io.open io.output io.read io.tmpfile io.type io.write io.stdin io.stdout io.stderr os.clock os.date os.difftime os.execute os.exit os.getenv os.remove os.rename os.setlocale os.time os.tmpname" +
-                        " coroutine.isyieldable coroutine.running io.popen module package.loaders package.seeall package.config package.searchers package.searchpath" +
-                        " require package.cpath package.loaded package.loadlib package.path package.preload");
-
-                    // Instruct the lexer to calculate folding
-                    pTextData.SetProperty("fold", "1");
-                    pTextData.SetProperty("fold.compact", "1");
-
-                    // Configure a margin to display folding symbols
-                    pTextData.Margins[2].Type = MarginType.Symbol;
-                    pTextData.Margins[2].Mask = Marker.MaskFolders;
-                    pTextData.Margins[2].Sensitive = true;
-                    pTextData.Margins[2].Width = 20;
-
-                    // Set colors for all folding markers
-                    for (int i = 25; i <= 31; i++)
-                    {
-                        pTextData.Markers[i].SetForeColor(SystemColors.ControlLightLight);
-                        pTextData.Markers[i].SetBackColor(SystemColors.ControlDark);
-                    }
-
-                    // Configure folding markers with respective symbols
-                    pTextData.Markers[Marker.Folder].Symbol = MarkerSymbol.BoxPlus;
-                    pTextData.Markers[Marker.FolderOpen].Symbol = MarkerSymbol.BoxMinus;
-                    pTextData.Markers[Marker.FolderEnd].Symbol = MarkerSymbol.BoxPlusConnected;
-                    pTextData.Markers[Marker.FolderMidTail].Symbol = MarkerSymbol.TCorner;
-                    pTextData.Markers[Marker.FolderOpenMid].Symbol = MarkerSymbol.BoxMinusConnected;
-                    pTextData.Markers[Marker.FolderSub].Symbol = MarkerSymbol.VLine;
-                    pTextData.Markers[Marker.FolderTail].Symbol = MarkerSymbol.LCorner;
-
-                    // Enable automatic folding
-                    pTextData.AutomaticFold = AutomaticFold.Show | AutomaticFold.Click | AutomaticFold.Change;
-                    break;
-                default:
-                    // Reset the styles
-                    pTextData.StyleResetDefault();
-                    pTextData.Styles[Style.Default].Font = "Consolas";
-                    pTextData.Styles[Style.Default].Size = 10;
-                    pTextData.Styles[Style.Default].BackColor = Color.FromArgb(0x282923);
-                    pTextData.Styles[Style.Default].ForeColor = Color.LightGray;
-                    pTextData.StyleClearAll();
-
-                    // Set the Styles to replicate Sublime
-                    pTextData.Styles[Style.Xml.XmlStart].ForeColor = Color.White;
-                    pTextData.Styles[Style.Xml.XmlEnd].ForeColor = Color.White;
-                    pTextData.Styles[Style.Xml.Other].ForeColor = Color.White;
-                    pTextData.Styles[Style.Xml.Attribute].ForeColor = Color.FromArgb(0xA7EC21);
-                    pTextData.Styles[Style.Xml.Entity].ForeColor = Color.FromArgb(0xA7EC21);
-                    pTextData.Styles[Style.Xml.Comment].ForeColor = Color.FromArgb(0xD8D8D8);
-                    pTextData.Styles[Style.Xml.Tag].ForeColor = Color.FromArgb(0xFF007F);
-                    pTextData.Styles[Style.Xml.TagEnd].ForeColor = Color.FromArgb(0xFF007F);
-                    pTextData.Styles[Style.Xml.DoubleString].ForeColor = Color.FromArgb(0xECE47E);
-                    pTextData.Styles[Style.Xml.SingleString].ForeColor = Color.FromArgb(0xECE47E);
-
-                    // Set the XML Lexer
-                    pTextData.Lexer = Lexer.Xml;
-
-                    // Show line numbers
-                    pTextData.Margins[0].Width = pTextData.TextWidth(Style.LineNumber, new string('9', 8)) + 2;
-
-                    // Enable folding
-                    pTextData.SetProperty("fold", "1");
-                    pTextData.SetProperty("fold.compact", "1");
-                    pTextData.SetProperty("fold.html", "1");
-
-                    // Use Margin 2 for fold markers
-                    pTextData.Margins[2].Type = MarginType.Symbol;
-                    pTextData.Margins[2].Mask = Marker.MaskFolders;
-                    pTextData.Margins[2].Sensitive = true;
-                    pTextData.Margins[2].Width = 20;
-
-                    // Reset folder markers
-                    for (int i = Marker.FolderEnd; i <= Marker.FolderOpen; i++)
-                    {
-                        pTextData.Markers[i].SetForeColor(SystemColors.ControlLightLight);
-                        pTextData.Markers[i].SetBackColor(SystemColors.ControlDark);
-                    }
-
-                    // Style the folder markers
-                    pTextData.Markers[Marker.Folder].Symbol = MarkerSymbol.BoxPlus;
-                    pTextData.Markers[Marker.Folder].SetBackColor(SystemColors.ControlText);
-                    pTextData.Markers[Marker.FolderOpen].Symbol = MarkerSymbol.BoxMinus;
-                    pTextData.Markers[Marker.FolderEnd].Symbol = MarkerSymbol.BoxPlusConnected;
-                    pTextData.Markers[Marker.FolderEnd].SetBackColor(SystemColors.ControlText);
-                    pTextData.Markers[Marker.FolderMidTail].Symbol = MarkerSymbol.TCorner;
-                    pTextData.Markers[Marker.FolderOpenMid].Symbol = MarkerSymbol.BoxMinusConnected;
-                    pTextData.Markers[Marker.FolderSub].Symbol = MarkerSymbol.VLine;
-                    pTextData.Markers[Marker.FolderTail].Symbol = MarkerSymbol.LCorner;
-
-                    // Enable automatic folding
-                    pTextData.AutomaticFold = AutomaticFold.Show | AutomaticFold.Click | AutomaticFold.Change;
-                    break;
-            }
         }
 
         private static string Dir_BackSlashToSlash(string sDir)
@@ -1214,7 +1154,7 @@ namespace Orion.Window
             pProgress.Start();
             pStream.GetFileList().Sort();
             SaveData(pProgress.Path, pStream.GetFileList());
-            uint dwFileCount = (uint) pStream.GetFileList().Count;
+            uint dwFileCount = (uint)pStream.GetFileList().Count;
             StringBuilder sFileString = new StringBuilder();
             foreach (PackFileEntry pEntry in pStream.GetFileList()) sFileString.Append(pEntry);
             pSaveWorkerThread.ReportProgress(96);
@@ -1261,14 +1201,14 @@ namespace Orion.Window
 
             if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Data == null) return;
 
-            if (!(pNode.Tag is PackFileEntry pEntry)) return;
+            if (!(pNode.Tag is PackFileEntry)) return;
 
-            string sData = pTextData.Text;
-            byte[] pData = Encoding.UTF8.GetBytes(sData.ToCharArray());
-            if (pNode.Data == pData) return;
+            JObject json = new JObject
+            {
+                { "type", "saveFile" }
+            };
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
 
-            pEntry.Data = pData;
-            pEntry.Changed = true;
         }
 
         private void OnSaveProgress(object sender, ProgressChangedEventArgs e)
@@ -1381,7 +1321,7 @@ namespace Orion.Window
                         uOffset += pHeader.GetEncodedFileSize();
 
                         // Allow the remaining 5% for header file write progression
-                        pSaveWorkerThread.ReportProgress((int) ((nCurIndex - 1) / (double) aEntry.Count * 95.0d));
+                        pSaveWorkerThread.ReportProgress((int)((nCurIndex - 1) / (double)aEntry.Count * 95.0d));
                         continue;
                     }
                     // If the entry is unchanged, parse the block from the original offsets
@@ -1393,11 +1333,11 @@ namespace Orion.Window
                     if (pHeader.GetVer() != uVer) uVer = pHeader.GetVer();
 
                     // Access the current encrypted block data from the memory map initially loaded
-                    using (MemoryMappedViewStream pBuffer = pDataMappedMemFile.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize()))
+                    using (MemoryMappedViewStream pBuffer = pDataMappedMemFile.CreateViewStream((long)pHeader.GetOffset(), pHeader.GetEncodedFileSize()))
                     {
                         byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                        if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
+                        if (pBuffer.Read(pSrc, 0, (int)pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
                         // Modify the header's file index to the updated offset after entry changes
                         pHeader.SetFileIndex(nCurIndex);
                         // Modify the header's offset to the updated offset after entry changes
@@ -1411,102 +1351,11 @@ namespace Orion.Window
                         nCurIndex++;
                         uOffset += pHeader.GetEncodedFileSize();
                     }
-                    
+
                     // Allow the remaining 5% for header file write progression
-                    pSaveWorkerThread.ReportProgress((int) ((nCurIndex - 1) / (double) aEntry.Count * 95.0d));
+                    pSaveWorkerThread.ReportProgress((int)((nCurIndex - 1) / (double)aEntry.Count * 95.0d));
                 }
             }
-        }
-
-        #endregion
-
-        #region Helpers - Search
-
-        private void LoadSearchForm(object sender, EventArgs e)
-        {
-            Form form = new Form
-            {
-                Text = "Search"
-            };
-            Label label = new Label
-            {
-                Text = "Input Text",
-                Location = new Point(10, 10),
-                AutoSize = true
-            };
-            TextBox txtBox = new TextBox
-            {
-                Name = "searchTxtBox",
-                Size = new Size(220, 0),
-                Location = new Point(10, 25)
-            };
-            Button button = new Button
-            {
-                AutoSize = true,
-                Location = new Point(155, 50),
-                Text = "OK"
-            };
-            form.Controls.Add(label);
-            form.Controls.Add(txtBox);
-            form.Controls.Add(button);
-            form.Controls[2].Click += OnSearchButtonClicked;
-            form.Controls[1].KeyDown += ActionSearchForm;
-            form.Size = new Size(260, 120);
-            form.AutoSize = false;
-            form.FormBorderStyle = FormBorderStyle.FixedDialog;
-            form.ShowDialog();
-        } // Search form
-
-        private void ActionSearchForm(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Escape)
-                ActiveForm.Close();
-            else if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return) OnSearchButtonClicked(sender, e);
-        }
-
-        private void OnSearchButtonClicked(object sender, EventArgs e)
-        {
-            Form form = ActiveForm;
-            string input = form.Controls[1].Text;
-
-            if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(pTextData.Text))
-            {
-                NotifyMessage("You have to open a file first in order to search a text.", MessageBoxIcon.Information);
-                ActiveForm.Close();
-                return;
-            }
-
-            // Indicators 0-7 could be in use by a lexer
-            // so we'll use indicator 8 to highlight words.
-            const int NUM = 8;
-
-            // Remove all uses of our indicator
-            pTextData.IndicatorCurrent = NUM;
-            pTextData.IndicatorClearRange(0, pTextData.TextLength);
-
-            // Update indicator appearance
-            pTextData.Indicators[NUM].Style = IndicatorStyle.StraightBox;
-            pTextData.Indicators[NUM].Under = true;
-            pTextData.Indicators[NUM].ForeColor = Color.Yellow;
-            pTextData.Indicators[NUM].OutlineAlpha = 50;
-            pTextData.Indicators[NUM].Alpha = 50;
-
-            // Search the document
-            pTextData.TargetStart = 0;
-            pTextData.TargetEnd = pTextData.TextLength;
-            pTextData.SearchFlags = SearchFlags.None;
-
-            while (pTextData.SearchInTarget(input) != -1)
-            {
-                // Mark the search results with the current indicator
-                pTextData.IndicatorFillRange(pTextData.TargetStart, pTextData.TargetEnd - pTextData.TargetStart);
-
-                // Search the remainder of the document
-                pTextData.TargetStart = pTextData.TargetEnd;
-                pTextData.TargetEnd = pTextData.TextLength;
-            }
-
-            ActiveForm.Close();
         }
 
         #endregion
@@ -1586,5 +1435,50 @@ namespace Orion.Window
         }
 
         #endregion
+
+        private void wordWrapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            wordWrapToolStripMenuItem.Checked = !wordWrapToolStripMenuItem.Checked;
+
+            string wordWrapValue = wordWrapToolStripMenuItem.Checked ? "on" : "off";
+
+            JObject json = new JObject
+            {
+                { "type", "wordWrap" },
+                { "wordWrap", wordWrapValue }
+            };
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+
+            Properties.Settings.Default.EditorWordWrap = wordWrapToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void darkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            darkToolStripMenuItem.Checked = true;
+            lightToolStripMenuItem.Checked = false;
+            JObject json = new JObject
+            {
+                { "type", "theme" },
+                { "theme", "vs-dark" }
+            };
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+            Properties.Settings.Default.EditorTheme = "vs-dark";
+            Properties.Settings.Default.Save();
+        }
+
+        private void lightToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            lightToolStripMenuItem.Checked = true;
+            darkToolStripMenuItem.Checked = false;
+            JObject json = new JObject
+            {
+                { "type", "theme" },
+                { "theme", "vs" }
+            };
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+            Properties.Settings.Default.EditorTheme = "vs";
+            Properties.Settings.Default.Save();
+        }
     }
 }
