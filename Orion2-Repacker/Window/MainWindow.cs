@@ -220,12 +220,15 @@ namespace Orion.Window
             string sDataUOL = Dir_BackSlashToSlash(pDialog.FileName);
             sHeaderUOL = sDataUOL.Replace(".m2d", ".m2h");
 
+             string fileName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
             if (!File.Exists(sHeaderUOL))
             {
-                string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
-                NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
+                NotifyMessage($"Unable to load the {fileName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
                 return;
             }
+
+            // Window title
+            Text = "Orion2 Repacker | " + fileName;
 
             IPackStreamVerBase pStream;
             using (BinaryReader pHeader = new BinaryReader(File.OpenRead(sHeaderUOL)))
@@ -375,7 +378,7 @@ namespace Orion.Window
         {
             if (pNodeList is null)
             {
-                NotifyMessage("Please load an file first.", MessageBoxIcon.Information);
+                NotifyMessage("Please load a file first.", MessageBoxIcon.Information);
                 return;
             }
 
@@ -388,58 +391,61 @@ namespace Orion.Window
 
             OpenFileDialog pDialog = new OpenFileDialog
             {
-                Title = "Select the file to add",
+                Title = "Select files to add",
                 Filter = "MapleStory2 Files|*",
-                Multiselect = false
+                Multiselect = true
             };
 
             if (pDialog.ShowDialog() != DialogResult.OK) return;
 
-            sHeaderUOL = Dir_BackSlashToSlash(pDialog.FileName);
-
-            string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
-
-            if (!File.Exists(sHeaderUOL))
+            foreach (string fileName in pDialog.FileNames)
             {
-                NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
-                    MessageBoxIcon.Error);
-                return;
+                string sHeaderUOL = Dir_BackSlashToSlash(fileName);
+                string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
+
+                if (!File.Exists(sHeaderUOL))
+                {
+                    NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                PackNodeList pList;
+                if (pNode.Level == 0)
+                    // If they're trying to add to the root of the file,
+                    // then just use the root node list of this tree.
+                    pList = pNodeList;
+                else
+                    pList = pNode.Tag as PackNodeList;
+
+                byte[] pData = File.ReadAllBytes(fileName);
+
+                PackFileEntry pEntry = new PackFileEntry
+                {
+                    Name = sHeaderName,
+                    Hash = Helpers.CreateHash(sHeaderUOL),
+                    Index = 1,
+                    Changed = true,
+                    TreeName = sHeaderName,
+                    Data = pData
+                };
+
+                if (pList.Entries.ContainsKey(pEntry.TreeName))
+                {
+                    NotifyMessage($"The file '{pEntry.TreeName}' already exists in the directory.", MessageBoxIcon.Exclamation);
+                    continue;
+                }
+
+                AddFileEntry(pEntry);
+                pList.Entries.Add(pEntry.TreeName, pEntry);
+
+                PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
+                pNode.Nodes.Add(pChild);
+
+                pEntry.Name = pChild.Path;
             }
-
-            PackNodeList pList;
-            if (pNode.Level == 0)
-                // If they're trying to add to the root of the file,
-                // then just use the root node list of this tree.
-                pList = pNodeList;
-            else
-                pList = pNode.Tag as PackNodeList;
-
-            byte[] pData = File.ReadAllBytes(pDialog.FileName);
-
-            PackFileEntry pEntry = new PackFileEntry
-            {
-                Name = sHeaderName,
-                Hash = Helpers.CreateHash(sHeaderUOL),
-                Index = 1,
-                Changed = true,
-                TreeName = sHeaderName,
-                Data = pData
-            };
-
-            if (pList.Entries.ContainsKey(pEntry.TreeName))
-            {
-                NotifyMessage("File name already exists in directory.", MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            AddFileEntry(pEntry);
-            pList.Entries.Add(pEntry.TreeName, pEntry);
-
-            PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
-            pNode.Nodes.Add(pChild);
-
-            pEntry.Name = pChild.Path;
         } // Add
+
 
         private void OnAddFolder(object sender, EventArgs e)
         {
