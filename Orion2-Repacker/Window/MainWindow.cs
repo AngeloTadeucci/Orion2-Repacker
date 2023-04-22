@@ -24,7 +24,6 @@ using System.IO.MemoryMappedFiles;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Orion.Crypto.Common;
 using Orion.Crypto.Stream;
@@ -86,6 +85,8 @@ namespace Orion.Window
             await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"window.chrome.webview.addEventListener('message', (event) => {
                 try {
                     if (event.data.type == 'updateContent') {
+                        editor.setScrollTop(0, 1);
+                        editor.setScrollLeft(0, 1);
                         editor.setValue(event.data.content);
                     } else if (event.data.type == 'theme') {
                         editor.updateOptions({theme: event.data.theme});
@@ -1082,7 +1083,7 @@ namespace Orion.Window
                         default:
                             break;
                     }
-                    JObject json = new JObject
+                    JObject json = new()
                     {
                         { "type", "updateSettings" },
                         { "theme", editorTheme },
@@ -1091,11 +1092,24 @@ namespace Orion.Window
                     };
                     webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
 
+                    string content = Encoding.UTF8.GetString(pBuffer);
                     json = new JObject
                     {
                         { "type", "updateContent" },
-                        { "content", Encoding.UTF8.GetString(pBuffer) }
+                        { "content", content }
                     };
+
+                    if (content.Contains("encoding=\"euc-kr\""))
+                    {
+                        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+                        json = new JObject
+                        {
+                            { "type", "updateContent" },
+                            { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) }
+                        };
+                    }
+
                     webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
                 }
                 else if (pImagePanel.Visible)

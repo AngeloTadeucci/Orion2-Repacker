@@ -36,6 +36,7 @@ namespace Orion.Window
                                       + "\r\n\r\nFeatures:"
                                       + "\r\n* Loads ANY MS2 header(.m2h)/data(.m2d) file"
                                       + "\r\n* Renders the data from the selected XML/INI/PNG/DDS/etc. file inside the repacker"
+                                      + "\r\n    * Uses modern Visual Studio Code editor"
                                       + "\r\n* Ability to extract the selected file(s) to disk"
                                       + "\r\n* Edit/Add data within the files"
                                       + "\r\n* Save your changes by re-packing the data to file";
@@ -50,7 +51,7 @@ namespace Orion.Window
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
                 if (attributes.Length > 0)
                 {
-                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) attributes[0];
+                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
                     if (titleAttribute.Title != "") return titleAttribute.Title;
                 }
 
@@ -66,7 +67,7 @@ namespace Orion.Window
             {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
                 if (attributes.Length == 0) return "";
-                return ((AssemblyDescriptionAttribute) attributes[0]).Description;
+                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
             }
         }
 
@@ -76,7 +77,7 @@ namespace Orion.Window
             {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
                 if (attributes.Length == 0) return "";
-                return ((AssemblyProductAttribute) attributes[0]).Product;
+                return ((AssemblyProductAttribute)attributes[0]).Product;
             }
         }
 
@@ -86,7 +87,7 @@ namespace Orion.Window
             {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
                 if (attributes.Length == 0) return "";
-                return ((AssemblyCopyrightAttribute) attributes[0]).Copyright;
+                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
             }
         }
 
@@ -96,7 +97,7 @@ namespace Orion.Window
             {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
                 if (attributes.Length == 0) return "";
-                return ((AssemblyCompanyAttribute) attributes[0]).Company;
+                return ((AssemblyCompanyAttribute)attributes[0]).Company;
             }
         }
 
