@@ -260,8 +260,6 @@ namespace Orion.Window
                 return;
             }
 
-            var folder = Properties.Settings.Default.LastInputFolder;
-
             OpenFileDialog pDialog = new OpenFileDialog
             {
                 Title = "Select the MS2 file to load",
