@@ -15,14 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
-using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json.Linq;
 using Orion.Crypto.Common;
@@ -265,14 +260,20 @@ namespace Orion.Window
                 return;
             }
 
+            var folder = Properties.Settings.Default.LastInputFolder;
+
             OpenFileDialog pDialog = new OpenFileDialog
             {
                 Title = "Select the MS2 file to load",
                 Filter = "MapleStory2 Files|*.m2d",
-                Multiselect = false
+                Multiselect = false,
+                InitialDirectory = Properties.Settings.Default.LastInputFolder
             };
 
             if (pDialog.ShowDialog() != DialogResult.OK) return;
+
+            Properties.Settings.Default.LastInputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
+            Properties.Settings.Default.Save();
 
             string sDataUOL = Dir_BackSlashToSlash(pDialog.FileName);
             sHeaderUOL = sDataUOL.Replace(".m2d", ".m2h");
@@ -351,11 +352,15 @@ namespace Orion.Window
                 SaveFileDialog pDialog = new SaveFileDialog
                 {
                     Title = "Select the destination to save the file",
-                    Filter = "MapleStory2 Files|*.m2d"
+                    Filter = "MapleStory2 Files|*.m2d",
+                    InitialDirectory = Properties.Settings.Default.LastOutputFolder
                 };
 
                 if (pDialog.ShowDialog() != DialogResult.OK) return;
                 string sPath = Dir_BackSlashToSlash(pDialog.FileName);
+
+                Properties.Settings.Default.LastOutputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
+                Properties.Settings.Default.Save();
 
                 if (pSaveWorkerThread.IsBusy) return;
                 pProgress = new ProgressWindow
@@ -708,26 +713,32 @@ namespace Orion.Window
                     {
                         FolderBrowserDialog pDialog = new FolderBrowserDialog
                         {
-                            Description = "Select the destination folder to export to"
+                            Description = "Select the destination folder to export to",
+                            InitialDirectory = Properties.Settings.Default.LastExportFolder
                         };
 
-                        if (pDialog.ShowDialog() == DialogResult.OK)
+                        if (pDialog.ShowDialog() != DialogResult.OK)
                         {
-                            StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath)).Append("/");
-                            PackNode pParent = pNode.Parent as PackNode;
-                            while (pParent?.Tag is PackNodeList)
-                            {
-                                sPath.Append(pParent.Name);
-
-                                pParent = pParent.Parent as PackNode;
-                            }
-
-                            sPath.Append(pNode.Name);
-
-                            OnExportNodeList(sPath.ToString(), tag);
-
-                            NotifyMessage($"Successfully exported to {sPath}", MessageBoxIcon.Information);
+                            break;
                         }
+
+                        Properties.Settings.Default.LastExportFolder = pDialog.SelectedPath + "\\";
+                        Properties.Settings.Default.Save();
+
+                        StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath)).Append("/");
+                        PackNode pParent = pNode.Parent as PackNode;
+                        while (pParent?.Tag is PackNodeList)
+                        {
+                            sPath.Append(pParent.Name);
+
+                            pParent = pParent.Parent as PackNode;
+                        }
+
+                        sPath.Append(pNode.Name);
+
+                        OnExportNodeList(sPath.ToString(), tag);
+
+                        NotifyMessage($"Successfully exported to {sPath}", MessageBoxIcon.Information);
 
                         break;
                     }
@@ -735,34 +746,40 @@ namespace Orion.Window
                     {
                         FolderBrowserDialog pDialog = new FolderBrowserDialog
                         {
-                            Description = "Select the destination folder to export to"
+                            Description = "Select the destination folder to export to",
+                            InitialDirectory = Properties.Settings.Default.LastExportFolder
                         };
 
-                        if (pDialog.ShowDialog() == DialogResult.OK)
+                        if (pDialog.ShowDialog() != DialogResult.OK)
                         {
-                            StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
-                            sPath.Append("/");
-                            sPath.Append(pNode.Name);
-                            sPath.Append("/");
-                            // Create root directory
-                            if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
-
-                            extractWindow = new ExtractWindow
-                            {
-                                Path = sPath.ToString(),
-                                PackNode = pNode
-                            };
-
-                            extractWindow.Show(this);
-                            // Why do you make this so complicated C#?
-                            int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
-                            int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
-                            extractWindow.SetDesktopLocation(x, y);
-                            extractWindow.SetProgressBarSize(pNode.Nodes.Count);
-
-                            extractWorkerThread.WorkerReportsProgress = true;
-                            extractWorkerThread.RunWorkerAsync();
+                            break;
                         }
+
+                        Properties.Settings.Default.LastExportFolder = pDialog.SelectedPath + "\\";
+                        Properties.Settings.Default.Save();
+
+                        StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
+                        sPath.Append("/");
+                        sPath.Append(pNode.Name);
+                        sPath.Append("/");
+                        // Create root directory
+                        if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
+
+                        extractWindow = new ExtractWindow
+                        {
+                            Path = sPath.ToString(),
+                            PackNode = pNode
+                        };
+
+                        extractWindow.Show(this);
+                        // Why do you make this so complicated C#?
+                        int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
+                        int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
+                        extractWindow.SetDesktopLocation(x, y);
+                        extractWindow.SetProgressBarSize(pNode.Nodes.Count);
+
+                        extractWorkerThread.WorkerReportsProgress = true;
+                        extractWorkerThread.RunWorkerAsync();
 
                         break;
                     }
@@ -775,29 +792,35 @@ namespace Orion.Window
                         {
                             Title = "Select the destination to export the file",
                             FileName = sName,
-                            Filter = $"{sExtension.ToUpper()} File|*.{sExtension}"
+                            Filter = $"{sExtension.ToUpper()} File|*.{sExtension}",
+                            InitialDirectory = Properties.Settings.Default.LastExportFolder
                         };
 
-                        if (pDialog.ShowDialog() == DialogResult.OK)
+                        if (pDialog.ShowDialog() != DialogResult.OK)
                         {
-                            IPackFileHeaderVerBase pFileHeader = tag.FileHeader;
-                            if (pFileHeader != null)
+                            break;
+                        }
+
+                        Properties.Settings.Default.LastExportFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')] + "\\";
+                        Properties.Settings.Default.Save();
+
+                        IPackFileHeaderVerBase pFileHeader = tag.FileHeader;
+                        if (pFileHeader != null)
+                        {
+                            if (pNode.Data == null)
                             {
-                                if (pNode.Data == null)
-                                {
-                                    pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
-                                    File.WriteAllBytes(pDialog.FileName, pNode.Data);
-
-                                    // Nullify the data as it was previously.
-                                    pNode.Data = null;
-                                    return;
-                                }
-
+                                pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
                                 File.WriteAllBytes(pDialog.FileName, pNode.Data);
+
+                                // Nullify the data as it was previously.
+                                pNode.Data = null;
+                                return;
                             }
 
-                            NotifyMessage($"Successfully exported to {pDialog.FileName}", MessageBoxIcon.Information);
+                            File.WriteAllBytes(pDialog.FileName, pNode.Data);
                         }
+
+                        NotifyMessage($"Successfully exported to {pDialog.FileName}", MessageBoxIcon.Information);
 
                         break;
                     }

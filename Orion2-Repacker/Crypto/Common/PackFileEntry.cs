@@ -15,8 +15,6 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System;
-using System.Collections.Generic;
 using Orion.Crypto.Stream;
 
 namespace Orion.Crypto.Common

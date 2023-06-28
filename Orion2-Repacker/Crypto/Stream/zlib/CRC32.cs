@@ -25,8 +25,6 @@
 //
 // ------------------------------------------------------------------
 
-using System;
-using System.IO;
 using Interop = System.Runtime.InteropServices;
 
 namespace Orion.Crypto.Stream.zlib

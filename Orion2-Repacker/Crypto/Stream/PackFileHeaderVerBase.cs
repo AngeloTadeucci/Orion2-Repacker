@@ -15,8 +15,6 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System.IO;
-
 namespace Orion.Crypto.Stream
 {
     public interface IPackFileHeaderVerBase

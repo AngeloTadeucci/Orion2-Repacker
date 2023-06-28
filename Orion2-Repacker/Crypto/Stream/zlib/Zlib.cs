@@ -86,8 +86,6 @@
 //
 // -----------------------------------------------------------------------
 
-using System;
-using System.IO;
 using System.Text;
 using Interop = System.Runtime.InteropServices;
 

@@ -66,8 +66,6 @@
 //
 // -----------------------------------------------------------------------
 
-using System;
-
 namespace Orion.Crypto.Stream.zlib
 {
     internal enum BlockState
