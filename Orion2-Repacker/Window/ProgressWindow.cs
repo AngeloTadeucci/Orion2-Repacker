@@ -16,7 +16,6 @@
  */
 
 using System.Diagnostics;
-using System.Windows.Forms;
 using Orion.Crypto.Stream;
 
 namespace Orion.Window

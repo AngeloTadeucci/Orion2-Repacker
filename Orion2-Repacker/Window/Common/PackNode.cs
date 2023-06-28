@@ -16,7 +16,6 @@
  */
 
 using System.Text;
-using System.Windows.Forms;
 using Orion.Crypto.Common;
 
 namespace Orion.Window.Common

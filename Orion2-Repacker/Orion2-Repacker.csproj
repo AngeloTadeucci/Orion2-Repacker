@@ -70,5 +70,6 @@
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 </Project>

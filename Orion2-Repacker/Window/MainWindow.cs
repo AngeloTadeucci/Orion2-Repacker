@@ -15,14 +15,9 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
-using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json.Linq;
 using Orion.Crypto.Common;

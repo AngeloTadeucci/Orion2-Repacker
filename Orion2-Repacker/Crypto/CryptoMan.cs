@@ -15,7 +15,6 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System;
 using System.IO.MemoryMappedFiles;
 using System.Text;
 using Orion.Crypto.Common;

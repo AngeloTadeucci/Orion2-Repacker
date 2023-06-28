@@ -59,8 +59,6 @@
 //
 // -----------------------------------------------------------------------
 
-using System;
-
 namespace Orion.Crypto.Stream.zlib
 {
     internal sealed class InfTree

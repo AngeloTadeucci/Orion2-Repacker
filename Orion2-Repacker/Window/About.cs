@@ -15,9 +15,7 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-using System.IO;
 using System.Reflection;
-using System.Windows.Forms;
 
 namespace Orion.Window
 {

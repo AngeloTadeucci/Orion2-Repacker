@@ -25,9 +25,6 @@
 //
 // ------------------------------------------------------------------
 
-using System;
-using System.IO;
-
 namespace Orion.Crypto.Stream.zlib
 {
     /// <summary>
