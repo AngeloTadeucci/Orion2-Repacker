@@ -18,29 +18,23 @@
 using System.Text;
 using Orion.Crypto.Common;
 
-namespace Orion.Window.Common
-{
-    public class PackNode : TreeNode
-    {
+namespace Orion.Window.Common {
+    public class PackNode : TreeNode {
         private byte[] pData;
 
-        public PackNode(object pItem, string sName)
-        {
+        public PackNode(object pItem, string sName) {
             Name = sName;
             Text = sName;
             Tag = pItem;
         }
 
         /* Generate the full current path of this node within the tree */
-        public string Path
-        {
-            get
-            {
+        public string Path {
+            get {
                 string[] aPath = new string[Level];
 
                 TreeNode pNode = this;
-                for (int i = 0; i < aPath.Length; i++)
-                {
+                for (int i = 0; i < aPath.Length; i++) {
                     aPath[i] = pNode.Name;
 
                     pNode = pNode.Parent;
@@ -55,11 +49,9 @@ namespace Orion.Window.Common
         }
 
         /* Return the decrypted data block from the entry */
-        public byte[] Data
-        {
+        public byte[] Data {
             get => Tag is PackFileEntry ? (Tag as PackFileEntry).Data : pData;
-            set
-            {
+            set {
                 if (Tag is PackFileEntry)
                     (Tag as PackFileEntry).Data = value;
                 else

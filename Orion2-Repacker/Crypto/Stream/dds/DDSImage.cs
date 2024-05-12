@@ -2,14 +2,11 @@
 using Pfim;
 using ImageFormat = Pfim.ImageFormat;
 
-namespace Orion.Crypto.Stream.DDS
-{
-    public class DDSImage : IDisposable
-    {
+namespace Orion.Crypto.Stream.DDS {
+    public class DDSImage : IDisposable {
         private readonly IImage _image;
 
-        public DDSImage(byte[] ddsImage)
-        {
+        public DDSImage(byte[] ddsImage) {
             if (ddsImage == null)
                 return;
 
@@ -20,8 +17,7 @@ namespace Orion.Crypto.Stream.DDS
             Parse();
         }
 
-        public DDSImage(System.IO.Stream ddsImage)
-        {
+        public DDSImage(System.IO.Stream ddsImage) {
             if (ddsImage == null)
                 return;
 
@@ -34,17 +30,14 @@ namespace Orion.Crypto.Stream.DDS
 
         public Bitmap BitmapImage { get; private set; }
 
-        public void Dispose()
-        {
-            if (BitmapImage != null)
-            {
+        public void Dispose() {
+            if (BitmapImage != null) {
                 BitmapImage.Dispose();
                 BitmapImage = null;
             }
         }
 
-        private void Parse()
-        {
+        private void Parse() {
             if (_image == null)
                 throw new Exception("Image data failed to create within Pfim");
 
@@ -54,17 +47,14 @@ namespace Orion.Crypto.Stream.DDS
             BitmapImage = CreateBitmap(_image);
         }
 
-        private Bitmap CreateBitmap(IImage image)
-        {
+        private Bitmap CreateBitmap(IImage image) {
             PixelFormat pxFormat = PixelFormat.Format24bppRgb;
             if (image.Format == ImageFormat.Rgba32)
                 pxFormat = PixelFormat.Format32bppArgb;
 
-            unsafe
-            {
-                fixed (byte* bytePtr = image.Data)
-                {
-                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr) bytePtr);
+            unsafe {
+                fixed (byte* bytePtr = image.Data) {
+                    return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr)bytePtr);
                 }
             }
         }

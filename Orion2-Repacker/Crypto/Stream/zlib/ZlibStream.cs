@@ -25,8 +25,7 @@
 //
 // ------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib
-{
+namespace Orion.Crypto.Stream.zlib {
     /// <summary>
     ///     Represents a Zlib stream for compression or decompression.
     /// </summary>
@@ -76,8 +75,7 @@ namespace Orion.Crypto.Stream.zlib
     /// </remarks>
     /// <seealso cref="DeflateStream" />
     /// <seealso cref="GZipStream" />
-    public class ZlibStream : System.IO.Stream
-    {
+    public class ZlibStream : System.IO.Stream {
         internal ZlibBaseStream _baseStream;
         private bool _disposed;
 
@@ -131,8 +129,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="stream">The stream which will be read or written.</param>
         /// <param name="mode">Indicates whether the ZlibStream will compress or decompress.</param>
         public ZlibStream(System.IO.Stream stream, CompressionMode mode)
-            : this(stream, mode, CompressionLevel.Default, false)
-        {
+            : this(stream, mode, CompressionLevel.Default, false) {
         }
 
         /// <summary>
@@ -188,8 +185,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="mode">Indicates whether the ZlibStream will compress or decompress.</param>
         /// <param name="level">A tuning knob to trade speed for effectiveness.</param>
         public ZlibStream(System.IO.Stream stream, CompressionMode mode, CompressionLevel level)
-            : this(stream, mode, level, false)
-        {
+            : this(stream, mode, level, false) {
         }
 
         /// <summary>
@@ -225,8 +221,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     open after inflation/deflation.
         /// </param>
         public ZlibStream(System.IO.Stream stream, CompressionMode mode, bool leaveOpen)
-            : this(stream, mode, CompressionLevel.Default, leaveOpen)
-        {
+            : this(stream, mode, CompressionLevel.Default, leaveOpen) {
         }
 
         /// <summary>
@@ -301,8 +296,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     A tuning knob to trade speed for effectiveness. This parameter is
         ///     effective only when mode is <c>CompressionMode.Compress</c>.
         /// </param>
-        public ZlibStream(System.IO.Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen)
-        {
+        public ZlibStream(System.IO.Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen) {
             _baseStream = new ZlibBaseStream(stream, mode, level, ZlibStreamFlavor.ZLIB, leaveOpen);
         }
 
@@ -320,10 +314,8 @@ namespace Orion.Crypto.Stream.zlib
         ///     using UTF8, then compressed.
         /// </param>
         /// <returns>The string in compressed form</returns>
-        public static byte[] CompressString(string s)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
+        public static byte[] CompressString(string s) {
+            using (MemoryStream ms = new MemoryStream()) {
                 System.IO.Stream compressor =
                     new ZlibStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
                 ZlibBaseStream.CompressString(s, compressor);
@@ -343,10 +335,8 @@ namespace Orion.Crypto.Stream.zlib
         ///     A buffer to compress.
         /// </param>
         /// <returns>The data in compressed form</returns>
-        public static byte[] CompressBuffer(byte[] b)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
+        public static byte[] CompressBuffer(byte[] b) {
+            using (MemoryStream ms = new MemoryStream()) {
                 System.IO.Stream compressor =
                     new ZlibStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
 
@@ -364,10 +354,8 @@ namespace Orion.Crypto.Stream.zlib
         ///     A buffer containing ZLIB-compressed data.
         /// </param>
         /// <returns>The uncompressed string</returns>
-        public static string UncompressString(byte[] compressed)
-        {
-            using (MemoryStream input = new MemoryStream(compressed))
-            {
+        public static string UncompressString(byte[] compressed) {
+            using (MemoryStream input = new MemoryStream(compressed)) {
                 System.IO.Stream decompressor =
                     new ZlibStream(input, CompressionMode.Decompress);
 
@@ -384,10 +372,8 @@ namespace Orion.Crypto.Stream.zlib
         ///     A buffer containing ZLIB-compressed data.
         /// </param>
         /// <returns>The data in uncompressed form</returns>
-        public static byte[] UncompressBuffer(byte[] compressed)
-        {
-            using (MemoryStream input = new MemoryStream(compressed))
-            {
+        public static byte[] UncompressBuffer(byte[] compressed) {
+            using (MemoryStream input = new MemoryStream(compressed)) {
                 System.IO.Stream decompressor =
                     new ZlibStream(input, CompressionMode.Decompress);
 
@@ -401,11 +387,9 @@ namespace Orion.Crypto.Stream.zlib
         ///     This property sets the flush behavior on the stream.
         ///     Sorry, though, not sure exactly how to describe all the various settings.
         /// </summary>
-        public virtual FlushType FlushMode
-        {
+        public virtual FlushType FlushMode {
             get => _baseStream._flushMode;
-            set
-            {
+            set {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
                 _baseStream._flushMode = value;
             }
@@ -426,11 +410,9 @@ namespace Orion.Crypto.Stream.zlib
         ///         stream. If you try to set it afterwards, it will throw.
         ///     </para>
         /// </remarks>
-        public int BufferSize
-        {
+        public int BufferSize {
             get => _baseStream._bufferSize;
-            set
-            {
+            set {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
                 if (_baseStream._workingBuffer != null)
                     throw new ZlibException("The working buffer is already set.");
@@ -473,19 +455,14 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="disposing">
         ///     indicates whether the Dispose method was invoked by user code.
         /// </param>
-        protected override void Dispose(bool disposing)
-        {
-            try
-            {
-                if (!_disposed)
-                {
+        protected override void Dispose(bool disposing) {
+            try {
+                if (!_disposed) {
                     if (disposing && _baseStream != null)
                         _baseStream.Close();
                     _disposed = true;
                 }
-            }
-            finally
-            {
+            } finally {
                 base.Dispose(disposing);
             }
         }
@@ -496,10 +473,8 @@ namespace Orion.Crypto.Stream.zlib
         /// <remarks>
         ///     The return value depends on whether the captive stream supports reading.
         /// </remarks>
-        public override bool CanRead
-        {
-            get
-            {
+        public override bool CanRead {
+            get {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
                 return _baseStream._stream.CanRead;
             }
@@ -519,10 +494,8 @@ namespace Orion.Crypto.Stream.zlib
         /// <remarks>
         ///     The return value depends on whether the captive stream supports writing.
         /// </remarks>
-        public override bool CanWrite
-        {
-            get
-            {
+        public override bool CanWrite {
+            get {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
                 return _baseStream._stream.CanWrite;
             }
@@ -531,8 +504,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <summary>
         ///     Flush the stream.
         /// </summary>
-        public override void Flush()
-        {
+        public override void Flush() {
             if (_disposed) throw new ObjectDisposedException("ZlibStream");
             _baseStream.Flush();
         }
@@ -554,10 +526,8 @@ namespace Orion.Crypto.Stream.zlib
         ///     reading.  The count may refer to compressed bytes or uncompressed bytes,
         ///     depending on how you've used the stream.
         /// </remarks>
-        public override long Position
-        {
-            get
-            {
+        public override long Position {
+            get {
                 if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
                     return _baseStream._z.TotalBytesOut;
                 if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader)
@@ -595,8 +565,7 @@ namespace Orion.Crypto.Stream.zlib
         /// </param>
         /// <param name="count">the number of bytes to read.</param>
         /// <returns>the number of bytes read</returns>
-        public override int Read(byte[] buffer, int offset, int count)
-        {
+        public override int Read(byte[] buffer, int offset, int count) {
             if (_disposed) throw new ObjectDisposedException("ZlibStream");
             return _baseStream.Read(buffer, offset, count);
         }
@@ -613,8 +582,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     THIS METHOD ACTUALLY DID ANYTHING.
         /// </param>
         /// <returns>nothing. This method always throws.</returns>
-        public override long Seek(long offset, SeekOrigin origin)
-        {
+        public override long Seek(long offset, SeekOrigin origin) {
             throw new NotSupportedException();
         }
 
@@ -625,8 +593,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     The new value for the stream length....  IF
         ///     THIS METHOD ACTUALLY DID ANYTHING.
         /// </param>
-        public override void SetLength(long value)
-        {
+        public override void SetLength(long value) {
             throw new NotSupportedException();
         }
 
@@ -653,8 +620,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="buffer">The buffer holding data to write to the stream.</param>
         /// <param name="offset">the offset within that data array to find the first byte to write.</param>
         /// <param name="count">the number of bytes to write.</param>
-        public override void Write(byte[] buffer, int offset, int count)
-        {
+        public override void Write(byte[] buffer, int offset, int count) {
             if (_disposed) throw new ObjectDisposedException("ZlibStream");
             _baseStream.Write(buffer, offset, count);
         }

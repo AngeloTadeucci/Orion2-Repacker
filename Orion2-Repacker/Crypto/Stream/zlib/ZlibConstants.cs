@@ -60,13 +60,11 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib
-{
+namespace Orion.Crypto.Stream.zlib {
     /// <summary>
     ///     A bunch of constants used in the Zlib interface.
     /// </summary>
-    public static class ZlibConstants
-    {
+    public static class ZlibConstants {
         /// <summary>
         ///     The maximum number of window bits for the Deflate algorithm.
         /// </summary>

@@ -18,15 +18,12 @@
 using System.Diagnostics;
 using Orion.Crypto.Stream;
 
-namespace Orion.Window
-{
-    public partial class ProgressWindow : Form
-    {
+namespace Orion.Window {
+    public partial class ProgressWindow : Form {
         private Stopwatch pStopWatch;
         private string sPath;
 
-        public ProgressWindow()
-        {
+        public ProgressWindow() {
             InitializeComponent();
         }
 
@@ -34,30 +31,25 @@ namespace Orion.Window
         public IPackStreamVerBase Stream { get; set; }
         public long ElapsedTime { get; set; }
 
-        public string Path
-        {
+        public string Path {
             get => sPath;
-            set
-            {
+            set {
                 sPath = value;
 
                 FileName = sPath.Substring(sPath.LastIndexOf('/') + 1).Split('.')[0];
             }
         }
 
-        public void UpdateProgressBar(int nProgress)
-        {
+        public void UpdateProgressBar(int nProgress) {
             pProgressBar.Value = nProgress;
             pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
         }
 
-        public void Start()
-        {
+        public void Start() {
             pStopWatch = Stopwatch.StartNew();
         }
 
-        public void Finish()
-        {
+        public void Finish() {
             ElapsedTime = pStopWatch.ElapsedMilliseconds;
             pStopWatch.Stop();
         }

@@ -15,10 +15,8 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Stream
-{
-    public interface IPackFileHeaderVerBase
-    {
+namespace Orion.Crypto.Stream {
+    public interface IPackFileHeaderVerBase {
         uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 
         int GetFileIndex(); // The index of this file located within the lookup table

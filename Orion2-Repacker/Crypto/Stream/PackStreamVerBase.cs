@@ -17,10 +17,8 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream
-{
-    public interface IPackStreamVerBase
-    {
+namespace Orion.Crypto.Stream {
+    public interface IPackStreamVerBase {
         uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 
         ulong GetCompressedHeaderSize(); // The total compressed size of the (raw) file list

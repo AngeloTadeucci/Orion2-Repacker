@@ -17,15 +17,12 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Window.Common
-{
+namespace Orion.Window.Common {
     [Serializable]
-    public class PackNodeList
-    {
+    public class PackNodeList {
         public const string DATA_FORMAT = "Pack.Node.FileList";
 
-        public PackNodeList(string sDir)
-        {
+        public PackNodeList(string sDir) {
             Directory = sDir;
             Children = new Dictionary<string, PackNodeList>();
             Entries = new Dictionary<string, PackFileEntry>();
@@ -39,8 +36,7 @@ namespace Orion.Window.Common
          * Recursively clear all children/entries within this node list.
          * 
         */
-        public void InternalRelease()
-        {
+        public void InternalRelease() {
             Entries.Clear();
 
             foreach (PackNodeList pChild in Children.Values) pChild.InternalRelease();

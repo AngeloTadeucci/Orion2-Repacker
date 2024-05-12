@@ -89,16 +89,14 @@
 using System.Text;
 using Interop = System.Runtime.InteropServices;
 
-namespace Orion.Crypto.Stream.zlib
-{
+namespace Orion.Crypto.Stream.zlib {
     /// <summary>
     ///     Describes how to flush the current deflate operation.
     /// </summary>
     /// <remarks>
     ///     The different FlushType values are useful when using a Deflate in a streaming application.
     /// </remarks>
-    public enum FlushType
-    {
+    public enum FlushType {
         /// <summary>No flush at all.</summary>
         None = 0,
 
@@ -137,8 +135,7 @@ namespace Orion.Crypto.Stream.zlib
     /// <summary>
     ///     The compression level to be used when using a DeflateStream or ZlibStream with CompressionMode.Compress.
     /// </summary>
-    public enum CompressionLevel
-    {
+    public enum CompressionLevel {
         /// <summary>
         ///     None means that the data will be simply stored, with no change at all.
         ///     If you are producing ZIPs for use on Mac OSX, be aware that archives produced with CompressionLevel.None
@@ -216,8 +213,7 @@ namespace Orion.Crypto.Stream.zlib
     ///     work better on different sorts of data.  The strategy parameter can affect the compression
     ///     ratio and the speed of compression but not the correctness of the compresssion.
     /// </summary>
-    public enum CompressionStrategy
-    {
+    public enum CompressionStrategy {
         /// <summary>
         ///     The default strategy is probably the best for normal data.
         /// </summary>
@@ -242,8 +238,7 @@ namespace Orion.Crypto.Stream.zlib
     /// <summary>
     ///     An enum to specify the direction of transcoding - whether to compress or decompress.
     /// </summary>
-    public enum CompressionMode
-    {
+    public enum CompressionMode {
         /// <summary>
         ///     Used to specify that the stream should compress the data.
         /// </summary>
@@ -258,14 +253,12 @@ namespace Orion.Crypto.Stream.zlib
     ///     A general purpose exception class for exceptions in the Zlib library.
     /// </summary>
     [Interop.Guid("ebc25cf6-9120-4283-b972-0e5520d0000E")]
-    public class ZlibException : Exception
-    {
+    public class ZlibException : Exception {
         /// <summary>
         ///     The ZlibException class captures exception information generated
         ///     by the Zlib library.
         /// </summary>
-        public ZlibException()
-        {
+        public ZlibException() {
         }
 
         /// <summary>
@@ -273,22 +266,19 @@ namespace Orion.Crypto.Stream.zlib
         /// </summary>
         /// <param name="s">the message for the exception.</param>
         public ZlibException(string s)
-            : base(s)
-        {
+            : base(s) {
         }
     }
 
-    internal class SharedUtils
-    {
+    internal class SharedUtils {
         /// <summary>
         ///     Performs an unsigned bitwise right shift with the specified number
         /// </summary>
         /// <param name="number">Number to operate on</param>
         /// <param name="bits">Ammount of bits to shift</param>
         /// <returns>The resulting number from the shift operation</returns>
-        public static int URShift(int number, int bits)
-        {
-            return (int) ((uint) number >> bits);
+        public static int URShift(int number, int bits) {
+            return (int)((uint)number >> bits);
         }
 
 #if NOT
@@ -317,8 +307,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     count depending on the data available in the source TextReader. Returns -1
         ///     if the end of the stream is reached.
         /// </returns>
-        public static int ReadInput(TextReader sourceTextReader, byte[] target, int start, int count)
-        {
+        public static int ReadInput(TextReader sourceTextReader, byte[] target, int start, int count) {
             // Returns 0 bytes if not enough space in target
             if (target.Length == 0) return 0;
 
@@ -329,24 +318,21 @@ namespace Orion.Crypto.Stream.zlib
             if (bytesRead == 0) return -1;
 
             for (int index = start; index < start + bytesRead; index++)
-                target[index] = (byte) charArray[index];
+                target[index] = (byte)charArray[index];
 
             return bytesRead;
         }
 
-        internal static byte[] ToByteArray(string sourceString)
-        {
+        internal static byte[] ToByteArray(string sourceString) {
             return Encoding.UTF8.GetBytes(sourceString);
         }
 
-        internal static char[] ToCharArray(byte[] byteArray)
-        {
+        internal static char[] ToCharArray(byte[] byteArray) {
             return Encoding.UTF8.GetChars(byteArray);
         }
     }
 
-    internal static class InternalConstants
-    {
+    internal static class InternalConstants {
         internal static readonly int MAX_BITS = 15;
         internal static readonly int BL_CODES = 19;
         internal static readonly int D_CODES = 30;
@@ -367,8 +353,7 @@ namespace Orion.Crypto.Stream.zlib
         internal static readonly int REPZ_11_138 = 18;
     }
 
-    internal sealed class StaticTree
-    {
+    internal sealed class StaticTree {
         internal static readonly short[] lengthAndLiteralsTreeCodes =
         {
             12,
@@ -1023,16 +1008,14 @@ namespace Orion.Crypto.Stream.zlib
 
         internal short[] treeCodes; // static tree or null
 
-        static StaticTree()
-        {
+        static StaticTree() {
             Literals = new StaticTree(lengthAndLiteralsTreeCodes, Tree.ExtraLengthBits, InternalConstants.LITERALS + 1, InternalConstants.L_CODES,
                 InternalConstants.MAX_BITS);
             Distances = new StaticTree(distTreeCodes, Tree.ExtraDistanceBits, 0, InternalConstants.D_CODES, InternalConstants.MAX_BITS);
             BitLengths = new StaticTree(null, Tree.extra_blbits, 0, InternalConstants.BL_CODES, InternalConstants.MAX_BL_BITS);
         }
 
-        private StaticTree(short[] treeCodes, int[] extraBits, int extraBase, int elems, int maxLength)
-        {
+        private StaticTree(short[] treeCodes, int[] extraBits, int extraBase, int elems, int maxLength) {
             this.treeCodes = treeCodes;
             this.extraBits = extraBits;
             this.extraBase = extraBase;
@@ -1051,8 +1034,7 @@ namespace Orion.Crypto.Stream.zlib
     ///     use this class directly.
     /// </remarks>
     /// <exclude />
-    public sealed class Adler
-    {
+    public sealed class Adler {
         // largest prime smaller than 65536
         private static readonly uint BASE = 65521;
         // NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
@@ -1076,20 +1058,17 @@ namespace Orion.Crypto.Stream.zlib
         ///    adler = Adler.Adler32(adler, buffer, index, length);
         ///  </code>
         /// </example>
-        public static uint Adler32(uint adler, byte[] buf, int index, int len)
-        {
+        public static uint Adler32(uint adler, byte[] buf, int index, int len) {
             if (buf == null)
                 return 1;
 
             uint s1 = adler & 0xffff;
             uint s2 = (adler >> 16) & 0xffff;
 
-            while (len > 0)
-            {
+            while (len > 0) {
                 int k = len < NMAX ? len : NMAX;
                 len -= k;
-                while (k >= 16)
-                {
+                while (k >= 16) {
                     //s1 += (buf[index++] & 0xff); s2 += s1;
                     s1 += buf[index++];
                     s2 += s1;
@@ -1127,8 +1106,7 @@ namespace Orion.Crypto.Stream.zlib
                 }
 
                 if (k != 0)
-                    do
-                    {
+                    do {
                         s1 += buf[index++];
                         s2 += s1;
                     } while (--k != 0);

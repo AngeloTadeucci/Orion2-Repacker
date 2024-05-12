@@ -17,10 +17,8 @@
 
 using Orion.Crypto.Stream;
 
-namespace Orion.Crypto.Common
-{
-    public class PackVer
-    {
+namespace Orion.Crypto.Common {
+    public class PackVer {
         public const uint
             MS2F = 0x4632534D, //Ver1
             NS2F = 0x4632534E, //Ver2
@@ -36,11 +34,9 @@ namespace Orion.Crypto.Common
          * @return A packed stream with header sizes decoded
          * 
         */
-        public static IPackStreamVerBase CreatePackVer(BinaryReader pHeader)
-        {
+        public static IPackStreamVerBase CreatePackVer(BinaryReader pHeader) {
             uint uVer = pHeader.ReadUInt32();
-            switch (uVer)
-            {
+            switch (uVer) {
                 case MS2F:
                     return PackStreamVer1.ParseHeader(pHeader);
                 case NS2F:

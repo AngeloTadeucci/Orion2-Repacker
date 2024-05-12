@@ -17,10 +17,8 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream
-{
-    public class PackFileHeaderVer1 : IPackFileHeaderVerBase
-    {
+namespace Orion.Crypto.Stream {
+    public class PackFileHeaderVer1 : IPackFileHeaderVerBase {
         private readonly byte[] aPackingDef; //A "Packing Definition", unused.
         private readonly int[] Reserved;
         private uint dwBufferFlag;
@@ -30,15 +28,13 @@ namespace Orion.Crypto.Stream
         private ulong uFileSize;
         private ulong uOffset;
 
-        private PackFileHeaderVer1()
-        {
+        private PackFileHeaderVer1() {
             aPackingDef = new byte[4];
             Reserved = new int[2];
         }
 
         public PackFileHeaderVer1(BinaryReader pReader)
-            : this()
-        {
+            : this() {
             aPackingDef = pReader.ReadBytes(4); //[ecx+16]
             nFileIndex = pReader.ReadInt32(); //[ecx+20]
             dwBufferFlag = pReader.ReadUInt32(); //[ecx+24]
@@ -50,8 +46,7 @@ namespace Orion.Crypto.Stream
             uFileSize = pReader.ReadUInt64(); //[ecx+56] | [ecx+60]
         }
 
-        public void Encode(BinaryWriter pWriter)
-        {
+        public void Encode(BinaryWriter pWriter) {
             pWriter.Write(aPackingDef);
             pWriter.Write(nFileIndex);
             pWriter.Write(dwBufferFlag);
@@ -63,72 +58,58 @@ namespace Orion.Crypto.Stream
             pWriter.Write(uFileSize);
         }
 
-        public uint GetVer()
-        {
+        public uint GetVer() {
             return PackVer.MS2F;
         }
 
-        public int GetFileIndex()
-        {
+        public int GetFileIndex() {
             return nFileIndex;
         }
 
-        public uint GetBufferFlag()
-        {
+        public uint GetBufferFlag() {
             return dwBufferFlag;
         }
 
-        public ulong GetOffset()
-        {
+        public ulong GetOffset() {
             return uOffset;
         }
 
-        public uint GetEncodedFileSize()
-        {
+        public uint GetEncodedFileSize() {
             return uEncodedFileSize;
         }
 
-        public ulong GetCompressedFileSize()
-        {
+        public ulong GetCompressedFileSize() {
             return uCompressedFileSize;
         }
 
-        public ulong GetFileSize()
-        {
+        public ulong GetFileSize() {
             return uFileSize;
         }
 
-        public void SetFileIndex(int nIndex)
-        {
+        public void SetFileIndex(int nIndex) {
             nFileIndex = nIndex;
         }
 
-        public void SetOffset(ulong uOffset)
-        {
+        public void SetOffset(ulong uOffset) {
             this.uOffset = uOffset;
         }
 
-        public void SetEncodedFileSize(uint uEncoded)
-        {
+        public void SetEncodedFileSize(uint uEncoded) {
             uEncodedFileSize = uEncoded;
         }
 
-        public void SetCompressedFileSize(ulong uCompressed)
-        {
+        public void SetCompressedFileSize(ulong uCompressed) {
             uCompressedFileSize = uCompressed;
         }
 
-        public void SetFileSize(ulong uSize)
-        {
+        public void SetFileSize(ulong uSize) {
             uFileSize = uSize;
         }
 
-        public static PackFileHeaderVer1 CreateHeader(int nIndex, uint dwFlag, ulong uOffset, byte[] pData)
-        {
+        public static PackFileHeaderVer1 CreateHeader(int nIndex, uint dwFlag, ulong uOffset, byte[] pData) {
             CryptoMan.Encrypt(PackVer.MS2F, pData, dwFlag, out uint uLen, out uint uCompressedLen, out uint uEncodedLen);
 
-            return new PackFileHeaderVer1
-            {
+            return new PackFileHeaderVer1 {
                 nFileIndex = nIndex,
                 dwBufferFlag = dwFlag,
                 uOffset = uOffset,

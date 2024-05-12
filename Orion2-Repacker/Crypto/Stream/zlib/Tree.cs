@@ -60,10 +60,8 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib
-{
-    internal sealed class Tree
-    {
+namespace Orion.Crypto.Stream.zlib {
+    internal sealed class Tree {
         // The lengths of the bit length codes are sent in order of decreasing
         // probability, to avoid transmitting the lengths for unused bit
         // length codes.
@@ -893,8 +891,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <remarks>
         ///     No side effects. _dist_code[256] and _dist_code[257] are never used.
         /// </remarks>
-        internal static int DistanceCode(int dist)
-        {
+        internal static int DistanceCode(int dist) {
             return dist < 256
                 ? _dist_code[dist]
                 : _dist_code[256 + SharedUtils.URShift(dist, 7)];
@@ -908,8 +905,7 @@ namespace Orion.Crypto.Stream.zlib
         //     array bl_count contains the frequencies for each bit length.
         //     The length opt_len is updated; static_len is also updated if stree is
         //     not null.
-        internal void gen_bitlen(DeflateManager s)
-        {
+        internal void gen_bitlen(DeflateManager s) {
             short[] tree = dyn_tree;
             short[] stree = staticTree.treeCodes;
             int[] extra = staticTree.extraBits;
@@ -929,17 +925,15 @@ namespace Orion.Crypto.Stream.zlib
             // overflow in the case of the bit length tree).
             tree[s.heap[s.heap_max] * 2 + 1] = 0; // root of the heap
 
-            for (h = s.heap_max + 1; h < HEAP_SIZE; h++)
-            {
+            for (h = s.heap_max + 1; h < HEAP_SIZE; h++) {
                 n = s.heap[h];
                 bits = tree[tree[n * 2 + 1] * 2 + 1] + 1;
-                if (bits > max_length)
-                {
+                if (bits > max_length) {
                     bits = max_length;
                     overflow++;
                 }
 
-                tree[n * 2 + 1] = (short) bits;
+                tree[n * 2 + 1] = (short)bits;
                 // We overwrite tree[n*2+1] which is no longer needed
 
                 if (n > max_code)
@@ -960,31 +954,27 @@ namespace Orion.Crypto.Stream.zlib
 
             // This happens for example on obj2 and pic of the Calgary corpus
             // Find the first bit length which could increase:
-            do
-            {
+            do {
                 bits = max_length - 1;
                 while (s.bl_count[bits] == 0)
                     bits--;
                 s.bl_count[bits]--; // move one leaf down the tree
-                s.bl_count[bits + 1] = (short) (s.bl_count[bits + 1] + 2); // move one overflow item as its brother
+                s.bl_count[bits + 1] = (short)(s.bl_count[bits + 1] + 2); // move one overflow item as its brother
                 s.bl_count[max_length]--;
                 // The brother of the overflow item also moves one step up,
                 // but this does not affect bl_count[max_length]
                 overflow -= 2;
             } while (overflow > 0);
 
-            for (bits = max_length; bits != 0; bits--)
-            {
+            for (bits = max_length; bits != 0; bits--) {
                 n = s.bl_count[bits];
-                while (n != 0)
-                {
+                while (n != 0) {
                     m = s.heap[--h];
                     if (m > max_code)
                         continue;
-                    if (tree[m * 2 + 1] != bits)
-                    {
-                        s.opt_len = (int) (s.opt_len + (bits - (long) tree[m * 2 + 1]) * tree[m * 2]);
-                        tree[m * 2 + 1] = (short) bits;
+                    if (tree[m * 2 + 1] != bits) {
+                        s.opt_len = (int)(s.opt_len + (bits - (long)tree[m * 2 + 1]) * tree[m * 2]);
+                        tree[m * 2 + 1] = (short)bits;
                     }
 
                     n--;
@@ -998,8 +988,7 @@ namespace Orion.Crypto.Stream.zlib
         // OUT assertions: the fields len and code are set to the optimal bit length
         //     and corresponding code. The length opt_len is updated; static_len is
         //     also updated if stree is not null. The field max_code is set.
-        internal void build_tree(DeflateManager s)
-        {
+        internal void build_tree(DeflateManager s) {
             short[] tree = dyn_tree;
             short[] stree = staticTree.treeCodes;
             int elems = staticTree.elems;
@@ -1014,13 +1003,10 @@ namespace Orion.Crypto.Stream.zlib
             s.heap_max = HEAP_SIZE;
 
             for (n = 0; n < elems; n++)
-                if (tree[n * 2] != 0)
-                {
+                if (tree[n * 2] != 0) {
                     s.heap[++s.heap_len] = max_code = n;
                     s.depth[n] = 0;
-                }
-                else
-                {
+                } else {
                     tree[n * 2 + 1] = 0;
                 }
 
@@ -1028,8 +1014,7 @@ namespace Orion.Crypto.Stream.zlib
             // and that at least one bit should be sent even if there is only one
             // possible code. So to avoid special checks later on we force at least
             // two codes of non zero frequency.
-            while (s.heap_len < 2)
-            {
+            while (s.heap_len < 2) {
                 node = s.heap[++s.heap_len] = max_code < 2 ? ++max_code : 0;
                 tree[node * 2] = 1;
                 s.depth[node] = 0;
@@ -1051,8 +1036,7 @@ namespace Orion.Crypto.Stream.zlib
             // frequent nodes.
 
             node = elems; // next internal node of the tree
-            do
-            {
+            do {
                 // n = node of least frequency
                 n = s.heap[1];
                 s.heap[1] = s.heap[s.heap_len--];
@@ -1063,9 +1047,9 @@ namespace Orion.Crypto.Stream.zlib
                 s.heap[--s.heap_max] = m;
 
                 // Create a new node father of n and m
-                tree[node * 2] = unchecked((short) (tree[n * 2] + tree[m * 2]));
-                s.depth[node] = (sbyte) (Math.Max((byte) s.depth[n], (byte) s.depth[m]) + 1);
-                tree[n * 2 + 1] = tree[m * 2 + 1] = (short) node;
+                tree[node * 2] = unchecked((short)(tree[n * 2] + tree[m * 2]));
+                s.depth[node] = (sbyte)(Math.Max((byte)s.depth[n], (byte)s.depth[m]) + 1);
+                tree[n * 2 + 1] = tree[m * 2 + 1] = (short)node;
 
                 // and insert the new node in the heap
                 s.heap[1] = node++;
@@ -1089,8 +1073,7 @@ namespace Orion.Crypto.Stream.zlib
         // the given tree and the field len is set for all tree elements.
         // OUT assertion: the field code is set for all tree elements of non
         //     zero code length.
-        internal static void gen_codes(short[] tree, int max_code, short[] bl_count)
-        {
+        internal static void gen_codes(short[] tree, int max_code, short[] bl_count) {
             short[] next_code = new short[InternalConstants.MAX_BITS + 1]; // next code value for each bit length
             short code = 0; // running code value
             int bits; // bit index
@@ -1099,9 +1082,8 @@ namespace Orion.Crypto.Stream.zlib
             // The distribution counts are first used to generate the code values
             // without bit reversal.
             for (bits = 1; bits <= InternalConstants.MAX_BITS; bits++)
-                unchecked
-                {
-                    next_code[bits] = code = (short) ((code + bl_count[bits - 1]) << 1);
+                unchecked {
+                    next_code[bits] = code = (short)((code + bl_count[bits - 1]) << 1);
                 }
 
             // Check that the bit counts in bl_count are consistent. The last code
@@ -1110,24 +1092,21 @@ namespace Orion.Crypto.Stream.zlib
             //        "inconsistent bit counts");
             //Tracev((stderr,"\ngen_codes: max_code %d ", max_code));
 
-            for (n = 0; n <= max_code; n++)
-            {
+            for (n = 0; n <= max_code; n++) {
                 int len = tree[n * 2 + 1];
                 if (len == 0)
                     continue;
                 // Now reverse the bits
-                tree[n * 2] = unchecked((short) bi_reverse(next_code[len]++, len));
+                tree[n * 2] = unchecked((short)bi_reverse(next_code[len]++, len));
             }
         }
 
         // Reverse the first len bits of a code, using straightforward code (a faster
         // method would use a table)
         // IN assertion: 1 <= len <= 15
-        internal static int bi_reverse(int code, int len)
-        {
+        internal static int bi_reverse(int code, int len) {
             int res = 0;
-            do
-            {
+            do {
                 res |= code & 1;
                 code >>= 1; //SharedUtils.URShift(code, 1);
                 res <<= 1;

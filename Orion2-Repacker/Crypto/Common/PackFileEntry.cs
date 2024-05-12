@@ -17,11 +17,9 @@
 
 using Orion.Crypto.Stream;
 
-namespace Orion.Crypto.Common
-{
+namespace Orion.Crypto.Common {
     [Serializable]
-    public class PackFileEntry : IComparable<PackFileEntry>
-    {
+    public class PackFileEntry : IComparable<PackFileEntry> {
         public const string DATA_FORMAT = "Pack.Node.FileEntry";
 
         public int Index { get; set; } // The index of the file in the lookup table
@@ -32,17 +30,14 @@ namespace Orion.Crypto.Common
         public byte[] Data { get; set; } // The raw, decrypted, and current data buffer of the file
         public bool Changed { get; set; } // If the data has been modified in the repacker
 
-        public int CompareTo(PackFileEntry pObj)
-        {
+        public int CompareTo(PackFileEntry pObj) {
             if (Index == pObj.Index) return 0;
 
             return Index > pObj.Index ? 1 : -1;
         }
 
-        public PackFileEntry CreateCopy(byte[] pData = null)
-        {
-            return new PackFileEntry
-            {
+        public PackFileEntry CreateCopy(byte[] pData = null) {
+            return new PackFileEntry {
                 Index = int.MaxValue,
                 Hash = Hash,
                 Name = Name,
@@ -53,8 +48,7 @@ namespace Orion.Crypto.Common
             };
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             if (string.IsNullOrEmpty(Hash)) return $"{Index},{Name}\r\n";
             return $"{Index},{Hash},{Name}\r\n";
         }
@@ -67,40 +61,33 @@ namespace Orion.Crypto.Common
          * @return A list of file entries with their index/hash/name loaded
          * 
         */
-        public static List<PackFileEntry> CreateFileList(string sFileString)
-        {
+        public static List<PackFileEntry> CreateFileList(string sFileString) {
             List<PackFileEntry> aFileList = new List<PackFileEntry>();
 
             string[] aEntries = sFileString.Split(new[]
             {
                 "\r\n"
             }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string sEntry in aEntries)
-            {
+            foreach (string sEntry in aEntries) {
                 int nProperties = 0;
                 foreach (char c in sEntry)
                     if (c == ',')
                         ++nProperties;
 
                 string sIndex, sName;
-                if (nProperties == 1)
-                {
+                if (nProperties == 1) {
                     sIndex = sEntry.Split(',')[0]; //strtok(pStr, ",")
                     sName = sEntry.Split(',')[1]; //strtok(pStr, ",")
 
-                    aFileList.Add(new PackFileEntry
-                    {
+                    aFileList.Add(new PackFileEntry {
                         Index = int.Parse(sIndex), //atoi(sIndex)
                         Name = sName
                     });
-                }
-                else if (nProperties == 2)
-                {
+                } else if (nProperties == 2) {
                     sIndex = sEntry.Split(',')[0]; //strtok(pStr, ",")
                     sName = sEntry.Split(',')[2]; //if (nPropertyIdx == 1)
 
-                    aFileList.Add(new PackFileEntry
-                    {
+                    aFileList.Add(new PackFileEntry {
                         Index = int.Parse(sIndex), //atoi(sIndex)
                         Hash = sEntry.Split(',')[1], //if (!nPropertyIdx)
                         Name = sName

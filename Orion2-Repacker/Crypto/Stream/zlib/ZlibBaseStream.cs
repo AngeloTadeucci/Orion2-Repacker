@@ -26,17 +26,14 @@
 
 using System.Text;
 
-namespace Orion.Crypto.Stream.zlib
-{
-    internal enum ZlibStreamFlavor
-    {
+namespace Orion.Crypto.Stream.zlib {
+    internal enum ZlibStreamFlavor {
         ZLIB = 1950,
         DEFLATE = 1951,
         GZIP = 1952
     }
 
-    internal class ZlibBaseStream : System.IO.Stream
-    {
+    internal class ZlibBaseStream : System.IO.Stream {
         protected internal ZlibCodec _z; // deferred init... new ZlibCodec();
 
         protected internal StreamMode _streamMode = StreamMode.Undefined;
@@ -56,10 +53,8 @@ namespace Orion.Crypto.Stream.zlib
         private readonly CRC32 crc;
         protected internal int _gzipHeaderByteCount;
 
-        internal int Crc32
-        {
-            get
-            {
+        internal int Crc32 {
+            get {
                 if (crc == null) return 0;
                 return crc.Crc32Result;
             }
@@ -69,8 +64,7 @@ namespace Orion.Crypto.Stream.zlib
             CompressionMode compressionMode,
             CompressionLevel level,
             ZlibStreamFlavor flavor,
-            bool leaveOpen)
-        {
+            bool leaveOpen) {
             _flushMode = FlushType.None;
             //this._workingBuffer = new byte[WORKING_BUFFER_SIZE_DEFAULT];
             _stream = stream;
@@ -84,20 +78,14 @@ namespace Orion.Crypto.Stream.zlib
 
         protected internal bool _wantCompress => _compressionMode == CompressionMode.Compress;
 
-        private ZlibCodec z
-        {
-            get
-            {
-                if (_z == null)
-                {
+        private ZlibCodec z {
+            get {
+                if (_z == null) {
                     bool wantRfc1950Header = _flavor == ZlibStreamFlavor.ZLIB;
                     _z = new ZlibCodec();
-                    if (_compressionMode == CompressionMode.Decompress)
-                    {
+                    if (_compressionMode == CompressionMode.Decompress) {
                         _z.InitializeInflate(wantRfc1950Header);
-                    }
-                    else
-                    {
+                    } else {
                         _z.Strategy = Strategy;
                         _z.InitializeDeflate(_level, wantRfc1950Header);
                     }
@@ -107,18 +95,15 @@ namespace Orion.Crypto.Stream.zlib
             }
         }
 
-        private byte[] workingBuffer
-        {
-            get
-            {
+        private byte[] workingBuffer {
+            get {
                 if (_workingBuffer == null)
                     _workingBuffer = new byte[_bufferSize];
                 return _workingBuffer;
             }
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
+        public override void Write(byte[] buffer, int offset, int count) {
             // workitem 7159
             // calculate the CRC on the unccompressed data  (before writing)
             if (crc != null)
@@ -137,8 +122,7 @@ namespace Orion.Crypto.Stream.zlib
             _z.NextIn = offset;
             _z.AvailableBytesIn = count;
             bool done = false;
-            do
-            {
+            do {
                 _z.OutputBuffer = workingBuffer;
                 _z.NextOut = 0;
                 _z.AvailableBytesOut = _workingBuffer.Length;
@@ -159,15 +143,12 @@ namespace Orion.Crypto.Stream.zlib
             } while (!done);
         }
 
-        private void finish()
-        {
+        private void finish() {
             if (_z == null) return;
 
-            if (_streamMode == StreamMode.Writer)
-            {
+            if (_streamMode == StreamMode.Writer) {
                 bool done = false;
-                do
-                {
+                do {
                     _z.OutputBuffer = workingBuffer;
                     _z.NextOut = 0;
                     _z.AvailableBytesOut = _workingBuffer.Length;
@@ -175,8 +156,7 @@ namespace Orion.Crypto.Stream.zlib
                         ? _z.Deflate(FlushType.Finish)
                         : _z.Inflate(FlushType.Finish);
 
-                    if (rc != ZlibConstants.Z_STREAM_END && rc != ZlibConstants.Z_OK)
-                    {
+                    if (rc != ZlibConstants.Z_STREAM_END && rc != ZlibConstants.Z_OK) {
                         string verb = (_wantCompress ? "de" : "in") + "flating";
                         if (_z.Message == null)
                             throw new ZlibException($"{verb}: (rc = {rc})");
@@ -194,29 +174,22 @@ namespace Orion.Crypto.Stream.zlib
                 Flush();
 
                 // workitem 7159
-                if (_flavor == ZlibStreamFlavor.GZIP)
-                {
-                    if (_wantCompress)
-                    {
+                if (_flavor == ZlibStreamFlavor.GZIP) {
+                    if (_wantCompress) {
                         // Emit the GZIP trailer: CRC32 and  size mod 2^32
                         int c1 = crc.Crc32Result;
                         _stream.Write(BitConverter.GetBytes(c1), 0, 4);
-                        int c2 = (int) (crc.TotalBytesRead & 0x00000000FFFFFFFF);
+                        int c2 = (int)(crc.TotalBytesRead & 0x00000000FFFFFFFF);
                         _stream.Write(BitConverter.GetBytes(c2), 0, 4);
-                    }
-                    else
-                    {
+                    } else {
                         throw new ZlibException("Writing with decompression is not supported.");
                     }
                 }
             }
             // workitem 7159
-            else if (_streamMode == StreamMode.Reader)
-            {
-                if (_flavor == ZlibStreamFlavor.GZIP)
-                {
-                    if (!_wantCompress)
-                    {
+            else if (_streamMode == StreamMode.Reader) {
+                if (_flavor == ZlibStreamFlavor.GZIP) {
+                    if (!_wantCompress) {
                         // workitem 8501: handle edge case (decompress empty stream)
                         if (_z.TotalBytesOut == 0L)
                             return;
@@ -226,8 +199,7 @@ namespace Orion.Crypto.Stream.zlib
                         byte[] trailer = new byte[8];
 
                         // workitems 8679 & 12554
-                        if (_z.AvailableBytesIn < 8)
-                        {
+                        if (_z.AvailableBytesIn < 8) {
                             // Make sure we have read to the end of the stream
                             Array.Copy(_z.InputBuffer, _z.NextIn, trailer, 0, _z.AvailableBytesIn);
                             int bytesNeeded = 8 - _z.AvailableBytesIn;
@@ -236,16 +208,14 @@ namespace Orion.Crypto.Stream.zlib
                                 bytesNeeded);
                             if (bytesNeeded != bytesRead)
                                 throw new ZlibException($"Missing or incomplete GZIP trailer. Expected 8 bytes, got {_z.AvailableBytesIn + bytesRead}.");
-                        }
-                        else
-                        {
+                        } else {
                             Array.Copy(_z.InputBuffer, _z.NextIn, trailer, 0, trailer.Length);
                         }
 
                         int crc32_expected = BitConverter.ToInt32(trailer, 0);
                         int crc32_actual = crc.Crc32Result;
                         int isize_expected = BitConverter.ToInt32(trailer, 4);
-                        int isize_actual = (int) (_z.TotalBytesOut & 0x00000000FFFFFFFF);
+                        int isize_actual = (int)(_z.TotalBytesOut & 0x00000000FFFFFFFF);
 
                         if (crc32_actual != crc32_expected)
                             throw new ZlibException(
@@ -253,17 +223,14 @@ namespace Orion.Crypto.Stream.zlib
 
                         if (isize_actual != isize_expected)
                             throw new ZlibException($"Bad size in GZIP trailer. (actual({isize_actual})!=expected({isize_expected}))");
-                    }
-                    else
-                    {
+                    } else {
                         throw new ZlibException("Reading with compression is not supported.");
                     }
                 }
             }
         }
 
-        private void end()
-        {
+        private void end() {
             if (z == null)
                 return;
             if (_wantCompress)
@@ -273,34 +240,27 @@ namespace Orion.Crypto.Stream.zlib
             _z = null;
         }
 
-        public override void Close()
-        {
+        public override void Close() {
             if (_stream == null) return;
-            try
-            {
+            try {
                 finish();
-            }
-            finally
-            {
+            } finally {
                 end();
                 if (!_leaveOpen) _stream.Close();
                 _stream = null;
             }
         }
 
-        public override void Flush()
-        {
+        public override void Flush() {
             _stream.Flush();
         }
 
-        public override long Seek(long offset, SeekOrigin origin)
-        {
+        public override long Seek(long offset, SeekOrigin origin) {
             throw new NotImplementedException();
             //_outStream.Seek(offset, origin);
         }
 
-        public override void SetLength(long value)
-        {
+        public override void SetLength(long value) {
             _stream.SetLength(value);
         }
 
@@ -318,8 +278,7 @@ namespace Orion.Crypto.Stream.zlib
 
         private bool nomoreinput;
 
-        private string ReadZeroTerminatedString()
-        {
+        private string ReadZeroTerminatedString() {
             /*
             var list = new System.Collections.Generic.List<byte>();
             bool done = false;
@@ -344,8 +303,7 @@ namespace Orion.Crypto.Stream.zlib
             return "";
         }
 
-        private int _ReadAndValidateGzipHeader()
-        {
+        private int _ReadAndValidateGzipHeader() {
             /*
             int totalBytesRead = 0;
             // read the header on the first read
@@ -390,24 +348,21 @@ namespace Orion.Crypto.Stream.zlib
             return 0;
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
-        {
+        public override int Read(byte[] buffer, int offset, int count) {
             // According to MS documentation, any implementation of the IO.Stream.Read function must:
             // (a) throw an exception if offset & count reference an invalid part of the buffer,
             //     or if count < 0, or if buffer is null
             // (b) return 0 only upon EOF, or if count = 0
             // (c) if not EOF, then return at least 1 byte, up to <count> bytes
 
-            if (_streamMode == StreamMode.Undefined)
-            {
+            if (_streamMode == StreamMode.Undefined) {
                 if (!_stream.CanRead) throw new ZlibException("The stream is not readable.");
                 // for the first read, set up some controls.
                 _streamMode = StreamMode.Reader;
                 // (The first reference to _z goes through the private accessor which
                 // may initialize it.)
                 z.AvailableBytesIn = 0;
-                if (_flavor == ZlibStreamFlavor.GZIP)
-                {
+                if (_flavor == ZlibStreamFlavor.GZIP) {
                     _gzipHeaderByteCount = _ReadAndValidateGzipHeader();
                     // workitem 8501: handle edge case (decompress empty stream)
                     if (_gzipHeaderByteCount == 0)
@@ -437,11 +392,9 @@ namespace Orion.Crypto.Stream.zlib
             // may initialize it.)
             _z.InputBuffer = workingBuffer;
 
-            do
-            {
+            do {
                 // need data in _workingBuffer in order to deflate/inflate.  Here, we check if we have any.
-                if (_z.AvailableBytesIn == 0 && !nomoreinput)
-                {
+                if (_z.AvailableBytesIn == 0 && !nomoreinput) {
                     // No data available, so try to Read data from the captive stream.
                     _z.NextIn = 0;
                     _z.AvailableBytesIn = _stream.Read(_workingBuffer, 0, _workingBuffer.Length);
@@ -469,18 +422,15 @@ namespace Orion.Crypto.Stream.zlib
 
             // workitem 8557
             // is there more room in output?
-            if (_z.AvailableBytesOut > 0)
-            {
-                if (rc == ZlibConstants.Z_OK && _z.AvailableBytesIn == 0)
-                {
+            if (_z.AvailableBytesOut > 0) {
+                if (rc == ZlibConstants.Z_OK && _z.AvailableBytesIn == 0) {
                     // deferred
                 }
 
                 // are we completely done reading?
                 if (nomoreinput)
                     // and in compression?
-                    if (_wantCompress)
-                    {
+                    if (_wantCompress) {
                         // no more input data available; therefore we flush to
                         // try to complete the read
                         rc = _z.Deflate(FlushType.Finish);
@@ -508,46 +458,37 @@ namespace Orion.Crypto.Stream.zlib
 
         public override long Length => _stream.Length;
 
-        public override long Position
-        {
+        public override long Position {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
 
-        internal enum StreamMode
-        {
+        internal enum StreamMode {
             Writer,
             Reader,
             Undefined
         }
 
-        public static void CompressString(string s, System.IO.Stream compressor)
-        {
+        public static void CompressString(string s, System.IO.Stream compressor) {
             byte[] uncompressed = Encoding.UTF8.GetBytes(s);
-            using (compressor)
-            {
+            using (compressor) {
                 compressor.Write(uncompressed, 0, uncompressed.Length);
             }
         }
 
-        public static void CompressBuffer(byte[] b, System.IO.Stream compressor)
-        {
+        public static void CompressBuffer(byte[] b, System.IO.Stream compressor) {
             // workitem 8460
-            using (compressor)
-            {
+            using (compressor) {
                 compressor.Write(b, 0, b.Length);
             }
         }
 
-        public static string UncompressString(byte[] compressed, System.IO.Stream decompressor)
-        {
+        public static string UncompressString(byte[] compressed, System.IO.Stream decompressor) {
             // workitem 8460
             byte[] working = new byte[1024];
             Encoding encoding = Encoding.UTF8;
-            using (MemoryStream output = new MemoryStream())
-            {
-                using (decompressor)
-                {
+            using (MemoryStream output = new MemoryStream()) {
+                using (decompressor) {
                     int n;
                     while ((n = decompressor.Read(working, 0, working.Length)) != 0) output.Write(working, 0, n);
                 }
@@ -559,14 +500,11 @@ namespace Orion.Crypto.Stream.zlib
             }
         }
 
-        public static byte[] UncompressBuffer(byte[] compressed, System.IO.Stream decompressor)
-        {
+        public static byte[] UncompressBuffer(byte[] compressed, System.IO.Stream decompressor) {
             // workitem 8460
             byte[] working = new byte[1024];
-            using (MemoryStream output = new MemoryStream())
-            {
-                using (decompressor)
-                {
+            using (MemoryStream output = new MemoryStream()) {
+                using (decompressor) {
                     int n;
                     while ((n = decompressor.Read(working, 0, working.Length)) != 0) output.Write(working, 0, n);
                 }

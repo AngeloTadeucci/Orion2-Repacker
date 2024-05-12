@@ -21,60 +21,48 @@ using Orion.Crypto.Common;
 using Orion.Crypto.Stream;
 using Orion.Crypto.Stream.zlib;
 
-namespace Orion.Crypto
-{
-    public class CryptoMan
-    {
-        public static byte[] DecryptFileString(IPackStreamVerBase pStream, System.IO.Stream pBuffer)
-        {
-            if (pStream.GetCompressedHeaderSize() <= 0 || pStream.GetEncodedHeaderSize() <= 0 || pStream.GetHeaderSize() <= 0)
-            {
+namespace Orion.Crypto {
+    public class CryptoMan {
+        public static byte[] DecryptFileString(IPackStreamVerBase pStream, System.IO.Stream pBuffer) {
+            if (pStream.GetCompressedHeaderSize() <= 0 || pStream.GetEncodedHeaderSize() <= 0 || pStream.GetHeaderSize() <= 0) {
                 throw new Exception("ERROR decrypting file list: the size of the list is invalid.");
             }
 
             byte[] pSrc = new byte[pStream.GetEncodedHeaderSize()];
 
-            if ((ulong) pBuffer.Read(pSrc, 0, (int) pStream.GetEncodedHeaderSize()) == pStream.GetEncodedHeaderSize())
-            {
-                return Decrypt(pStream.GetVer(), (uint) pStream.GetEncodedHeaderSize(), (uint) pStream.GetCompressedHeaderSize(),
+            if ((ulong)pBuffer.Read(pSrc, 0, (int)pStream.GetEncodedHeaderSize()) == pStream.GetEncodedHeaderSize()) {
+                return Decrypt(pStream.GetVer(), (uint)pStream.GetEncodedHeaderSize(), (uint)pStream.GetCompressedHeaderSize(),
                     BufferManipulation.AES_ZLIB, pSrc);
             }
 
             throw new Exception("ERROR decrypting file list: the size of the list is invalid.");
         }
 
-        public static byte[] DecryptFileTable(IPackStreamVerBase pStream, System.IO.Stream pBuffer)
-        {
-            if (pStream.GetCompressedDataSize() <= 0 || pStream.GetEncodedDataSize() <= 0 || pStream.GetDataSize() <= 0)
-            {
+        public static byte[] DecryptFileTable(IPackStreamVerBase pStream, System.IO.Stream pBuffer) {
+            if (pStream.GetCompressedDataSize() <= 0 || pStream.GetEncodedDataSize() <= 0 || pStream.GetDataSize() <= 0) {
                 throw new Exception("ERROR decrypting file table: the size of the table is invalid.");
             }
 
             byte[] pSrc = new byte[pStream.GetEncodedDataSize()];
 
-            if ((ulong) pBuffer.Read(pSrc, 0, (int) pStream.GetEncodedDataSize()) == pStream.GetEncodedDataSize())
-            {
-                return Decrypt(pStream.GetVer(), (uint) pStream.GetEncodedDataSize(), (uint) pStream.GetCompressedDataSize(), BufferManipulation.AES_ZLIB,
+            if ((ulong)pBuffer.Read(pSrc, 0, (int)pStream.GetEncodedDataSize()) == pStream.GetEncodedDataSize()) {
+                return Decrypt(pStream.GetVer(), (uint)pStream.GetEncodedDataSize(), (uint)pStream.GetCompressedDataSize(), BufferManipulation.AES_ZLIB,
                     pSrc);
             }
 
             throw new Exception("ERROR decrypting file table: the size of the table is invalid.");
         }
 
-        public static byte[] DecryptData(IPackFileHeaderVerBase pHeader, MemoryMappedFile pData)
-        {
-            if (pHeader.GetCompressedFileSize() <= 0 || pHeader.GetEncodedFileSize() <= 0 || pHeader.GetFileSize() <= 0)
-            {
+        public static byte[] DecryptData(IPackFileHeaderVerBase pHeader, MemoryMappedFile pData) {
+            if (pHeader.GetCompressedFileSize() <= 0 || pHeader.GetEncodedFileSize() <= 0 || pHeader.GetFileSize() <= 0) {
                 throw new Exception("ERROR decrypting data file segment: the size of the block is invalid.");
             }
 
-            using (MemoryMappedViewStream pBuffer = pData.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize()))
-            {
+            using (MemoryMappedViewStream pBuffer = pData.CreateViewStream((long)pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
                 byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) == pHeader.GetEncodedFileSize())
-                {
-                    return Decrypt(pHeader.GetVer(), pHeader.GetEncodedFileSize(), (uint) pHeader.GetCompressedFileSize(), pHeader.GetBufferFlag(), pSrc);
+                if (pBuffer.Read(pSrc, 0, (int)pHeader.GetEncodedFileSize()) == pHeader.GetEncodedFileSize()) {
+                    return Decrypt(pHeader.GetVer(), pHeader.GetEncodedFileSize(), (uint)pHeader.GetCompressedFileSize(), pHeader.GetBufferFlag(), pSrc);
                 }
             }
 
@@ -82,12 +70,10 @@ namespace Orion.Crypto
         }
 
         // Decryption Routine: Base64 -> AES -> Zlib
-        private static byte[] Decrypt(uint uVer, uint uLen, uint uLenCompressed, uint dwBufferFlag, byte[] pSrc)
-        {
+        private static byte[] Decrypt(uint uVer, uint uLen, uint uLenCompressed, uint dwBufferFlag, byte[] pSrc) {
             byte[] bits = BitConverter.GetBytes(dwBufferFlag);
 
-            if ((bits[3] & 1) == 0)
-            {
+            if ((bits[3] & 1) == 0) {
                 // Get the AES Key/IV for transformation
                 CipherKeys.GetKeyAndIV(uVer, uLenCompressed, out byte[] aKey, out byte[] aIV);
 
@@ -97,9 +83,7 @@ namespace Orion.Crypto
                 // Decrypt the AES encrypted block
                 AESCipher pCipher = new AESCipher(aKey, aIV);
                 pCipher.TransformBlock(pSrc, 0, uLen, pSrc, 0);
-            }
-            else
-            {
+            } else {
                 // Decrypt the XOR encrypted block
                 pSrc = EncryptXOR(uVer, pSrc, uLen);
             }
@@ -108,26 +92,21 @@ namespace Orion.Crypto
         }
 
         // Encryption Routine: Zlib -> AES -> Base64
-        public static byte[] Encrypt(uint uVer, byte[] pSrc, uint dwBufferFlag, out uint uLen, out uint uLenCompressed, out uint uLenEncoded)
-        {
+        public static byte[] Encrypt(uint uVer, byte[] pSrc, uint dwBufferFlag, out uint uLen, out uint uLenCompressed, out uint uLenEncoded) {
             byte[] bits = BitConverter.GetBytes(dwBufferFlag);
 
             byte[] pEncrypted;
-            if (bits[0] != 0)
-            {
+            if (bits[0] != 0) {
                 pEncrypted = ZlibStream.CompressBuffer(pSrc);
-            }
-            else
-            {
+            } else {
                 pEncrypted = new byte[pSrc.Length];
                 Buffer.BlockCopy(pSrc, 0, pEncrypted, 0, pSrc.Length);
             }
 
-            uLen = (uint) pSrc.Length;
-            uLenCompressed = (uint) pEncrypted.Length;
+            uLen = (uint)pSrc.Length;
+            uLenCompressed = (uint)pEncrypted.Length;
 
-            if ((bits[3] & 1) == 0)
-            {
+            if ((bits[3] & 1) == 0) {
                 // Get the AES Key/IV for transformation
                 CipherKeys.GetKeyAndIV(uVer, uLenCompressed, out byte[] aKey, out byte[] aIV);
 
@@ -137,30 +116,25 @@ namespace Orion.Crypto
 
                 // Encode the encrypted data into a base64 encoded string
                 pEncrypted = Encoding.UTF8.GetBytes(Convert.ToBase64String(pEncrypted));
-            }
-            else
-            {
+            } else {
                 // Perform XOR block encryption
                 pEncrypted = EncryptXOR(uVer, pEncrypted, uLen);
             }
 
-            uLenEncoded = (uint) pEncrypted.Length;
+            uLenEncoded = (uint)pEncrypted.Length;
 
             return pEncrypted;
         }
 
-        private static byte[] EncryptXOR(uint uVer, byte[] pSrc, uint uLen)
-        {
+        private static byte[] EncryptXOR(uint uVer, byte[] pSrc, uint uLen) {
             CipherKeys.GetXORKey(uVer, out byte[] aKey);
 
             uint uBlock = uLen >> 2;
             uint uBlockOffset = 0;
             int nKeyOffset = 0;
 
-            if (uBlock != 0)
-            {
-                while (uBlockOffset < uBlock)
-                {
+            if (uBlock != 0) {
+                while (uBlockOffset < uBlock) {
                     /*
                      *  _begin:
                      *      mov     eax, [ebp+pKey]
@@ -175,34 +149,32 @@ namespace Orion.Crypto
                      *      mov     eax, [ebp+uLen]
                     */
 
-                    uint pBlockData = BitConverter.ToUInt32(pSrc, (int) (4 * uBlockOffset)) ^ BitConverter.ToUInt32(aKey, 4 * nKeyOffset);
-                    Buffer.BlockCopy(BitConverter.GetBytes(pBlockData), 0, pSrc, (int) (4 * uBlockOffset), sizeof(uint));
+                    uint pBlockData = BitConverter.ToUInt32(pSrc, (int)(4 * uBlockOffset)) ^ BitConverter.ToUInt32(aKey, 4 * nKeyOffset);
+                    Buffer.BlockCopy(BitConverter.GetBytes(pBlockData), 0, pSrc, (int)(4 * uBlockOffset), sizeof(uint));
 
-                    nKeyOffset = ((ushort) nKeyOffset + 1) & 0x1FF;
+                    nKeyOffset = ((ushort)nKeyOffset + 1) & 0x1FF;
                     uBlockOffset++;
                 }
             }
 
             uBlock = uLen & 3;
             if (uBlock == 0) return pSrc;
-            
-            int nStart = (int) (4 * uBlockOffset);
+
+            int nStart = (int)(4 * uBlockOffset);
 
             uBlockOffset = 0;
             nKeyOffset = 0;
 
-            while (uBlockOffset < uBlock)
-            {
+            while (uBlockOffset < uBlock) {
                 pSrc[nStart + uBlockOffset++] ^= aKey[nKeyOffset];
 
-                nKeyOffset = ((ushort) nKeyOffset + 1) & 0x7FF;
+                nKeyOffset = ((ushort)nKeyOffset + 1) & 0x7FF;
             }
 
             return pSrc;
         }
 
-        public class BufferManipulation
-        {
+        public class BufferManipulation {
             public const uint
                 /*
                  * Standard crypto: Base64 Encoded + AES Encrypted buffers.

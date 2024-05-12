@@ -27,8 +27,7 @@
 
 using Interop = System.Runtime.InteropServices;
 
-namespace Orion.Crypto.Stream.zlib
-{
+namespace Orion.Crypto.Stream.zlib {
     /// <summary>
     ///     Computes a CRC-32. The CRC-32 algorithm is parameterized - you
     ///     can set the polynomial and enable or disable bit
@@ -44,8 +43,7 @@ namespace Orion.Crypto.Stream.zlib
 #if !NETCF
     [Interop.ClassInterface(Interop.ClassInterfaceType.AutoDispatch)]
 #endif
-    public class CRC32
-    {
+    public class CRC32 {
         private const int BUFFER_SIZE = 8192;
         private uint _register = 0xFFFFFFFFU;
         private uint[] crc32Table;
@@ -59,8 +57,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     bit reversal, and a polynomial of 0xEDB88320.
         /// </summary>
         public CRC32()
-            : this(false)
-        {
+            : this(false) {
         }
 
         /// <summary>
@@ -80,8 +77,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     </para>
         /// </remarks>
         public CRC32(bool reverseBits) :
-            this(unchecked((int) 0xEDB88320), reverseBits)
-        {
+            this(unchecked((int)0xEDB88320), reverseBits) {
         }
 
         /// <summary>
@@ -108,10 +104,9 @@ namespace Orion.Crypto.Stream.zlib
         ///         <c>reverseBits</c> parameter.
         ///     </para>
         /// </remarks>
-        public CRC32(int polynomial, bool reverseBits)
-        {
+        public CRC32(int polynomial, bool reverseBits) {
             this.reverseBits = reverseBits;
-            dwPolynomial = (uint) polynomial;
+            dwPolynomial = (uint)polynomial;
             GenerateLookupTable();
         }
 
@@ -123,15 +118,14 @@ namespace Orion.Crypto.Stream.zlib
         /// <summary>
         ///     Indicates the current CRC for all blocks slurped in.
         /// </summary>
-        public int Crc32Result => unchecked((int) ~_register);
+        public int Crc32Result => unchecked((int)~_register);
 
         /// <summary>
         ///     Returns the CRC32 for the specified stream.
         /// </summary>
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <returns>the CRC32 calculation</returns>
-        public int GetCrc32(System.IO.Stream input)
-        {
+        public int GetCrc32(System.IO.Stream input) {
             return GetCrc32AndCopy(input, null);
         }
 
@@ -142,28 +136,25 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <param name="output">The stream into which to deflate the input</param>
         /// <returns>the CRC32 calculation</returns>
-        public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
-        {
+        public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output) {
             if (input == null)
                 throw new Exception("The input stream must not be null.");
 
-            unchecked
-            {
+            unchecked {
                 byte[] buffer = new byte[BUFFER_SIZE];
 
                 TotalBytesRead = 0;
                 int count = input.Read(buffer, 0, BUFFER_SIZE);
                 if (output != null) output.Write(buffer, 0, count);
                 TotalBytesRead += count;
-                while (count > 0)
-                {
+                while (count > 0) {
                     SlurpBlock(buffer, 0, count);
                     count = input.Read(buffer, 0, BUFFER_SIZE);
                     if (output != null) output.Write(buffer, 0, count);
                     TotalBytesRead += count;
                 }
 
-                return (int) ~_register;
+                return (int)~_register;
             }
         }
 
@@ -174,14 +165,12 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="W">The word to start with.</param>
         /// <param name="B">The byte to combine it with.</param>
         /// <returns>The CRC-ized result.</returns>
-        public int ComputeCrc32(int W, byte B)
-        {
-            return _InternalComputeCrc32((uint) W, B);
+        public int ComputeCrc32(int W, byte B) {
+            return _InternalComputeCrc32((uint)W, B);
         }
 
-        internal int _InternalComputeCrc32(uint W, byte B)
-        {
-            return (int) (crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+        internal int _InternalComputeCrc32(uint W, byte B) {
+            return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
         }
 
         /// <summary>
@@ -191,23 +180,18 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="block">block of bytes to slurp</param>
         /// <param name="offset">starting point in the block</param>
         /// <param name="count">how many bytes within the block to slurp</param>
-        public void SlurpBlock(byte[] block, int offset, int count)
-        {
+        public void SlurpBlock(byte[] block, int offset, int count) {
             if (block == null)
                 throw new Exception("The data buffer must not be null.");
 
             // bzip algorithm
-            for (int i = 0; i < count; i++)
-            {
+            for (int i = 0; i < count; i++) {
                 int x = offset + i;
                 byte b = block[x];
-                if (reverseBits)
-                {
+                if (reverseBits) {
                     uint temp = (_register >> 24) ^ b;
                     _register = (_register << 8) ^ crc32Table[temp];
-                }
-                else
-                {
+                } else {
                     uint temp = (_register & 0x000000FF) ^ b;
                     _register = (_register >> 8) ^ crc32Table[temp];
                 }
@@ -220,15 +204,11 @@ namespace Orion.Crypto.Stream.zlib
         ///     Process one byte in the CRC.
         /// </summary>
         /// <param name="b">the byte to include into the CRC .  </param>
-        public void UpdateCRC(byte b)
-        {
-            if (reverseBits)
-            {
+        public void UpdateCRC(byte b) {
+            if (reverseBits) {
                 uint temp = (_register >> 24) ^ b;
                 _register = (_register << 8) ^ crc32Table[temp];
-            }
-            else
-            {
+            } else {
                 uint temp = (_register & 0x000000FF) ^ b;
                 _register = (_register >> 8) ^ crc32Table[temp];
             }
@@ -248,18 +228,14 @@ namespace Orion.Crypto.Stream.zlib
         /// </remarks>
         /// <param name="b">the byte to include into the CRC.  </param>
         /// <param name="n">the number of times that byte should be repeated. </param>
-        public void UpdateCRC(byte b, int n)
-        {
+        public void UpdateCRC(byte b, int n) {
             while (n-- > 0)
-                if (reverseBits)
-                {
+                if (reverseBits) {
                     uint temp = (_register >> 24) ^ b;
                     _register = (_register << 8) ^ crc32Table[temp >= 0
                         ? temp
                         : temp + 256];
-                }
-                else
-                {
+                } else {
                     uint temp = (_register & 0x000000FF) ^ b;
                     _register = (_register >> 8) ^ crc32Table[temp >= 0
                         ? temp
@@ -267,10 +243,8 @@ namespace Orion.Crypto.Stream.zlib
                 }
         }
 
-        private static uint ReverseBits(uint data)
-        {
-            unchecked
-            {
+        private static uint ReverseBits(uint data) {
+            unchecked {
                 uint ret = data;
                 ret = ((ret & 0x55555555) << 1) | ((ret >> 1) & 0x55555555);
                 ret = ((ret & 0x33333333) << 2) | ((ret >> 2) & 0x33333333);
@@ -280,27 +254,22 @@ namespace Orion.Crypto.Stream.zlib
             }
         }
 
-        private static byte ReverseBits(byte data)
-        {
-            unchecked
-            {
-                uint u = (uint) data * 0x00020202;
+        private static byte ReverseBits(byte data) {
+            unchecked {
+                uint u = (uint)data * 0x00020202;
                 uint m = 0x01044010;
                 uint s = u & m;
                 uint t = (u << 2) & (m << 1);
-                return (byte) ((0x01001001 * (s + t)) >> 24);
+                return (byte)((0x01001001 * (s + t)) >> 24);
             }
         }
 
-        private void GenerateLookupTable()
-        {
+        private void GenerateLookupTable() {
             crc32Table = new uint[256];
-            unchecked
-            {
+            unchecked {
                 uint dwCrc;
                 byte i = 0;
-                do
-                {
+                do {
                     dwCrc = i;
                     for (byte j = 8; j > 0; j--)
                         if ((dwCrc & 1) == 1)
@@ -332,12 +301,10 @@ namespace Orion.Crypto.Stream.zlib
 #endif
         }
 
-        private uint gf2_matrix_times(uint[] matrix, uint vec)
-        {
+        private uint gf2_matrix_times(uint[] matrix, uint vec) {
             uint sum = 0;
             int i = 0;
-            while (vec != 0)
-            {
+            while (vec != 0) {
                 if ((vec & 0x01) == 0x01)
                     sum ^= matrix[i];
                 vec >>= 1;
@@ -347,8 +314,7 @@ namespace Orion.Crypto.Stream.zlib
             return sum;
         }
 
-        private void gf2_matrix_square(uint[] square, uint[] mat)
-        {
+        private void gf2_matrix_square(uint[] square, uint[] mat) {
             for (int i = 0; i < 32; i++)
                 square[i] = gf2_matrix_times(mat, mat[i]);
         }
@@ -364,8 +330,7 @@ namespace Orion.Crypto.Stream.zlib
         /// </remarks>
         /// <param name="crc">the crc value to be combined with this one</param>
         /// <param name="length">the length of data the CRC value was calculated on</param>
-        public void Combine(int crc, int length)
-        {
+        public void Combine(int crc, int length) {
             uint[] even = new uint[32]; // even-power-of-two zeros operator
             uint[] odd = new uint[32]; // odd-power-of-two zeros operator
 
@@ -373,13 +338,12 @@ namespace Orion.Crypto.Stream.zlib
                 return;
 
             uint crc1 = ~_register;
-            uint crc2 = (uint) crc;
+            uint crc2 = (uint)crc;
 
             // put operator for one zero bit in odd
             odd[0] = dwPolynomial; // the CRC-32 polynomial
             uint row = 1;
-            for (int i = 1; i < 32; i++)
-            {
+            for (int i = 1; i < 32; i++) {
                 odd[i] = row;
                 row <<= 1;
             }
@@ -390,12 +354,11 @@ namespace Orion.Crypto.Stream.zlib
             // put operator for four zero bits in odd
             gf2_matrix_square(odd, even);
 
-            uint len2 = (uint) length;
+            uint len2 = (uint)length;
 
             // apply len2 zeros to crc1 (first square will put the operator for one
             // zero byte, eight zero bits, in even)
-            do
-            {
+            do {
                 // apply zeros operator for this bit of len2
                 gf2_matrix_square(even, odd);
 
@@ -429,8 +392,7 @@ namespace Orion.Crypto.Stream.zlib
         ///         multiple, distinct CRCs on multiple, distinct data blocks.
         ///     </para>
         /// </remarks>
-        public void Reset()
-        {
+        public void Reset() {
             _register = 0xFFFFFFFFU;
         }
     }
@@ -452,8 +414,7 @@ namespace Orion.Crypto.Stream.zlib
     ///         DotNetZip library.
     ///     </para>
     /// </remarks>
-    public class CrcCalculatorStream : System.IO.Stream, IDisposable
-    {
+    public class CrcCalculatorStream : System.IO.Stream, IDisposable {
         private static readonly long UnsetLengthLimit = -99;
         private readonly CRC32 _Crc32;
 
@@ -472,8 +433,7 @@ namespace Orion.Crypto.Stream.zlib
         /// </remarks>
         /// <param name="stream">The underlying stream</param>
         public CrcCalculatorStream(System.IO.Stream stream)
-            : this(true, UnsetLengthLimit, stream, null)
-        {
+            : this(true, UnsetLengthLimit, stream, null) {
         }
 
         /// <summary>
@@ -492,8 +452,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     open upon close of the <c>CrcCalculatorStream</c>; false otherwise.
         /// </param>
         public CrcCalculatorStream(System.IO.Stream stream, bool leaveOpen)
-            : this(leaveOpen, UnsetLengthLimit, stream, null)
-        {
+            : this(leaveOpen, UnsetLengthLimit, stream, null) {
         }
 
         /// <summary>
@@ -513,8 +472,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="stream">The underlying stream</param>
         /// <param name="length">The length of the stream to slurp</param>
         public CrcCalculatorStream(System.IO.Stream stream, long length)
-            : this(true, length, stream, null)
-        {
+            : this(true, length, stream, null) {
             if (length < 0)
                 throw new ArgumentException("length");
         }
@@ -537,8 +495,7 @@ namespace Orion.Crypto.Stream.zlib
         ///     open upon close of the <c>CrcCalculatorStream</c>; false otherwise.
         /// </param>
         public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen)
-            : this(leaveOpen, length, stream, null)
-        {
+            : this(leaveOpen, length, stream, null) {
             if (length < 0)
                 throw new ArgumentException("length");
         }
@@ -563,8 +520,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="crc32">the CRC32 instance to use to calculate the CRC32</param>
         public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen,
             CRC32 crc32)
-            : this(leaveOpen, length, stream, crc32)
-        {
+            : this(leaveOpen, length, stream, crc32) {
             if (length < 0)
                 throw new ArgumentException("length");
         }
@@ -575,8 +531,7 @@ namespace Orion.Crypto.Stream.zlib
         // explicit param, otherwise we don't validate, because it could be our special
         // value.
         private CrcCalculatorStream
-            (bool leaveOpen, long length, System.IO.Stream stream, CRC32 crc32)
-        {
+            (bool leaveOpen, long length, System.IO.Stream stream, CRC32 crc32) {
             _innerStream = stream;
             _Crc32 = crc32 ?? new CRC32();
             _lengthLimit = length;
@@ -638,10 +593,8 @@ namespace Orion.Crypto.Stream.zlib
         /// <summary>
         ///     Returns the length of the underlying stream.
         /// </summary>
-        public override long Length
-        {
-            get
-            {
+        public override long Length {
+            get {
                 if (_lengthLimit == UnsetLengthLimit)
                     return _innerStream.Length;
                 return _lengthLimit;
@@ -653,14 +606,12 @@ namespace Orion.Crypto.Stream.zlib
         ///     If you use the setter, it will throw
         ///     <see cref="NotSupportedException" />.
         /// </summary>
-        public override long Position
-        {
+        public override long Position {
             get => _Crc32.TotalBytesRead;
             set => throw new NotSupportedException();
         }
 
-        void IDisposable.Dispose()
-        {
+        void IDisposable.Dispose() {
             Close();
         }
 
@@ -671,8 +622,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="offset">the offset at which to start</param>
         /// <param name="count">the number of bytes to read</param>
         /// <returns>the number of bytes actually read</returns>
-        public override int Read(byte[] buffer, int offset, int count)
-        {
+        public override int Read(byte[] buffer, int offset, int count) {
             int bytesToRead = count;
 
             // Need to limit the # of bytes returned, if the stream is intended to have
@@ -683,11 +633,10 @@ namespace Orion.Crypto.Stream.zlib
             // calling ReadToEnd() on it, We can "over-read" the zip data and get a
             // corrupt string.  The length limits that, prevents that problem.
 
-            if (_lengthLimit != UnsetLengthLimit)
-            {
+            if (_lengthLimit != UnsetLengthLimit) {
                 if (_Crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
                 long bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
-                if (bytesRemaining < count) bytesToRead = (int) bytesRemaining;
+                if (bytesRemaining < count) bytesToRead = (int)bytesRemaining;
             }
 
             int n = _innerStream.Read(buffer, offset, bytesToRead);
@@ -701,8 +650,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="buffer">the buffer from which to write</param>
         /// <param name="offset">the offset at which to start writing</param>
         /// <param name="count">the number of bytes to write</param>
-        public override void Write(byte[] buffer, int offset, int count)
-        {
+        public override void Write(byte[] buffer, int offset, int count) {
             if (count > 0) _Crc32.SlurpBlock(buffer, offset, count);
             _innerStream.Write(buffer, offset, count);
         }
@@ -710,8 +658,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <summary>
         ///     Flush the stream.
         /// </summary>
-        public override void Flush()
-        {
+        public override void Flush() {
             _innerStream.Flush();
         }
 
@@ -722,8 +669,7 @@ namespace Orion.Crypto.Stream.zlib
         /// <param name="offset">N/A</param>
         /// <param name="origin">N/A</param>
         /// <returns>N/A</returns>
-        public override long Seek(long offset, SeekOrigin origin)
-        {
+        public override long Seek(long offset, SeekOrigin origin) {
             throw new NotSupportedException();
         }
 
@@ -732,16 +678,14 @@ namespace Orion.Crypto.Stream.zlib
         ///     <see cref="NotSupportedException" />
         /// </summary>
         /// <param name="value">N/A</param>
-        public override void SetLength(long value)
-        {
+        public override void SetLength(long value) {
             throw new NotSupportedException();
         }
 
         /// <summary>
         ///     Closes the stream.
         /// </summary>
-        public override void Close()
-        {
+        public override void Close() {
             base.Close();
             if (!LeaveOpen)
                 _innerStream.Close();

@@ -15,10 +15,8 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Common
-{
-    public class CipherKeys
-    {
+namespace Orion.Crypto.Common {
+    public class CipherKeys {
         const int BITS = 128;       //128-bit AES
         const int IV_LEN = 16;      //16-byte IV (CTR)
         const int KEY_LEN = 32;     //32-byte UserKey
@@ -1633,13 +1631,11 @@ namespace Orion.Crypto.Common
          * @param aIVChain The outputted IV (CTR) block
          * 
         */
-        public static void GetKeyAndIV(uint uVer, uint uKeyOffset, out byte[] aUserKey, out byte[] aIVChain)
-        {
+        public static void GetKeyAndIV(uint uVer, uint uKeyOffset, out byte[] aUserKey, out byte[] aIVChain) {
             byte[,] aKey;
             byte[,] aIV;
 
-            switch (uVer)
-            {
+            switch (uVer) {
                 case PackVer.MS2F:
                     aKey = MS2F_USER_KEY;
                     aIV = MS2F_IV_CHAIN;
@@ -1656,16 +1652,14 @@ namespace Orion.Crypto.Common
                     aKey = PS2F_USER_KEY;
                     aIV = PS2F_IV_CHAIN;
                     break;
-                default:
-                {
-                    throw new Exception("ERROR generating Key/IV: the specified package version does not exist!");
-                }
+                default: {
+                        throw new Exception("ERROR generating Key/IV: the specified package version does not exist!");
+                    }
             }
 
             aUserKey = new byte[KEY_LEN];
             aIVChain = new byte[IV_LEN];
-            for (int i = 0; i < KEY_LEN; i++)
-            {
+            for (int i = 0; i < KEY_LEN; i++) {
                 aUserKey[i] = aKey[uKeyOffset & 0x7F, i];
 
                 if (i < IV_LEN) aIVChain[i] = aIV[uKeyOffset & 0x7F, i];
@@ -1679,10 +1673,8 @@ namespace Orion.Crypto.Common
          * @param aKey The outputted key block
          * 
         */
-        public static void GetXORKey(uint uVer, out byte[] aKey)
-        {
-            switch (uVer)
-            {
+        public static void GetXORKey(uint uVer, out byte[] aKey) {
+            switch (uVer) {
                 case PackVer.MS2F:
                     aKey = MS2F_XOR_KEY;
                     break;
