@@ -17,36 +17,35 @@
 
 using Orion.Crypto.Stream;
 
-namespace Orion.Crypto.Common {
-    public class PackVer {
-        public const uint
-            MS2F = 0x4632534D, //Ver1
-            NS2F = 0x4632534E, //Ver2
-            OS2F = 0x4632534F, //Ver3
-            PS2F = 0x46325350 //Ver3
-            ;
+namespace Orion.Crypto.Common; 
+public class PackVer {
+    public const uint
+        MS2F = 0x4632534D, //Ver1
+        NS2F = 0x4632534E, //Ver2
+        OS2F = 0x4632534F, //Ver3
+        PS2F = 0x46325350 //Ver3
+        ;
 
-        /*
-         * Creates a new packed stream based on the type of version.
-         * 
-         * @param pHeader The stream to read the pack version from
-         * 
-         * @return A packed stream with header sizes decoded
-         * 
-        */
-        public static IPackStreamVerBase CreatePackVer(BinaryReader pHeader) {
-            uint uVer = pHeader.ReadUInt32();
-            switch (uVer) {
-                case MS2F:
-                    return PackStreamVer1.ParseHeader(pHeader);
-                case NS2F:
-                    return PackStreamVer2.ParseHeader(pHeader);
-                case OS2F:
-                case PS2F:
-                    return PackStreamVer3.ParseHeader(pHeader, uVer);
-            }
-
-            throw new Exception($"Unknown file version read from stream ({uVer})");
+    /*
+     * Creates a new packed stream based on the type of version.
+     * 
+     * @param pHeader The stream to read the pack version from
+     * 
+     * @return A packed stream with header sizes decoded
+     * 
+    */
+    public static IPackStreamVerBase CreatePackVer(BinaryReader pHeader) {
+        uint uVer = pHeader.ReadUInt32();
+        switch (uVer) {
+            case MS2F:
+                return PackStreamVer1.ParseHeader(pHeader);
+            case NS2F:
+                return PackStreamVer2.ParseHeader(pHeader);
+            case OS2F:
+            case PS2F:
+                return PackStreamVer3.ParseHeader(pHeader, uVer);
         }
+
+        throw new Exception($"Unknown file version read from stream ({uVer})");
     }
 }

@@ -17,30 +17,29 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Window.Common {
-    [Serializable]
-    public class PackNodeList {
-        public const string DATA_FORMAT = "Pack.Node.FileList";
+namespace Orion.Window.Common; 
+[Serializable]
+public class PackNodeList {
+    public const string DATA_FORMAT = "Pack.Node.FileList";
 
-        public PackNodeList(string sDir) {
-            Directory = sDir;
-            Children = new Dictionary<string, PackNodeList>();
-            Entries = new Dictionary<string, PackFileEntry>();
-        }
+    public PackNodeList(string sDir) {
+        Directory = sDir;
+        Children = new Dictionary<string, PackNodeList>();
+        Entries = new Dictionary<string, PackFileEntry>();
+    }
 
-        public Dictionary<string, PackNodeList> Children { get; }
-        public Dictionary<string, PackFileEntry> Entries { get; }
-        public string Directory { get; private set; }
+    public Dictionary<string, PackNodeList> Children { get; }
+    public Dictionary<string, PackFileEntry> Entries { get; }
+    public string Directory { get; private set; }
 
-        /*
-         * Recursively clear all children/entries within this node list.
-         * 
-        */
-        public void InternalRelease() {
-            Entries.Clear();
+    /*
+     * Recursively clear all children/entries within this node list.
+     * 
+    */
+    public void InternalRelease() {
+        Entries.Clear();
 
-            foreach (PackNodeList pChild in Children.Values) pChild.InternalRelease();
-            Children.Clear();
-        }
+        foreach (PackNodeList pChild in Children.Values) pChild.InternalRelease();
+        Children.Clear();
     }
 }

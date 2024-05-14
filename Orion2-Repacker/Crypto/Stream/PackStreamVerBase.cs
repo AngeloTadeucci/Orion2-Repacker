@@ -17,32 +17,31 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream {
-    public interface IPackStreamVerBase {
-        uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
+namespace Orion.Crypto.Stream; 
+public interface IPackStreamVerBase {
+    uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 
-        ulong GetCompressedHeaderSize(); // The total compressed size of the (raw) file list
-        ulong GetEncodedHeaderSize(); // The total (base64) encoded size of the file list
-        ulong GetHeaderSize(); // The total size of the raw (decoded, decompressed) file list
+    ulong GetCompressedHeaderSize(); // The total compressed size of the (raw) file list
+    ulong GetEncodedHeaderSize(); // The total (base64) encoded size of the file list
+    ulong GetHeaderSize(); // The total size of the raw (decoded, decompressed) file list
 
-        ulong GetCompressedDataSize(); // The total compressed size of the (raw) file table
-        ulong GetEncodedDataSize(); // The total (base64) encoded size of the file table
-        ulong GetDataSize(); // The total size of the raw (decoded, decompressed) file table
+    ulong GetCompressedDataSize(); // The total compressed size of the (raw) file table
+    ulong GetEncodedDataSize(); // The total (base64) encoded size of the file table
+    ulong GetDataSize(); // The total size of the raw (decoded, decompressed) file table
 
-        ulong GetFileListCount(); // The total count of files within the data file
+    ulong GetFileListCount(); // The total count of files within the data file
 
-        List<PackFileEntry> GetFileList(); // Represents a list of fileinfo containers (<Index>,<Hash>,<Name>)
+    List<PackFileEntry> GetFileList(); // Represents a list of fileinfo containers (<Index>,<Hash>,<Name>)
 
-        void Encode(BinaryWriter pWriter); // Encodes the header/data pack sizes to stream
+    void Encode(BinaryWriter pWriter); // Encodes the header/data pack sizes to stream
 
-        void SetCompressedHeaderSize(ulong uCompressed); // Updates the compressed file string size
-        void SetEncodedHeaderSize(ulong uEncoded); // Updates the base64 encoded file string length
-        void SetHeaderSize(ulong uSize); // Updates the raw (uncompressed) file string size
+    void SetCompressedHeaderSize(ulong uCompressed); // Updates the compressed file string size
+    void SetEncodedHeaderSize(ulong uEncoded); // Updates the base64 encoded file string length
+    void SetHeaderSize(ulong uSize); // Updates the raw (uncompressed) file string size
 
-        void SetCompressedDataSize(ulong uCompressed); // Updates the compressed file table size
-        void SetEncodedDataSize(ulong uEncoded); // Updates the base64 encoded file table length
-        void SetDataSize(ulong uSize); // Updates the raw (uncompressed) file table size
+    void SetCompressedDataSize(ulong uCompressed); // Updates the compressed file table size
+    void SetEncodedDataSize(ulong uEncoded); // Updates the base64 encoded file table length
+    void SetDataSize(ulong uSize); // Updates the raw (uncompressed) file table size
 
-        void SetFileListCount(ulong uCount); // Updates the total count of files within this stream
-    }
+    void SetFileListCount(ulong uCount); // Updates the total count of files within this stream
 }

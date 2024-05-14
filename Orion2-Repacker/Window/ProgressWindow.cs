@@ -18,40 +18,39 @@
 using System.Diagnostics;
 using Orion.Crypto.Stream;
 
-namespace Orion.Window {
-    public partial class ProgressWindow : Form {
-        private Stopwatch pStopWatch;
-        private string sPath;
+namespace Orion.Window; 
+public partial class ProgressWindow : Form {
+    private Stopwatch pStopWatch;
+    private string sPath;
 
-        public ProgressWindow() {
-            InitializeComponent();
+    public ProgressWindow() {
+        InitializeComponent();
+    }
+
+    public string FileName { get; set; }
+    public IPackStreamVerBase Stream { get; set; }
+    public long ElapsedTime { get; set; }
+
+    public string Path {
+        get => sPath;
+        set {
+            sPath = value;
+
+            FileName = sPath.Substring(sPath.LastIndexOf('/') + 1).Split('.')[0];
         }
+    }
 
-        public string FileName { get; set; }
-        public IPackStreamVerBase Stream { get; set; }
-        public long ElapsedTime { get; set; }
+    public void UpdateProgressBar(int nProgress) {
+        pProgressBar.Value = nProgress;
+        pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
+    }
 
-        public string Path {
-            get => sPath;
-            set {
-                sPath = value;
+    public void Start() {
+        pStopWatch = Stopwatch.StartNew();
+    }
 
-                FileName = sPath.Substring(sPath.LastIndexOf('/') + 1).Split('.')[0];
-            }
-        }
-
-        public void UpdateProgressBar(int nProgress) {
-            pProgressBar.Value = nProgress;
-            pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
-        }
-
-        public void Start() {
-            pStopWatch = Stopwatch.StartNew();
-        }
-
-        public void Finish() {
-            ElapsedTime = pStopWatch.ElapsedMilliseconds;
-            pStopWatch.Stop();
-        }
+    public void Finish() {
+        ElapsedTime = pStopWatch.ElapsedMilliseconds;
+        pStopWatch.Stop();
     }
 }

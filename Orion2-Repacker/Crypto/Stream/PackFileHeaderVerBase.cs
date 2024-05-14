@@ -15,28 +15,27 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Stream {
-    public interface IPackFileHeaderVerBase {
-        uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
+namespace Orion.Crypto.Stream; 
+public interface IPackFileHeaderVerBase {
+    uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 
-        int GetFileIndex(); // The index of this file located within the lookup table
+    int GetFileIndex(); // The index of this file located within the lookup table
 
-        uint GetBufferFlag(); // The flag that determines buffer manipulation
+    uint GetBufferFlag(); // The flag that determines buffer manipulation
 
-        ulong GetOffset(); // The start offset of this file's data within the m2d file
+    ulong GetOffset(); // The start offset of this file's data within the m2d file
 
-        uint GetEncodedFileSize(); // The total (base64) encoded size of the file
-        ulong GetCompressedFileSize(); // The total compressed size of the (raw) file
-        ulong GetFileSize(); // The total size of the raw (decoded, decompressed) file
+    uint GetEncodedFileSize(); // The total (base64) encoded size of the file
+    ulong GetCompressedFileSize(); // The total compressed size of the (raw) file
+    ulong GetFileSize(); // The total size of the raw (decoded, decompressed) file
 
-        void Encode(BinaryWriter pWriter); // Encodes the contents of this file to stream
+    void Encode(BinaryWriter pWriter); // Encodes the contents of this file to stream
 
-        void SetFileIndex(int nIndex); // Updates this file's index within the lookup table
+    void SetFileIndex(int nIndex); // Updates this file's index within the lookup table
 
-        void SetOffset(ulong uOffset); // Updates this file's initial offset within the m2d file
+    void SetOffset(ulong uOffset); // Updates this file's initial offset within the m2d file
 
-        void SetEncodedFileSize(uint uEncoded); // Updates this file's encoded base64 length
-        void SetCompressedFileSize(ulong uCompressed); // Updates this file's compressed file size
-        void SetFileSize(ulong uSize); // Updates this file's raw (uncompressed) file size
-    }
+    void SetEncodedFileSize(uint uEncoded); // Updates this file's encoded base64 length
+    void SetCompressedFileSize(ulong uCompressed); // Updates this file's compressed file size
+    void SetFileSize(ulong uSize); // Updates this file's raw (uncompressed) file size
 }

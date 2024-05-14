@@ -18,36 +18,35 @@
 using System.Diagnostics;
 using Orion.Window.Common;
 
-namespace Orion.Window {
-    public partial class ExtractWindow : Form {
-        private Stopwatch pStopWatch;
+namespace Orion.Window; 
+public partial class ExtractWindow : Form {
+    private Stopwatch pStopWatch;
 
-        public ExtractWindow() {
-            InitializeComponent();
-        }
+    public ExtractWindow() {
+        InitializeComponent();
+    }
 
-        public PackNode PackNode { get; set; }
-        public long ElapsedTime { get; private set; }
-        public string Path { get; set; }
+    public PackNode PackNode { get; set; }
+    public long ElapsedTime { get; private set; }
+    public string Path { get; set; }
 
-        public void UpdateProgressBar(int nProgress) {
-            pProgressBar.Value = nProgress;
-            pSaveInfo.Text = "Extracting ...";
-        }
+    public void UpdateProgressBar(int nProgress) {
+        pProgressBar.Value = nProgress;
+        pSaveInfo.Text = "Extracting ...";
+    }
 
-        public void Start() {
-            pStopWatch = Stopwatch.StartNew();
-        }
+    public void Start() {
+        pStopWatch = Stopwatch.StartNew();
+    }
 
-        public void Finish() {
-            ElapsedTime = pStopWatch.ElapsedMilliseconds;
-            pStopWatch.Stop();
-        }
+    public void Finish() {
+        ElapsedTime = pStopWatch.ElapsedMilliseconds;
+        pStopWatch.Stop();
+    }
 
-        public void SetProgressBarSize(int size) {
-            pProgressBar.Maximum = size;
-            pProgressBar.Step = 1;
-            pProgressBar.Value = 0;
-        }
+    public void SetProgressBarSize(int size) {
+        pProgressBar.Maximum = size;
+        pProgressBar.Step = 1;
+        pProgressBar.Value = 0;
     }
 }
