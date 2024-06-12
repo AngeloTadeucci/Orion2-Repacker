@@ -110,18 +110,18 @@ public partial class MainWindow : Form {
     private void InitializeTree(IPackStreamVerBase pStream) {
         // Insert the root node (file)
         string[] aPath = sHeaderUOL.Replace(".m2h", "").Split('/');
-        pTreeView.Nodes.Add(new PackNode(pStream, aPath[aPath.Length - 1]));
+        pTreeView.Nodes.Add(new PackNode(pStream, aPath[^1]));
 
         pNodeList?.InternalRelease();
         pNodeList = new PackNodeList("/");
 
         foreach (PackFileEntry pEntry in pStream.GetFileList())
-            if (pEntry.Name.Contains("/")) {
+            if (pEntry.Name.Contains('/')) {
                 string sPath = pEntry.Name;
                 PackNodeList pCurList = pNodeList;
 
-                while (sPath.Contains("/")) {
-                    string sDir = sPath.Substring(0, sPath.IndexOf('/') + 1);
+                while (sPath.Contains('/')) {
+                    string sDir = sPath[..(sPath.IndexOf('/') + 1)];
                     if (!pCurList.Children.ContainsKey(sDir)) {
                         pCurList.Children.Add(sDir, new PackNodeList(sDir));
                         if (pCurList == pNodeList) pTreeView.Nodes[0].Nodes.Add(new PackNode(pCurList.Children[sDir], sDir));
@@ -129,7 +129,7 @@ public partial class MainWindow : Form {
 
                     pCurList = pCurList.Children[sDir];
 
-                    sPath = sPath.Substring(sPath.IndexOf('/') + 1);
+                    sPath = sPath[(sPath.IndexOf('/') + 1)..];
                 }
 
                 pEntry.TreeName = sPath;
@@ -254,7 +254,7 @@ public partial class MainWindow : Form {
     private bool SetHeaderUOL() {
         sHeaderUOL = sDataUOL.Replace(".m2d", ".m2h");
 
-        string fileName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
+        string fileName = sHeaderUOL[(sHeaderUOL.LastIndexOf('/') + 1)..];
         if (!File.Exists(sHeaderUOL)) {
             NotifyMessage($"Unable to load the {fileName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
             return false;
@@ -419,7 +419,7 @@ public partial class MainWindow : Form {
 
         foreach (string fileName in pDialog.FileNames) {
             string sHeaderUOL = Dir_BackSlashToSlash(fileName);
-            string sHeaderName = sHeaderUOL.Substring(sHeaderUOL.LastIndexOf('/') + 1);
+            string sHeaderName = sHeaderUOL[(sHeaderUOL.LastIndexOf('/') + 1)..];
 
             if (!File.Exists(sHeaderUOL)) {
                 NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
@@ -1036,7 +1036,7 @@ public partial class MainWindow : Form {
     }
 
     private static string Dir_BackSlashToSlash(string sDir) {
-        while (sDir.Contains("\\")) {
+        while (sDir.Contains('\\')) {
             sDir = sDir.Replace("\\", "/");
         }
 

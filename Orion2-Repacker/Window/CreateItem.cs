@@ -6,7 +6,7 @@ using Orion.Crypto.Stream;
 using Orion.Window.Common;
 using static Orion.Crypto.CryptoMan;
 
-namespace Orion.Window; 
+namespace Orion.Window;
 public partial class CreateItem : Form {
     private readonly string ImageFilePath;
     private readonly string ItemFilePath;
@@ -53,7 +53,7 @@ public partial class CreateItem : Form {
         if (itemEntries is null) return;
 
         if (!string.IsNullOrEmpty(MaleNifFilePath)) {
-            string fileName = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
+            string fileName = MaleNifFilePath[(MaleNifFilePath.LastIndexOf('\\') + 1)..];
 
             if (itemEntries.Any(x => x.Name.Contains(fileName))) {
                 NotifyMessage($"There is already an entry with the same name '{fileName}' in Item.m2d, fix it");
@@ -62,7 +62,7 @@ public partial class CreateItem : Form {
         }
 
         if (!string.IsNullOrEmpty(MaleNifFilePath)) {
-            string fileName = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
+            string fileName = FemaleNifFilePath[(FemaleNifFilePath.LastIndexOf('\\') + 1)..];
 
             if (itemEntries.Any(x => x.Name.Contains(fileName))) {
                 NotifyMessage($"There is already an entry with the same name '{fileName}' in Item.m2d, fix it");
@@ -90,7 +90,7 @@ public partial class CreateItem : Form {
         if (textureEntries is null) return;
 
         foreach (string path in MaleTexturePaths) {
-            string maleTextureFileName = path.Substring(path.LastIndexOf('\\') + 1);
+            string maleTextureFileName = path[(path.LastIndexOf('\\') + 1)..];
 
             if (!textureEntries.Any(x => x.Name.Contains(maleTextureFileName))) continue;
 
@@ -99,7 +99,7 @@ public partial class CreateItem : Form {
         }
 
         foreach (string path in FemaleTexturePaths) {
-            string femaleTextureFileName = path.Substring(path.LastIndexOf('\\') + 1);
+            string femaleTextureFileName = path[(path.LastIndexOf('\\') + 1)..];
 
             if (!textureEntries.Any(x => x.Name.Contains(femaleTextureFileName))) continue;
 
@@ -116,7 +116,7 @@ public partial class CreateItem : Form {
 
     private void AddIconFile(IPackStreamVerBase imageStream) {
         byte[] pData = File.ReadAllBytes(SlotIconFilePath);
-        string fileName = SlotIconFilePath.Substring(SlotIconFilePath.LastIndexOf('\\') + 1);
+        string fileName = SlotIconFilePath[(SlotIconFilePath.LastIndexOf('\\') + 1)..];
 
         PackFileEntry pEntry = new PackFileEntry {
             Name = "item/icon/" + fileName,
@@ -131,10 +131,10 @@ public partial class CreateItem : Form {
 
     private void AddItemXmlButton(IPackStreamVerBase xmlStream) {
         byte[] pData = File.ReadAllBytes(ItemXmlFilePath);
-        string fileName = ItemXmlFilePath.Substring(ItemXmlFilePath.LastIndexOf('\\') + 1);
+        string fileName = ItemXmlFilePath[(ItemXmlFilePath.LastIndexOf('\\') + 1)..];
         string itemId = fileName.Split('.').First();
 
-        string firstDigit = itemId.Substring(0, 1);
+        string firstDigit = itemId[..1];
         string next2Digits = itemId.Substring(1, 2);
 
         PackFileEntry pEntry = new PackFileEntry {
@@ -151,7 +151,7 @@ public partial class CreateItem : Form {
     private void AddTextures(IPackStreamVerBase textureStream) {
         foreach (string path in MaleTexturePaths) {
             byte[] pData = File.ReadAllBytes(path);
-            string fileName = path.Substring(path.LastIndexOf('\\') + 1);
+            string fileName = path[(path.LastIndexOf('\\') + 1)..];
 
             string itemSlot = GetItemSlotDescription(slotNameTextBox.Text);
             if (string.IsNullOrEmpty(itemSlot)) return;
@@ -168,7 +168,7 @@ public partial class CreateItem : Form {
 
         foreach (string path in FemaleTexturePaths) {
             byte[] pData = File.ReadAllBytes(path);
-            string fileName = path.Substring(path.LastIndexOf('\\') + 1);
+            string fileName = path[(path.LastIndexOf('\\') + 1)..];
 
             string itemSlot = GetItemSlotDescription(slotNameTextBox.Text);
             if (string.IsNullOrEmpty(itemSlot)) return;
@@ -232,10 +232,10 @@ public partial class CreateItem : Form {
     private void AddNifs(IPackStreamVerBase itemStream) {
         if (!string.IsNullOrEmpty(MaleNifFilePath)) {
             byte[] pData = File.ReadAllBytes(MaleNifFilePath);
-            string fileName = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
+            string fileName = MaleNifFilePath[(MaleNifFilePath.LastIndexOf('\\') + 1)..];
             string itemId = fileName.Split('_').First();
 
-            string firstDigit = itemId.Substring(0, 1);
+            string firstDigit = itemId[..1];
             string next2Digits = itemId.Substring(1, 2);
 
             PackFileEntry pEntry = new PackFileEntry {
@@ -253,10 +253,10 @@ public partial class CreateItem : Form {
 
         {
             byte[] pData = File.ReadAllBytes(FemaleNifFilePath);
-            string fileName = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
+            string fileName = FemaleNifFilePath[(FemaleNifFilePath.LastIndexOf('\\') + 1)..];
             string itemId = fileName.Split('_').First();
 
-            string firstDigit = itemId.Substring(0, 1);
+            string firstDigit = itemId[..1];
             string next2Digits = itemId.Substring(1, 2);
 
             PackFileEntry pEntry = new PackFileEntry {
@@ -386,7 +386,7 @@ public partial class CreateItem : Form {
         string m2hPath = filePath.Replace(".m2d", ".m2h");
 
         if (!File.Exists(m2hPath)) {
-            string sHeaderName = m2hPath.Substring(m2hPath.LastIndexOf('/') + 1);
+            string sHeaderName = m2hPath[(m2hPath.LastIndexOf('/') + 1)..];
             NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
                 MessageBoxIcon.Error);
             return null;
@@ -664,7 +664,7 @@ public partial class CreateItem : Form {
 
         MaleNifFilePath = pDialog.FileName;
 
-        maleNifFileStatus.Text = MaleNifFilePath.Substring(MaleNifFilePath.LastIndexOf('\\') + 1);
+        maleNifFileStatus.Text = MaleNifFilePath[(MaleNifFilePath.LastIndexOf('\\') + 1)..];
     }
 
     private void OnFindFemaleNifFile(object sender, EventArgs e) {
@@ -677,7 +677,7 @@ public partial class CreateItem : Form {
         if (pDialog.ShowDialog() != DialogResult.OK) return;
         FemaleNifFilePath = pDialog.FileName;
 
-        femaleNifFileStatus.Text = FemaleNifFilePath.Substring(FemaleNifFilePath.LastIndexOf('\\') + 1);
+        femaleNifFileStatus.Text = FemaleNifFilePath[(FemaleNifFilePath.LastIndexOf('\\') + 1)..];
     }
 
     private void OnFindMaleTextureFiles(object sender, EventArgs e) {
@@ -690,7 +690,7 @@ public partial class CreateItem : Form {
         if (pDialog.ShowDialog() != DialogResult.OK) return;
         MaleTexturePaths = pDialog.FileNames;
 
-        List<string> filenames = MaleTexturePaths.Select(path => path.Substring(path.LastIndexOf('\\') + 1)).ToList();
+        List<string> filenames = MaleTexturePaths.Select(path => path[(path.LastIndexOf('\\') + 1)..]).ToList();
         maleTextureStatus.Text = string.Join("\r\n", filenames);
     }
 
@@ -704,7 +704,7 @@ public partial class CreateItem : Form {
         if (pDialog.ShowDialog() != DialogResult.OK) return;
         FemaleTexturePaths = pDialog.FileNames;
 
-        List<string> filenames = FemaleTexturePaths.Select(path => path.Substring(path.LastIndexOf('\\') + 1)).ToList();
+        List<string> filenames = FemaleTexturePaths.Select(path => path[(path.LastIndexOf('\\') + 1)..]).ToList();
         femaleTextureStatus.Text = string.Join("\r\n", filenames);
     }
 
@@ -718,7 +718,7 @@ public partial class CreateItem : Form {
         if (pDialog.ShowDialog() != DialogResult.OK) return;
         SlotIconFilePath = pDialog.FileName;
 
-        slotIconFileStatus.Text = SlotIconFilePath.Substring(SlotIconFilePath.LastIndexOf('\\') + 1);
+        slotIconFileStatus.Text = SlotIconFilePath[(SlotIconFilePath.LastIndexOf('\\') + 1)..];
         slotIconFileStatus.Visible = true;
     }
 
@@ -758,7 +758,7 @@ public partial class CreateItem : Form {
         if (pDialog.ShowDialog() != DialogResult.OK) return;
         ItemXmlFilePath = pDialog.FileName;
 
-        itemXmlStatus.Text = ItemXmlFilePath.Substring(ItemXmlFilePath.LastIndexOf('\\') + 1);
+        itemXmlStatus.Text = ItemXmlFilePath[(ItemXmlFilePath.LastIndexOf('\\') + 1)..];
     }
 
     private void OnRemoveItemXmlButton(object sender, EventArgs e) {
