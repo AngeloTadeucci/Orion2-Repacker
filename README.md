@@ -1,40 +1,52 @@
-## This fork changes:
- * Add folder and item button;
- * VS Code Editor instead of ScintillaNET;
- * Exporting progress bar. No more "App is not responding";
- * .NET 7 instead of .NET Framework.
+## This fork changes
+
+- Add folder and item button;
+- VS Code Editor instead of ScintillaNET;
+- Exporting progress bar. No more "App is not responding";
+- .NET 8 instead of .NET Framework.
+- Drag and drop files
 
 # Orion2 Repacker
+
 Orion2 Repacker - A HaRepacker for MapleStory2!
 
 [![N|Solid](https://user-images.githubusercontent.com/15664821/233808955-e1bb6e6e-f72f-4666-961b-16221c826d1d.png)](https://github.com/AngeloTadeucci/Orion2-Repacker)
 
-----------------------------------------------------------------------
+---
+
 ## General Features
- * Supports all MS2 file formats (MS2F, NS2F, OS2F, and PS2F)
- * Loads the file list into a expandable tree view for easy access
- * Selecting a node will render it, as well as display actions for modifying it
- * Double-clicking a node will expand the directory and add the new entries to tree
- * Ability to add, remove, copy, paste, and modify any of the data
- * Ability to export the selected node's file data to disk
- * Full saving support for all file formats
+
+- Supports all MS2 file formats (MS2F, NS2F, OS2F, and PS2F)
+- Loads the file list into a expandable tree view for easy access
+- Selecting a node will render it, as well as display actions for modifying it
+- Double-clicking a node will expand the directory and add the new entries to tree
+- Ability to add, remove, copy, paste, and modify any of the data
+- Ability to export the selected node's file data to disk
+- Full saving support for all file formats
+
 ## Rendering
+
 Currently the Orion2 Repacker is able to display the following formats:
- * Initialization Files (.ini)
- * N-Triple Files (.nt)
- * LUA Files (.lua)
- * XML Files (.xml)
- * FLAT Files (.flat)
- * XBlock Files (.xblock)
- * Database Diagram Files (.diagram)
- * Preset Files (.preset)
- * PNG Image Files (.png)
- * DDS Image Files (.dds)
- 
+
+- Initialization Files (.ini)
+- N-Triple Files (.nt)
+- LUA Files (.lua)
+- XML Files (.xml)
+- FLAT Files (.flat)
+- XBlock Files (.xblock)
+- Database Diagram Files (.diagram)
+- Preset Files (.preset)
+- PNG Image Files (.png)
+- DDS Image Files (.dds)
+
 The following are currently unable to be rendered, but these external applications can:
- * USM Movie Files (.usm) - [VGMToolbox](https://sourceforge.net/projects/vgmtoolbox/)
- * Gamebryo NIF/KF Files (.nif, .kf, .kfm) - [Noesis](https://richwhitehouse.com/index.php?content=inc_projects.php&showproject=91)
+
+- USM Movie Files (.usm) - [VGMToolbox](https://sourceforge.net/projects/vgmtoolbox/)
+- Gamebryo NIF/KF Files (.nif, .kf, .kfm) - [Noesis](https://richwhitehouse.com/index.php?content=inc_projects.php&showproject=91)
+
 ## Dependencies
+
 The Orion2 Repacker utilizes these great libraries:
- * [Monaco Editor](https://github.com/microsoft/monaco-editor) The Monaco Editor is the code editor that powers VS Code.
- * [Pfim](https://github.com/nickbabcock/Pfim) DDS decoder
+
+- [Monaco Editor](https://github.com/microsoft/monaco-editor) The Monaco Editor is the code editor that powers VS Code.
+- [Pfim](https://github.com/nickbabcock/Pfim) DDS decoder
