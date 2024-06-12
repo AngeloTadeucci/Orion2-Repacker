@@ -95,9 +95,9 @@ public partial class MainWindow : Form {
     }
 
     private void SaveFile(object sender, CoreWebView2WebMessageReceivedEventArgs e) {
-        if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
 
-        if (!(pNode.Tag is PackFileEntry pEntry)) return;
+        if (pNode.Tag is not PackFileEntry pEntry) return;
 
         string sData = e.TryGetWebMessageAsString();
         byte[] pData = Encoding.UTF8.GetBytes(sData.ToCharArray());
@@ -468,7 +468,7 @@ public partial class MainWindow : Form {
             return;
         }
 
-        if (!(pTreeView.SelectedNode is PackNode pNode)) return;
+        if (pTreeView.SelectedNode is not PackNode pNode) return;
 
         if (pNode.Tag is PackFileEntry) {
             NotifyMessage("Please select a directory to add into!", MessageBoxIcon.Exclamation);
@@ -489,14 +489,14 @@ public partial class MainWindow : Form {
     }
 
     private void OnRemoveFile(object sender, EventArgs e) {
-        if (!(pTreeView.SelectedNode is PackNode pNode)) {
+        if (pTreeView.SelectedNode is not PackNode pNode) {
             NotifyMessage("Please select a file or directory to remove.", MessageBoxIcon.Exclamation);
             return;
         }
 
-        if (!(pTreeView.Nodes[0] is PackNode pRoot) || pNode == pRoot) return;
+        if (pTreeView.Nodes[0] is not PackNode pRoot || pNode == pRoot) return;
 
-        if (!(pRoot.Tag is IPackStreamVerBase pStream)) return;
+        if (pRoot.Tag is not IPackStreamVerBase pStream) return;
 
         switch (pNode.Tag) {
             case PackFileEntry pEntry: {
@@ -527,7 +527,7 @@ public partial class MainWindow : Form {
     } // Remove
 
     private void OnCopyNode(object sender, EventArgs e) {
-        if (!(pTreeView.SelectedNode is PackNode pNode)) {
+        if (pTreeView.SelectedNode is not PackNode pNode) {
             NotifyMessage("Please select the node you wish to copy.", MessageBoxIcon.Exclamation);
             return;
         }
@@ -557,7 +557,7 @@ public partial class MainWindow : Form {
         IDataObject pData = Clipboard.GetDataObject();
         if (pData == null) return;
 
-        if (!(pTreeView.SelectedNode is PackNode pNode)) return;
+        if (pTreeView.SelectedNode is not PackNode pNode) return;
 
         if (pNode.Tag is PackFileEntry) //wtf are they thinking?
         {
@@ -627,7 +627,7 @@ public partial class MainWindow : Form {
     #region Tools
 
     private void OnExport(object sender, EventArgs e) {
-        if (!(pTreeView.SelectedNode is PackNode pNode)) {
+        if (pTreeView.SelectedNode is not PackNode pNode) {
             NotifyMessage("Please select a file to export.", MessageBoxIcon.Asterisk);
             return;
         }
@@ -801,9 +801,9 @@ public partial class MainWindow : Form {
     private void OnChangeImage(object sender, EventArgs e) {
         if (!pChangeImageBtn.Visible) return;
 
-        if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
 
-        if (!(pNode.Tag is PackFileEntry pEntry)) return;
+        if (pNode.Tag is not PackFileEntry pEntry) return;
 
         string sExtension = pEntry.TreeName.Split('.')[1];
         OpenFileDialog pDialog = new OpenFileDialog {
@@ -853,11 +853,11 @@ public partial class MainWindow : Form {
     }
 
     private void OnDoubleClickNode(object sender, TreeNodeMouseClickEventArgs e) {
-        if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Nodes.Count != 0) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Nodes.Count != 0) return;
 
         object pObj = pNode.Tag;
 
-        if (!(pObj is PackNodeList pList)) return;
+        if (pObj is not PackNodeList pList) return;
 
         // Iterate all further directories within the list
         foreach (KeyValuePair<string, PackNodeList> pChild in pList.Children) {
@@ -1048,7 +1048,7 @@ public partial class MainWindow : Form {
     #region Helpers - Save
 
     private void OnSaveBegin(object sender, DoWorkEventArgs e) {
-        if (!(sender is BackgroundWorker)) return;
+        if (sender is not BackgroundWorker) return;
 
         IPackStreamVerBase pStream = pProgress.Stream;
 
@@ -1098,9 +1098,9 @@ public partial class MainWindow : Form {
     private void OnSaveChanges(object sender, EventArgs e) {
         if (!pUpdateDataBtn.Visible) return;
 
-        if (!(pTreeView.SelectedNode is PackNode pNode) || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
 
-        if (!(pNode.Tag is PackFileEntry)) return;
+        if (pNode.Tag is not PackFileEntry) return;
 
         JObject json = new JObject
         {
@@ -1295,7 +1295,7 @@ public partial class MainWindow : Form {
     }
 
     private void extractWorkerThread_DoWork(object sender, DoWorkEventArgs e) {
-        if (!(sender is BackgroundWorker)) return;
+        if (sender is not BackgroundWorker) return;
 
         string sPath = extractWindow.Path;
         PackNode pNode = extractWindow.PackNode;
