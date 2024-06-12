@@ -66,7 +66,7 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 internal enum BlockState {
     NeedMore = 0, // block not completed, need more input or more output
     BlockDone, // block flush performed
@@ -132,7 +132,7 @@ internal sealed class DeflateManager {
         }
 
         public static Config Lookup(CompressionLevel level) {
-            return Table[(int)level];
+            return Table[(int) level];
         }
     }
 
@@ -420,7 +420,7 @@ internal sealed class DeflateManager {
             if (++count < max_count && curlen == nextlen) continue;
 
             if (count < min_count) {
-                bl_tree[curlen * 2] = (short)(bl_tree[curlen * 2] + count);
+                bl_tree[curlen * 2] = (short) (bl_tree[curlen * 2] + count);
             } else if (curlen != 0) {
                 if (curlen != prevlen)
                     bl_tree[curlen * 2]++;
@@ -583,17 +583,17 @@ internal sealed class DeflateManager {
                 //int val = value;
                 //      bi_buf |= (val << bi_valid);
 
-                bi_buf |= (short)((value << bi_valid) & 0xffff);
+                bi_buf |= (short) ((value << bi_valid) & 0xffff);
                 //put_short(bi_buf);
-                pending[pendingCount++] = (byte)bi_buf;
-                pending[pendingCount++] = (byte)(bi_buf >> 8);
+                pending[pendingCount++] = (byte) bi_buf;
+                pending[pendingCount++] = (byte) (bi_buf >> 8);
 
 
-                bi_buf = (short)((uint)value >> (Buf_size - bi_valid));
+                bi_buf = (short) ((uint) value >> (Buf_size - bi_valid));
                 bi_valid += length - Buf_size;
             } else {
                 //      bi_buf |= (value) << bi_valid;
-                bi_buf |= (short)((value << bi_valid) & 0xffff);
+                bi_buf |= (short) ((value << bi_valid) & 0xffff);
                 bi_valid += length;
             }
         }
@@ -630,9 +630,9 @@ internal sealed class DeflateManager {
     // Save the match info and tally the frequency counts. Return true if
     // the current block must be flushed.
     internal bool _tr_tally(int dist, int lc) {
-        pending[_distanceOffset + last_lit * 2] = unchecked((byte)((uint)dist >> 8));
-        pending[_distanceOffset + last_lit * 2 + 1] = unchecked((byte)dist);
-        pending[_lengthOffset + last_lit] = unchecked((byte)lc);
+        pending[_distanceOffset + last_lit * 2] = unchecked((byte) ((uint) dist >> 8));
+        pending[_distanceOffset + last_lit * 2 + 1] = unchecked((byte) dist);
+        pending[_lengthOffset + last_lit] = unchecked((byte) lc);
         last_lit++;
 
         if (dist == 0) {
@@ -646,13 +646,13 @@ internal sealed class DeflateManager {
             dyn_dtree[Tree.DistanceCode(dist) * 2]++;
         }
 
-        if ((last_lit & 0x1fff) == 0 && (int)compressionLevel > 2) {
+        if ((last_lit & 0x1fff) == 0 && (int) compressionLevel > 2) {
             // Compute an upper bound for the compressed length
             int out_length = last_lit << 3;
             int in_length = strstart - block_start;
             int dcode;
             for (dcode = 0; dcode < InternalConstants.D_CODES; dcode++)
-                out_length = (int)(out_length + dyn_dtree[dcode * 2] * (5L + Tree.ExtraDistanceBits[dcode]));
+                out_length = (int) (out_length + dyn_dtree[dcode * 2] * (5L + Tree.ExtraDistanceBits[dcode]));
             out_length >>= 3;
             if (matches < last_lit / 2 && out_length < in_length / 2)
                 return true;
@@ -741,19 +741,19 @@ internal sealed class DeflateManager {
             n++;
         }
 
-        data_type = (sbyte)(bin_freq > ascii_freq >> 2 ? Z_BINARY : Z_ASCII);
+        data_type = (sbyte) (bin_freq > ascii_freq >> 2 ? Z_BINARY : Z_ASCII);
     }
 
     // Flush the bit buffer, keeping at most 7 bits in it.
     internal void bi_flush() {
         if (bi_valid == 16) {
-            pending[pendingCount++] = (byte)bi_buf;
-            pending[pendingCount++] = (byte)(bi_buf >> 8);
+            pending[pendingCount++] = (byte) bi_buf;
+            pending[pendingCount++] = (byte) (bi_buf >> 8);
             bi_buf = 0;
             bi_valid = 0;
         } else if (bi_valid >= 8) {
             //put_byte((byte)bi_buf);
-            pending[pendingCount++] = (byte)bi_buf;
+            pending[pendingCount++] = (byte) bi_buf;
             bi_buf >>= 8;
             bi_valid -= 8;
         }
@@ -762,11 +762,11 @@ internal sealed class DeflateManager {
     // Flush the bit buffer and align the output on a byte boundary
     internal void bi_windup() {
         if (bi_valid > 8) {
-            pending[pendingCount++] = (byte)bi_buf;
-            pending[pendingCount++] = (byte)(bi_buf >> 8);
+            pending[pendingCount++] = (byte) bi_buf;
+            pending[pendingCount++] = (byte) (bi_buf >> 8);
         } else if (bi_valid > 0) {
             //put_byte((byte)bi_buf);
-            pending[pendingCount++] = (byte)bi_buf;
+            pending[pendingCount++] = (byte) bi_buf;
         }
 
         bi_buf = 0;
@@ -782,11 +782,11 @@ internal sealed class DeflateManager {
         if (header)
             unchecked {
                 //put_short((short)len);
-                pending[pendingCount++] = (byte)len;
-                pending[pendingCount++] = (byte)(len >> 8);
+                pending[pendingCount++] = (byte) len;
+                pending[pendingCount++] = (byte) (len >> 8);
                 //put_short((short)~len);
-                pending[pendingCount++] = (byte)~len;
-                pending[pendingCount++] = (byte)(~len >> 8);
+                pending[pendingCount++] = (byte) ~len;
+                pending[pendingCount++] = (byte) (~len >> 8);
             }
 
         put_bytes(window, buf, len);
@@ -963,14 +963,14 @@ internal sealed class DeflateManager {
                 p = n;
                 do {
                     m = head[--p] & 0xffff;
-                    head[p] = (short)(m >= w_size ? m - w_size : 0);
+                    head[p] = (short) (m >= w_size ? m - w_size : 0);
                 } while (--n != 0);
 
                 n = w_size;
                 p = n;
                 do {
                     m = prev[--p] & 0xffff;
-                    prev[p] = (short)(m >= w_size ? m - w_size : 0);
+                    prev[p] = (short) (m >= w_size ? m - w_size : 0);
                     // If n is not on any hash chain, prev[n] is garbage but
                     // its value will never be used.
                 } while (--n != 0);
@@ -1035,7 +1035,7 @@ internal sealed class DeflateManager {
                 //  prev[strstart&w_mask]=hash_head=head[ins_h];
                 hash_head = head[ins_h] & 0xffff;
                 prev[strstart & w_mask] = head[ins_h];
-                head[ins_h] = unchecked((short)strstart);
+                head[ins_h] = unchecked((short) strstart);
             }
 
             // Find the longest match, discarding those <= prev_length.
@@ -1066,7 +1066,7 @@ internal sealed class DeflateManager {
                         //      prev[strstart&w_mask]=hash_head=head[ins_h];
                         hash_head = head[ins_h] & 0xffff;
                         prev[strstart & w_mask] = head[ins_h];
-                        head[ins_h] = unchecked((short)strstart);
+                        head[ins_h] = unchecked((short) strstart);
 
                         // strstart never exceeds WSIZE-MAX_MATCH, so there are
                         // always MIN_MATCH bytes ahead.
@@ -1139,7 +1139,7 @@ internal sealed class DeflateManager {
                 //  prev[strstart&w_mask]=hash_head=head[ins_h];
                 hash_head = head[ins_h] & 0xffff;
                 prev[strstart & w_mask] = head[ins_h];
-                head[ins_h] = unchecked((short)strstart);
+                head[ins_h] = unchecked((short) strstart);
             }
 
             // Find the longest match, discarding those <= prev_length.
@@ -1185,7 +1185,7 @@ internal sealed class DeflateManager {
                         //prev[strstart&w_mask]=hash_head=head[ins_h];
                         hash_head = head[ins_h] & 0xffff;
                         prev[strstart & w_mask] = head[ins_h];
-                        head[ins_h] = unchecked((short)strstart);
+                        head[ins_h] = unchecked((short) strstart);
                     }
                 } while (--prev_length != 0);
 
@@ -1392,7 +1392,7 @@ internal sealed class DeflateManager {
         status = WantRfc1950HeaderBytes ? INIT_STATE : BUSY_STATE;
         _codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
-        last_flush = (int)FlushType.None;
+        last_flush = (int) FlushType.None;
 
         _InitializeTreeData();
         _InitializeLazyMatch();
@@ -1476,7 +1476,7 @@ internal sealed class DeflateManager {
         for (int n = 0; n <= length - MIN_MATCH; n++) {
             ins_h = ((ins_h << hash_shift) ^ (window[n + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
             prev[n & w_mask] = head[ins_h];
-            head[ins_h] = (short)n;
+            head[ins_h] = (short) n;
         }
 
         return ZlibConstants.Z_OK;
@@ -1498,12 +1498,12 @@ internal sealed class DeflateManager {
         }
 
         old_flush = last_flush;
-        last_flush = (int)flush;
+        last_flush = (int) flush;
 
         // Write the zlib (rfc1950) header bytes
         if (status == INIT_STATE) {
             int header = (Z_DEFLATED + ((w_bits - 8) << 4)) << 8;
-            int level_flags = (((int)compressionLevel - 1) & 0xff) >> 1;
+            int level_flags = (((int) compressionLevel - 1) & 0xff) >> 1;
 
             if (level_flags > 3)
                 level_flags = 3;
@@ -1515,16 +1515,16 @@ internal sealed class DeflateManager {
             status = BUSY_STATE;
             //putShortMSB(header);
             unchecked {
-                pending[pendingCount++] = (byte)(header >> 8);
-                pending[pendingCount++] = (byte)header;
+                pending[pendingCount++] = (byte) (header >> 8);
+                pending[pendingCount++] = (byte) header;
             }
 
             // Save the adler32 of the preset dictionary:
             if (strstart != 0) {
-                pending[pendingCount++] = (byte)((_codec._Adler32 & 0xFF000000) >> 24);
-                pending[pendingCount++] = (byte)((_codec._Adler32 & 0x00FF0000) >> 16);
-                pending[pendingCount++] = (byte)((_codec._Adler32 & 0x0000FF00) >> 8);
-                pending[pendingCount++] = (byte)(_codec._Adler32 & 0x000000FF);
+                pending[pendingCount++] = (byte) ((_codec._Adler32 & 0xFF000000) >> 24);
+                pending[pendingCount++] = (byte) ((_codec._Adler32 & 0x00FF0000) >> 16);
+                pending[pendingCount++] = (byte) ((_codec._Adler32 & 0x0000FF00) >> 8);
+                pending[pendingCount++] = (byte) (_codec._Adler32 & 0x000000FF);
             }
 
             _codec._Adler32 = Adler.Adler32(0, null, 0, 0);
@@ -1548,7 +1548,7 @@ internal sealed class DeflateManager {
             // flushes. For repeated and useless calls with Z_FINISH, we keep
             // returning Z_STREAM_END instead of Z_BUFF_ERROR.
         } else if (_codec.AvailableBytesIn == 0 &&
-                   (int)flush <= old_flush &&
+                   (int) flush <= old_flush &&
                    flush != FlushType.Finish) {
             // workitem 8557
             //
@@ -1614,10 +1614,10 @@ internal sealed class DeflateManager {
             return ZlibConstants.Z_STREAM_END;
 
         // Write the zlib trailer (adler32)
-        pending[pendingCount++] = (byte)((_codec._Adler32 & 0xFF000000) >> 24);
-        pending[pendingCount++] = (byte)((_codec._Adler32 & 0x00FF0000) >> 16);
-        pending[pendingCount++] = (byte)((_codec._Adler32 & 0x0000FF00) >> 8);
-        pending[pendingCount++] = (byte)(_codec._Adler32 & 0x000000FF);
+        pending[pendingCount++] = (byte) ((_codec._Adler32 & 0xFF000000) >> 24);
+        pending[pendingCount++] = (byte) ((_codec._Adler32 & 0x00FF0000) >> 16);
+        pending[pendingCount++] = (byte) ((_codec._Adler32 & 0x0000FF00) >> 8);
+        pending[pendingCount++] = (byte) (_codec._Adler32 & 0x000000FF);
         //putShortMSB((int)(SharedUtils.URShift(_codec._Adler32, 16)));
         //putShortMSB((int)(_codec._Adler32 & 0xffff));
 

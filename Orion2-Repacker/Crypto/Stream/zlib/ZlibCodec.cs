@@ -65,7 +65,7 @@
 
 using Interop = System.Runtime.InteropServices;
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     Encoder and Decoder for ZLIB and DEFLATE (IETF RFC1950 and RFC1951).
 /// </summary>
@@ -209,7 +209,7 @@ public sealed class ZlibCodec {
     /// <summary>
     ///     The Adler32 checksum on the data transferred through the codec so far. You probably don't need to look at this.
     /// </summary>
-    public int Adler32 => (int)_Adler32;
+    public int Adler32 => (int) _Adler32;
 
     /// <summary>
     ///     Initialize the inflation state.

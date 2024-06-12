@@ -1,4 +1,4 @@
-﻿namespace Orion.Crypto.Stream.DDS; 
+﻿namespace Orion.Crypto.Stream.DDS;
 /// <summary>
 ///     This is the main class of the library.  All static methods are contained within.
 /// </summary>

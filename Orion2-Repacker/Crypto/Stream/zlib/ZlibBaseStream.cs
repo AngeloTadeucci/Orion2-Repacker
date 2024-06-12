@@ -26,7 +26,7 @@
 
 using System.Text;
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 internal enum ZlibStreamFlavor {
     ZLIB = 1950,
     DEFLATE = 1951,
@@ -179,7 +179,7 @@ internal class ZlibBaseStream : System.IO.Stream {
                     // Emit the GZIP trailer: CRC32 and  size mod 2^32
                     int c1 = crc.Crc32Result;
                     _stream.Write(BitConverter.GetBytes(c1), 0, 4);
-                    int c2 = (int)(crc.TotalBytesRead & 0x00000000FFFFFFFF);
+                    int c2 = (int) (crc.TotalBytesRead & 0x00000000FFFFFFFF);
                     _stream.Write(BitConverter.GetBytes(c2), 0, 4);
                 } else {
                     throw new ZlibException("Writing with decompression is not supported.");
@@ -215,7 +215,7 @@ internal class ZlibBaseStream : System.IO.Stream {
                     int crc32_expected = BitConverter.ToInt32(trailer, 0);
                     int crc32_actual = crc.Crc32Result;
                     int isize_expected = BitConverter.ToInt32(trailer, 4);
-                    int isize_actual = (int)(_z.TotalBytesOut & 0x00000000FFFFFFFF);
+                    int isize_actual = (int) (_z.TotalBytesOut & 0x00000000FFFFFFFF);
 
                     if (crc32_actual != crc32_expected)
                         throw new ZlibException(

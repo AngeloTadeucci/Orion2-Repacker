@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public class PackStreamVer3 : IPackStreamVerBase {
     private readonly List<PackFileEntry> aFileList;
     private readonly uint uVer;
@@ -107,7 +107,7 @@ public class PackStreamVer3 : IPackStreamVerBase {
     }
 
     public void SetFileListCount(ulong uCount) {
-        dwFileListCount = (uint)uCount;
+        dwFileListCount = (uint) uCount;
     }
 
     public static PackStreamVer3 ParseHeader(BinaryReader pReader, uint uVer) {

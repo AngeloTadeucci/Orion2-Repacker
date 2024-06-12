@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public class PackFileHeaderVer1 : IPackFileHeaderVerBase {
     private readonly byte[] aPackingDef; //A "Packing Definition", unused.
     private readonly int[] Reserved;

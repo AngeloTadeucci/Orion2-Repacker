@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public class PackFileHeaderVer2 : IPackFileHeaderVerBase {
     private uint dwBufferFlag;
     private int nFileIndex;

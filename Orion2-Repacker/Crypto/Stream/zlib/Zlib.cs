@@ -89,7 +89,7 @@
 using System.Text;
 using Interop = System.Runtime.InteropServices;
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     Describes how to flush the current deflate operation.
 /// </summary>
@@ -278,7 +278,7 @@ internal class SharedUtils {
     /// <param name="bits">Ammount of bits to shift</param>
     /// <returns>The resulting number from the shift operation</returns>
     public static int URShift(int number, int bits) {
-        return (int)((uint)number >> bits);
+        return (int) ((uint) number >> bits);
     }
 
 #if NOT
@@ -318,7 +318,7 @@ internal class SharedUtils {
         if (bytesRead == 0) return -1;
 
         for (int index = start; index < start + bytesRead; index++)
-            target[index] = (byte)charArray[index];
+            target[index] = (byte) charArray[index];
 
         return bytesRead;
     }

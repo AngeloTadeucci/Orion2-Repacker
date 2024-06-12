@@ -60,7 +60,7 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     A bunch of constants used in the Zlib interface.
 /// </summary>

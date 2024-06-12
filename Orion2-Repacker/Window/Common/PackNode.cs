@@ -18,7 +18,7 @@
 using System.Text;
 using Orion.Crypto.Common;
 
-namespace Orion.Window.Common; 
+namespace Orion.Window.Common;
 public class PackNode : TreeNode {
     private byte[] pData;
 

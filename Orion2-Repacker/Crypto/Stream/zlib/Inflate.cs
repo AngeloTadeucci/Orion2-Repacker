@@ -61,7 +61,7 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 internal sealed class InflateBlocks {
     private const int MANY = 1440;
 
@@ -168,7 +168,7 @@ internal sealed class InflateBlocks {
                     t = b & 7;
                     last = t & 1;
 
-                    switch ((uint)t >> 1) {
+                    switch ((uint) t >> 1) {
                         case 0: // stored
                             b >>= 3;
                             k -= 3;
@@ -767,8 +767,8 @@ internal sealed class InflateCodes {
 
     internal void Init(int bl, int bd, int[] tl, int tl_index, int[] td, int td_index) {
         mode = START;
-        lbits = (byte)bl;
-        dbits = (byte)bd;
+        lbits = (byte) bl;
+        dbits = (byte) bd;
         ltree = tl;
         ltree_index = tl_index;
         dtree = td;
@@ -1095,7 +1095,7 @@ internal sealed class InflateCodes {
 
                     r = ZlibConstants.Z_OK;
 
-                    blocks.window[q++] = (byte)lit;
+                    blocks.window[q++] = (byte) lit;
                     m--;
 
                     mode = START;
@@ -1217,7 +1217,7 @@ internal sealed class InflateCodes {
                 b >>= tp[tp_index_t_3 + 1];
                 k -= tp[tp_index_t_3 + 1];
 
-                s.window[q++] = (byte)tp[tp_index_t_3 + 2];
+                s.window[q++] = (byte) tp[tp_index_t_3 + 2];
                 m--;
                 continue;
             }
@@ -1358,7 +1358,7 @@ internal sealed class InflateCodes {
                     if ((e = tp[tp_index_t_3]) == 0) {
                         b >>= tp[tp_index_t_3 + 1];
                         k -= tp[tp_index_t_3 + 1];
-                        s.window[q++] = (byte)tp[tp_index_t_3 + 2];
+                        s.window[q++] = (byte) tp[tp_index_t_3 + 2];
                         m--;
                         break;
                     }
@@ -1565,7 +1565,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
+                    expectedCheck = (uint) ((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
                     mode = InflateManagerMode.DICT3;
                     break;
 
@@ -1574,7 +1574,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
+                    expectedCheck += (uint) ((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
                     mode = InflateManagerMode.DICT2;
                     break;
 
@@ -1584,7 +1584,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
+                    expectedCheck += (uint) ((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
                     mode = InflateManagerMode.DICT1;
                     break;
 
@@ -1594,7 +1594,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0x000000ff);
+                    expectedCheck += (uint) (_codec.InputBuffer[_codec.NextIn++] & 0x000000ff);
                     _codec._Adler32 = expectedCheck;
                     mode = InflateManagerMode.DICT0;
                     return ZlibConstants.Z_NEED_DICT;
@@ -1635,7 +1635,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
+                    expectedCheck = (uint) ((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
                     mode = InflateManagerMode.CHECK3;
                     break;
 
@@ -1644,7 +1644,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
+                    expectedCheck += (uint) ((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
                     mode = InflateManagerMode.CHECK2;
                     break;
 
@@ -1653,7 +1653,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
+                    expectedCheck += (uint) ((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
                     mode = InflateManagerMode.CHECK1;
                     break;
 
@@ -1662,7 +1662,7 @@ internal sealed class InflateManager {
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
-                    expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0x000000ff);
+                    expectedCheck += (uint) (_codec.InputBuffer[_codec.NextIn++] & 0x000000ff);
                     if (computedCheck != expectedCheck) {
                         mode = InflateManagerMode.BAD;
                         _codec.Message = "incorrect data check";

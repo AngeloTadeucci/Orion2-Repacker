@@ -15,7 +15,7 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public class PackFileHeaderVer3 : IPackFileHeaderVerBase {
     private readonly uint uVer;
     private uint dwBufferFlag;

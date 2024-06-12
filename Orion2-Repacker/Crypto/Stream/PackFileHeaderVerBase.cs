@@ -15,7 +15,7 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public interface IPackFileHeaderVerBase {
     uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 

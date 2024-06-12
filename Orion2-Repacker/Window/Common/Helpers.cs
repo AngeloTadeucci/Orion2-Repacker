@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Orion.Window.Common; 
+namespace Orion.Window.Common;
 public static class Helpers {
     public static string CreateHash(string sHeaderUOL) {
         if (!File.Exists(sHeaderUOL)) return "";

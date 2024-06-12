@@ -17,7 +17,7 @@
 
 using System.Security.Cryptography;
 
-namespace Orion.Crypto; 
+namespace Orion.Crypto;
 public class AESCipher {
     private readonly byte[] aCounter;
     private readonly SymmetricAlgorithm pAlgorithm;
@@ -63,7 +63,7 @@ public class AESCipher {
 
             for (int j = 0; j < pXORBlock.Length; j++) {
                 if (i + j >= pDest.Length) break;
-                pDest[Dst + i + j] = (byte)(pSrc[uOffset + i + j] ^ pXORBlock[j]);
+                pDest[Dst + i + j] = (byte) (pSrc[uOffset + i + j] ^ pXORBlock[j]);
             }
         }
 

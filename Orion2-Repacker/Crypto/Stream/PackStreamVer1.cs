@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public class PackStreamVer1 : IPackStreamVerBase {
     private readonly List<PackFileEntry> aFileList;
     private ulong dwCompressedDataSize;

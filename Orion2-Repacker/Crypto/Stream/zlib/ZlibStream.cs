@@ -25,7 +25,7 @@
 //
 // ------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     Represents a Zlib stream for compression or decompression.
 /// </summary>

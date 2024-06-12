@@ -312,7 +312,7 @@ public partial class CreateItem : Form {
 
         pStream.GetFileList().Sort();
         SaveData(sPath, pStream.GetFileList(), pDataMappedMemFile);
-        uint dwFileCount = (uint)pStream.GetFileList().Count;
+        uint dwFileCount = (uint) pStream.GetFileList().Count;
         StringBuilder sFileString = new StringBuilder();
         foreach (PackFileEntry pEntry in pStream.GetFileList()) sFileString.Append(pEntry);
         byte[] pFileString = Encoding.UTF8.GetBytes(sFileString.ToString().ToCharArray());
@@ -544,10 +544,10 @@ public partial class CreateItem : Form {
 
                 // Access the current encrypted block data from the memory map initially loaded
                 using (MemoryMappedViewStream pBuffer =
-                       pDataMappedMemFile.CreateViewStream((long)pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
+                       pDataMappedMemFile.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
                     byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                    if (pBuffer.Read(pSrc, 0, (int)pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
+                    if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
                     // Modify the header's file index to the updated offset after entry changes
                     pHeader.SetFileIndex(nCurIndex);
                     // Modify the header's offset to the updated offset after entry changes

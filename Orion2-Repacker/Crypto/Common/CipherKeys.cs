@@ -15,7 +15,7 @@
  *      You should have received a copy of the GNU General Public License
  */
 
-namespace Orion.Crypto.Common; 
+namespace Orion.Crypto.Common;
 public class CipherKeys {
     const int BITS = 128;       //128-bit AES
     const int IV_LEN = 16;      //16-byte IV (CTR)

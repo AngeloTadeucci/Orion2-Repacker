@@ -21,7 +21,7 @@ using Orion.Crypto.Common;
 using Orion.Crypto.Stream;
 using Orion.Crypto.Stream.zlib;
 
-namespace Orion.Crypto; 
+namespace Orion.Crypto;
 public class CryptoMan {
     public static byte[] DecryptFileString(IPackStreamVerBase pStream, System.IO.Stream pBuffer) {
         if (pStream.GetCompressedHeaderSize() <= 0 || pStream.GetEncodedHeaderSize() <= 0 || pStream.GetHeaderSize() <= 0) {
@@ -30,8 +30,8 @@ public class CryptoMan {
 
         byte[] pSrc = new byte[pStream.GetEncodedHeaderSize()];
 
-        if ((ulong)pBuffer.Read(pSrc, 0, (int)pStream.GetEncodedHeaderSize()) == pStream.GetEncodedHeaderSize()) {
-            return Decrypt(pStream.GetVer(), (uint)pStream.GetEncodedHeaderSize(), (uint)pStream.GetCompressedHeaderSize(),
+        if ((ulong) pBuffer.Read(pSrc, 0, (int) pStream.GetEncodedHeaderSize()) == pStream.GetEncodedHeaderSize()) {
+            return Decrypt(pStream.GetVer(), (uint) pStream.GetEncodedHeaderSize(), (uint) pStream.GetCompressedHeaderSize(),
                 BufferManipulation.AES_ZLIB, pSrc);
         }
 
@@ -45,8 +45,8 @@ public class CryptoMan {
 
         byte[] pSrc = new byte[pStream.GetEncodedDataSize()];
 
-        if ((ulong)pBuffer.Read(pSrc, 0, (int)pStream.GetEncodedDataSize()) == pStream.GetEncodedDataSize()) {
-            return Decrypt(pStream.GetVer(), (uint)pStream.GetEncodedDataSize(), (uint)pStream.GetCompressedDataSize(), BufferManipulation.AES_ZLIB,
+        if ((ulong) pBuffer.Read(pSrc, 0, (int) pStream.GetEncodedDataSize()) == pStream.GetEncodedDataSize()) {
+            return Decrypt(pStream.GetVer(), (uint) pStream.GetEncodedDataSize(), (uint) pStream.GetCompressedDataSize(), BufferManipulation.AES_ZLIB,
                 pSrc);
         }
 
@@ -58,11 +58,11 @@ public class CryptoMan {
             throw new Exception("ERROR decrypting data file segment: the size of the block is invalid.");
         }
 
-        using (MemoryMappedViewStream pBuffer = pData.CreateViewStream((long)pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
+        using (MemoryMappedViewStream pBuffer = pData.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
             byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-            if (pBuffer.Read(pSrc, 0, (int)pHeader.GetEncodedFileSize()) == pHeader.GetEncodedFileSize()) {
-                return Decrypt(pHeader.GetVer(), pHeader.GetEncodedFileSize(), (uint)pHeader.GetCompressedFileSize(), pHeader.GetBufferFlag(), pSrc);
+            if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) == pHeader.GetEncodedFileSize()) {
+                return Decrypt(pHeader.GetVer(), pHeader.GetEncodedFileSize(), (uint) pHeader.GetCompressedFileSize(), pHeader.GetBufferFlag(), pSrc);
             }
         }
 
@@ -103,8 +103,8 @@ public class CryptoMan {
             Buffer.BlockCopy(pSrc, 0, pEncrypted, 0, pSrc.Length);
         }
 
-        uLen = (uint)pSrc.Length;
-        uLenCompressed = (uint)pEncrypted.Length;
+        uLen = (uint) pSrc.Length;
+        uLenCompressed = (uint) pEncrypted.Length;
 
         if ((bits[3] & 1) == 0) {
             // Get the AES Key/IV for transformation
@@ -121,7 +121,7 @@ public class CryptoMan {
             pEncrypted = EncryptXOR(uVer, pEncrypted, uLen);
         }
 
-        uLenEncoded = (uint)pEncrypted.Length;
+        uLenEncoded = (uint) pEncrypted.Length;
 
         return pEncrypted;
     }
@@ -149,10 +149,10 @@ public class CryptoMan {
                  *      mov     eax, [ebp+uLen]
                 */
 
-                uint pBlockData = BitConverter.ToUInt32(pSrc, (int)(4 * uBlockOffset)) ^ BitConverter.ToUInt32(aKey, 4 * nKeyOffset);
-                Buffer.BlockCopy(BitConverter.GetBytes(pBlockData), 0, pSrc, (int)(4 * uBlockOffset), sizeof(uint));
+                uint pBlockData = BitConverter.ToUInt32(pSrc, (int) (4 * uBlockOffset)) ^ BitConverter.ToUInt32(aKey, 4 * nKeyOffset);
+                Buffer.BlockCopy(BitConverter.GetBytes(pBlockData), 0, pSrc, (int) (4 * uBlockOffset), sizeof(uint));
 
-                nKeyOffset = ((ushort)nKeyOffset + 1) & 0x1FF;
+                nKeyOffset = ((ushort) nKeyOffset + 1) & 0x1FF;
                 uBlockOffset++;
             }
         }
@@ -160,7 +160,7 @@ public class CryptoMan {
         uBlock = uLen & 3;
         if (uBlock == 0) return pSrc;
 
-        int nStart = (int)(4 * uBlockOffset);
+        int nStart = (int) (4 * uBlockOffset);
 
         uBlockOffset = 0;
         nKeyOffset = 0;
@@ -168,7 +168,7 @@ public class CryptoMan {
         while (uBlockOffset < uBlock) {
             pSrc[nStart + uBlockOffset++] ^= aKey[nKeyOffset];
 
-            nKeyOffset = ((ushort)nKeyOffset + 1) & 0x7FF;
+            nKeyOffset = ((ushort) nKeyOffset + 1) & 0x7FF;
         }
 
         return pSrc;

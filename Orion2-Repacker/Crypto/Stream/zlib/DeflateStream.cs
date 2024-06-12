@@ -24,7 +24,7 @@
 //
 // ------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     A class for compressing and decompressing streams using the Deflate algorithm.
 /// </summary>

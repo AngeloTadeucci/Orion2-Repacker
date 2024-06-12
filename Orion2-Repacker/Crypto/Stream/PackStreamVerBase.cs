@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Crypto.Stream; 
+namespace Orion.Crypto.Stream;
 public interface IPackStreamVerBase {
     uint GetVer(); // Represents the format of the packed stream (MS2F/NS2F/etc)
 

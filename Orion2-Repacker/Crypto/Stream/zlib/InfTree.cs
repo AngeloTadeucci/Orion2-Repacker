@@ -59,7 +59,7 @@
 //
 // -----------------------------------------------------------------------
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 internal sealed class InfTree {
     private const int MANY = 1440;
 
@@ -1882,8 +1882,8 @@ internal sealed class InfTree {
                     // connect to last table, if there is one
                     if (h != 0) {
                         x[h] = i; // save pattern for backing up
-                        r[0] = (sbyte)j; // bits in this table
-                        r[1] = (sbyte)l; // bits to dump before this table
+                        r[0] = (sbyte) j; // bits in this table
+                        r[1] = (sbyte) l; // bits to dump before this table
                         j = SharedUtils.URShift(i, w - l);
                         r[2] = q - u[h - 1] - j; // offset to this table
                         Array.Copy(r, 0, hp, (u[h - 1] + j) * 3, 3); // connect to last table
@@ -1893,14 +1893,14 @@ internal sealed class InfTree {
                 }
 
                 // set up table entry in r
-                r[1] = (sbyte)(k - w);
+                r[1] = (sbyte) (k - w);
                 if (p >= n) {
                     r[0] = 128 + 64; // out of values--invalid code
                 } else if (v[p] < s) {
-                    r[0] = (sbyte)(v[p] < 256 ? 0 : 32 + 64); // 256 is end-of-block
+                    r[0] = (sbyte) (v[p] < 256 ? 0 : 32 + 64); // 256 is end-of-block
                     r[2] = v[p++]; // simple code is just the value
                 } else {
-                    r[0] = (sbyte)(e[v[p] - s] + 16 + 64); // non-simple--look up in lists
+                    r[0] = (sbyte) (e[v[p] - s] + 16 + 64); // non-simple--look up in lists
                     r[2] = d[v[p++] - s];
                 }
 

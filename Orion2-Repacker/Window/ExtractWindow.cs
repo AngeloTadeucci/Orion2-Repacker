@@ -18,7 +18,7 @@
 using System.Diagnostics;
 using Orion.Window.Common;
 
-namespace Orion.Window; 
+namespace Orion.Window;
 public partial class ExtractWindow : Form {
     private Stopwatch pStopWatch;
 

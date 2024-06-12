@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Stream;
 
-namespace Orion.Crypto.Common; 
+namespace Orion.Crypto.Common;
 public class PackVer {
     public const uint
         MS2F = 0x4632534D, //Ver1

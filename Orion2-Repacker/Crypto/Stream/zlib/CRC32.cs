@@ -27,7 +27,7 @@
 
 using Interop = System.Runtime.InteropServices;
 
-namespace Orion.Crypto.Stream.zlib; 
+namespace Orion.Crypto.Stream.zlib;
 /// <summary>
 ///     Computes a CRC-32. The CRC-32 algorithm is parameterized - you
 ///     can set the polynomial and enable or disable bit
@@ -77,7 +77,7 @@ public class CRC32 {
     ///     </para>
     /// </remarks>
     public CRC32(bool reverseBits) :
-        this(unchecked((int)0xEDB88320), reverseBits) {
+        this(unchecked((int) 0xEDB88320), reverseBits) {
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class CRC32 {
     /// </remarks>
     public CRC32(int polynomial, bool reverseBits) {
         this.reverseBits = reverseBits;
-        dwPolynomial = (uint)polynomial;
+        dwPolynomial = (uint) polynomial;
         GenerateLookupTable();
     }
 
@@ -118,7 +118,7 @@ public class CRC32 {
     /// <summary>
     ///     Indicates the current CRC for all blocks slurped in.
     /// </summary>
-    public int Crc32Result => unchecked((int)~_register);
+    public int Crc32Result => unchecked((int) ~_register);
 
     /// <summary>
     ///     Returns the CRC32 for the specified stream.
@@ -154,7 +154,7 @@ public class CRC32 {
                 TotalBytesRead += count;
             }
 
-            return (int)~_register;
+            return (int) ~_register;
         }
     }
 
@@ -166,11 +166,11 @@ public class CRC32 {
     /// <param name="B">The byte to combine it with.</param>
     /// <returns>The CRC-ized result.</returns>
     public int ComputeCrc32(int W, byte B) {
-        return _InternalComputeCrc32((uint)W, B);
+        return _InternalComputeCrc32((uint) W, B);
     }
 
     internal int _InternalComputeCrc32(uint W, byte B) {
-        return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+        return (int) (crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
     }
 
     /// <summary>
@@ -256,11 +256,11 @@ public class CRC32 {
 
     private static byte ReverseBits(byte data) {
         unchecked {
-            uint u = (uint)data * 0x00020202;
+            uint u = (uint) data * 0x00020202;
             uint m = 0x01044010;
             uint s = u & m;
             uint t = (u << 2) & (m << 1);
-            return (byte)((0x01001001 * (s + t)) >> 24);
+            return (byte) ((0x01001001 * (s + t)) >> 24);
         }
     }
 
@@ -338,7 +338,7 @@ public class CRC32 {
             return;
 
         uint crc1 = ~_register;
-        uint crc2 = (uint)crc;
+        uint crc2 = (uint) crc;
 
         // put operator for one zero bit in odd
         odd[0] = dwPolynomial; // the CRC-32 polynomial
@@ -354,7 +354,7 @@ public class CRC32 {
         // put operator for four zero bits in odd
         gf2_matrix_square(odd, even);
 
-        uint len2 = (uint)length;
+        uint len2 = (uint) length;
 
         // apply len2 zeros to crc1 (first square will put the operator for one
         // zero byte, eight zero bits, in even)
@@ -636,7 +636,7 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
         if (_lengthLimit != UnsetLengthLimit) {
             if (_Crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
             long bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
-            if (bytesRemaining < count) bytesToRead = (int)bytesRemaining;
+            if (bytesRemaining < count) bytesToRead = (int) bytesRemaining;
         }
 
         int n = _innerStream.Read(buffer, offset, bytesToRead);

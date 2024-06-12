@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Common;
 
-namespace Orion.Window.Common; 
+namespace Orion.Window.Common;
 [Serializable]
 public class PackNodeList {
     public const string DATA_FORMAT = "Pack.Node.FileList";

@@ -17,7 +17,7 @@
 
 using Orion.Crypto.Stream;
 
-namespace Orion.Crypto.Common; 
+namespace Orion.Crypto.Common;
 [Serializable]
 public class PackFileEntry : IComparable<PackFileEntry> {
     public const string DATA_FORMAT = "Pack.Node.FileEntry";

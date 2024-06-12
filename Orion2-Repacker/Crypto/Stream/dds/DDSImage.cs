@@ -2,7 +2,7 @@
 using Pfim;
 using ImageFormat = Pfim.ImageFormat;
 
-namespace Orion.Crypto.Stream.DDS; 
+namespace Orion.Crypto.Stream.DDS;
 public class DDSImage : IDisposable {
     private readonly IImage _image;
 
@@ -54,7 +54,7 @@ public class DDSImage : IDisposable {
 
         unsafe {
             fixed (byte* bytePtr = image.Data) {
-                return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr)bytePtr);
+                return new Bitmap(image.Width, image.Height, image.Stride, pxFormat, (IntPtr) bytePtr);
             }
         }
     }
