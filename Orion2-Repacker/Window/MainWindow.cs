@@ -477,7 +477,7 @@ public partial class MainWindow : Form {
         };
 
         if (pList.Entries.ContainsKey(pEntry.TreeName)) {
-            DialogResult result = MessageBox.Show(this, $"The file '{pEntry.TreeName}' already exists in the directory.\nIf you want to replace, select Yes\nIf you want to keep both, select No", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            DialogResult result = MessageBox.Show(this, $"The file '{pEntry.TreeName}' already exists in the directory.\r\nIf you want to replace, select Yes\r\nIf you want to keep both, select No", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
             if (result == DialogResult.Cancel) return;
 
@@ -490,10 +490,8 @@ public partial class MainWindow : Form {
                     nCount++;
                 }
             } else {
-                PackFileEntry oldEntry = pList.Entries[pEntry.TreeName];
-
-                pList.Entries.Remove(oldEntry.TreeName);
-                pRoot.Nodes.Remove(pRoot.Nodes.Find(oldEntry.TreeName, false)[0]);
+                PackNode pNode = pTreeView.Nodes.Find(pEntry.TreeName, true).FirstOrDefault() as PackNode;
+                RemoveFileInternal(pNode);
             }
         }
 
@@ -544,6 +542,10 @@ public partial class MainWindow : Form {
             return;
         }
 
+        RemoveFileInternal(pNode);
+    } // Remove
+
+    private void RemoveFileInternal(PackNode pNode) {
         if (pTreeView.Nodes[0] is not PackNode pRoot || pNode == pRoot) return;
 
         if (pRoot.Tag is not IPackStreamVerBase pStream) return;
@@ -574,7 +576,7 @@ public partial class MainWindow : Form {
                     break;
                 }
         }
-    } // Remove
+    }
 
     private void OnCopyNode(object sender, EventArgs e) {
         if (pTreeView.SelectedNode is not PackNode pNode) {
