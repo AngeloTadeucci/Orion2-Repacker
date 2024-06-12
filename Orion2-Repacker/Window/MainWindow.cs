@@ -32,8 +32,8 @@ public partial class MainWindow : Form {
     private MemoryMappedFile pDataMappedMemFile;
     private PackNodeList pNodeList;
     private ProgressWindow pProgress;
-    private string sHeaderUOL;
-    private string sDataUOL;
+    private string headerFilePath;
+    private string dataFilePath;
 
     public MainWindow() {
         InitializeComponent();
@@ -47,7 +47,7 @@ public partial class MainWindow : Form {
 
         pPrevSize = Size;
 
-        sHeaderUOL = "";
+        headerFilePath = "";
 
         pNodeList = null;
         pDataMappedMemFile = null;
@@ -109,7 +109,7 @@ public partial class MainWindow : Form {
 
     private void InitializeTree(IPackStreamVerBase pStream) {
         // Insert the root node (file)
-        string[] aPath = sHeaderUOL.Replace(".m2h", "").Split('/');
+        string[] aPath = headerFilePath.Replace(".m2h", "").Split('/');
         pTreeView.Nodes.Add(new PackNode(pStream, aPath[^1]));
 
         pNodeList?.InternalRelease();
@@ -244,21 +244,21 @@ public partial class MainWindow : Form {
         Properties.Settings.Default.LastInputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
         Properties.Settings.Default.Save();
 
-        sDataUOL = Dir_BackSlashToSlash(pDialog.FileName);
+        dataFilePath = Dir_BackSlashToSlash(pDialog.FileName);
         if (!SetHeaderUOL()) {
             return;
         }
 
         // Window title
-        Text = "Orion2 Repacker | " + pDialog.FileName.Split('\\').Last();
-        InitializeStream(sDataUOL);
+        SetWindowTitle(pDialog.FileName);
+        InitializeStream(dataFilePath);
     } // Open
 
     private bool SetHeaderUOL() {
-        sHeaderUOL = sDataUOL.Replace(".m2d", ".m2h");
+        headerFilePath = dataFilePath.Replace(".m2d", ".m2h");
 
-        string fileName = sHeaderUOL[(sHeaderUOL.LastIndexOf('/') + 1)..];
-        if (!File.Exists(sHeaderUOL)) {
+        string fileName = headerFilePath[(headerFilePath.LastIndexOf('/') + 1)..];
+        if (!File.Exists(headerFilePath)) {
             NotifyMessage($"Unable to load the {fileName} file.\r\nPlease make sure it exists and is not being used.", MessageBoxIcon.Error);
             return false;
         }
@@ -267,7 +267,7 @@ public partial class MainWindow : Form {
 
     private void InitializeStream(string sDataUOL) {
         IPackStreamVerBase pStream;
-        using (BinaryReader pHeader = new BinaryReader(File.OpenRead(sHeaderUOL))) {
+        using (BinaryReader pHeader = new BinaryReader(File.OpenRead(headerFilePath))) {
             // Construct a new packed stream from the header data
             pStream = PackVer.CreatePackVer(pHeader);
 
@@ -373,7 +373,7 @@ public partial class MainWindow : Form {
                 pDataMappedMemFile = null;
             }
 
-            InitializeStream(sDataUOL);
+            InitializeStream(dataFilePath);
             UpdatePanel("Empty", null);
             return;
         }
@@ -398,7 +398,7 @@ public partial class MainWindow : Form {
         pNodeList.InternalRelease();
         pNodeList = null;
 
-        sHeaderUOL = "";
+        headerFilePath = "";
         if (resetWindowName) {
             Text = "Orion2 Repacker";
         }
@@ -1165,7 +1165,7 @@ public partial class MainWindow : Form {
         }
 
         // Reload the file to reflect the changes made.
-        InitializeStream(sDataUOL);
+        InitializeStream(dataFilePath);
     }
 
     private void OnExtractComplete(object sender, RunWorkerCompletedEventArgs e) {
@@ -1431,14 +1431,13 @@ public partial class MainWindow : Form {
             }
 
             string file = files.First(x => x.Contains(".m2d"));
-            sDataUOL = Dir_BackSlashToSlash(file);
+            dataFilePath = Dir_BackSlashToSlash(file);
             if (!SetHeaderUOL()) {
                 return;
             }
 
-            // Window title
-            Text = "Orion2 Repacker | " + file.Split('\\').Last();
-            InitializeStream(sDataUOL);
+            SetWindowTitle(file);
+            InitializeStream(dataFilePath);
             return;
         }
 
@@ -1464,5 +1463,9 @@ public partial class MainWindow : Form {
                 Focus();
             }
         }
+    }
+
+    private void SetWindowTitle(string fileName) {
+        Text = "Orion2 Repacker | " + fileName;
     }
 }
