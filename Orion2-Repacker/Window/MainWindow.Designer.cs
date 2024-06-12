@@ -93,8 +93,7 @@ partial class MainWindow
     /// Required method for Designer support - do not modify
     /// the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
-    {
+    private void InitializeComponent() {
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
         pMenuStrip = new MenuStrip();
         pFileMenuStripItem = new ToolStripMenuItem();
@@ -224,7 +223,7 @@ partial class MainWindow
         addToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
         addToolStripMenuItem.ForeColor = Color.Black;
         addToolStripMenuItem.Name = "addToolStripMenuItem";
-        addToolStripMenuItem.Size = new Size(130, 22);
+        addToolStripMenuItem.Size = new Size(157, 22);
         addToolStripMenuItem.Text = "Add items";
         addToolStripMenuItem.Click += OnAddFile;
         // 
@@ -233,7 +232,7 @@ partial class MainWindow
         addFolderToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
         addFolderToolStripMenuItem.ForeColor = Color.Black;
         addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-        addFolderToolStripMenuItem.Size = new Size(130, 22);
+        addFolderToolStripMenuItem.Size = new Size(157, 22);
         addFolderToolStripMenuItem.Text = "Add folder";
         addFolderToolStripMenuItem.Click += OnAddFolder;
         // 
@@ -243,7 +242,8 @@ partial class MainWindow
         removeToolStripMenuItem.ForeColor = Color.Black;
         removeToolStripMenuItem.Name = "removeToolStripMenuItem";
         removeToolStripMenuItem.ShortcutKeyDisplayString = "";
-        removeToolStripMenuItem.Size = new Size(130, 22);
+        removeToolStripMenuItem.ShortcutKeys = Keys.Delete;
+        removeToolStripMenuItem.Size = new Size(157, 22);
         removeToolStripMenuItem.Text = "Remove";
         removeToolStripMenuItem.Click += OnRemoveFile;
         // 
@@ -253,7 +253,7 @@ partial class MainWindow
         copyToolStripMenuItem.ForeColor = Color.Black;
         copyToolStripMenuItem.Name = "copyToolStripMenuItem";
         copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-        copyToolStripMenuItem.Size = new Size(130, 22);
+        copyToolStripMenuItem.Size = new Size(157, 22);
         copyToolStripMenuItem.Text = "Copy";
         copyToolStripMenuItem.Click += OnCopyNode;
         // 
@@ -263,7 +263,7 @@ partial class MainWindow
         pasteToolStripMenuItem.ForeColor = Color.Black;
         pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
         pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-        pasteToolStripMenuItem.Size = new Size(130, 22);
+        pasteToolStripMenuItem.Size = new Size(157, 22);
         pasteToolStripMenuItem.Text = "Paste";
         pasteToolStripMenuItem.Click += OnPasteNode;
         // 
@@ -273,7 +273,7 @@ partial class MainWindow
         allNodesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { expandToolStripMenuItem, collapseToolStripMenuItem });
         allNodesToolStripMenuItem.ForeColor = Color.Black;
         allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-        allNodesToolStripMenuItem.Size = new Size(130, 22);
+        allNodesToolStripMenuItem.Size = new Size(157, 22);
         allNodesToolStripMenuItem.Text = "All Nodes";
         // 
         // expandToolStripMenuItem
@@ -388,6 +388,7 @@ partial class MainWindow
         // 
         // pTreeView
         // 
+        pTreeView.AllowDrop = true;
         pTreeView.BackColor = Color.White;
         pTreeView.ForeColor = Color.Black;
         pTreeView.Location = new Point(0, 28);
@@ -397,11 +398,15 @@ partial class MainWindow
         pTreeView.TabIndex = 1;
         pTreeView.AfterSelect += OnSelectNode;
         pTreeView.NodeMouseDoubleClick += OnDoubleClickNode;
+        pTreeView.DragDrop += pTreeView_DragDrop;
+        pTreeView.DragEnter += pTreeView_DragEnter;
+        pTreeView.DragOver += pTreeView_DragOver;
+        pTreeView.DragLeave += pTreeView_DragLeave;
         // 
         // pEntryName
         // 
         pEntryName.BackColor = Color.White;
-        pEntryName.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        pEntryName.Font = new Font("Microsoft Sans Serif", 10F);
         pEntryName.ForeColor = Color.Black;
         pEntryName.Location = new Point(528, 31);
         pEntryName.Margin = new Padding(4, 3, 4, 3);
@@ -483,7 +488,7 @@ partial class MainWindow
         // pEntryValue
         // 
         pEntryValue.BackColor = Color.FromArgb(240, 240, 240);
-        pEntryValue.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
+        pEntryValue.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold);
         pEntryValue.Location = new Point(977, 0);
         pEntryValue.Margin = new Padding(4, 0, 4, 0);
         pEntryValue.Name = "pEntryValue";
@@ -500,6 +505,7 @@ partial class MainWindow
         // 
         // MainWindow
         // 
+        AllowDrop = true;
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = Color.FromArgb(180, 180, 180);

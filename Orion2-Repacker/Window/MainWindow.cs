@@ -115,34 +115,40 @@ public partial class MainWindow : Form {
         pNodeList?.InternalRelease();
         pNodeList = new PackNodeList("/");
 
-        foreach (PackFileEntry pEntry in pStream.GetFileList())
+        foreach (PackFileEntry pEntry in pStream.GetFileList()) {
             if (pEntry.Name.Contains('/')) {
                 string sPath = pEntry.Name;
                 PackNodeList pCurList = pNodeList;
 
                 while (sPath.Contains('/')) {
                     string sDir = sPath[..(sPath.IndexOf('/') + 1)];
-                    if (!pCurList.Children.ContainsKey(sDir)) {
-                        pCurList.Children.Add(sDir, new PackNodeList(sDir));
-                        if (pCurList == pNodeList) pTreeView.Nodes[0].Nodes.Add(new PackNode(pCurList.Children[sDir], sDir));
+                    if (!pCurList.Children.TryGetValue(sDir, out PackNodeList value)) {
+                        value = new PackNodeList(sDir);
+                        pCurList.Children.Add(sDir, value);
+                        if (pCurList == pNodeList) {
+                            pTreeView.Nodes[0].Nodes.Add(new PackNode(pCurList.Children[sDir], sDir));
+                        }
                     }
 
-                    pCurList = pCurList.Children[sDir];
+                    pCurList = value;
 
                     sPath = sPath[(sPath.IndexOf('/') + 1)..];
                 }
 
                 pEntry.TreeName = sPath;
                 pCurList.Entries.Add(sPath, pEntry);
-            } else {
-                pEntry.TreeName = pEntry.Name;
-
-                pNodeList.Entries.Add(pEntry.Name, pEntry);
-                pTreeView.Nodes[0].Nodes.Add(new PackNode(pEntry, pEntry.Name));
+                continue;
             }
+
+            pEntry.TreeName = pEntry.Name;
+
+            pNodeList.Entries.Add(pEntry.Name, pEntry);
+            pTreeView.Nodes[0].Nodes.Add(new PackNode(pEntry, pEntry.Name));
+        }
 
         // Sort all nodes
         pTreeView.Sort();
+        pTreeView.Nodes[0].Expand();
     }
 
     #region About
@@ -171,19 +177,16 @@ public partial class MainWindow : Form {
 
     private void OnSelectNode(object sender, TreeViewEventArgs e) {
         if (pTreeView.SelectedNode is PackNode pNode) {
-            object pObj = pNode.Tag;
             pEntryName.Visible = true;
             pEntryName.Text = pNode.Name;
-            if (pObj is PackNodeList) {
+            if (pNode.Tag is PackNodeList) {
                 UpdatePanel("Packed Directory", null);
-            } else if (pObj is PackFileEntry) {
-                PackFileEntry pEntry = pObj as PackFileEntry;
+            } else if (pNode.Tag is PackFileEntry pEntry) {
                 IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
                 if (pFileHeader != null)
-                    if (pNode.Data == null)
-                        pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
+                    pNode.Data ??= DecryptData(pFileHeader, pDataMappedMemFile);
                 UpdatePanel(pEntry.TreeName.Split('.')[1].ToLower(), pNode.Data);
-            } else if (pObj is IPackStreamVerBase) {
+            } else if (pNode.Tag is IPackStreamVerBase) {
                 UpdatePanel("Packed Data File", null);
             } else {
                 UpdatePanel("Empty", null);
@@ -247,7 +250,7 @@ public partial class MainWindow : Form {
         }
 
         // Window title
-        Text = "Orion2 Repacker | " + pDialog.FileName;
+        Text = "Orion2 Repacker | " + pDialog.FileName.Split('\\').Last();
         InitializeStream(sDataUOL);
     } // Open
 
@@ -312,34 +315,46 @@ public partial class MainWindow : Form {
     }
 
     private void OnSaveFile(object sender, EventArgs e) {
-        if (pTreeView.SelectedNode is PackNode pNode && pNode.Tag is IPackStreamVerBase) {
-            SaveFileDialog pDialog = new SaveFileDialog {
-                Title = "Select the destination to save the file",
-                Filter = "MapleStory2 Files|*.m2d",
-                InitialDirectory = Properties.Settings.Default.LastOutputFolder
-            };
-
-            if (pDialog.ShowDialog() != DialogResult.OK) return;
-            string sPath = Dir_BackSlashToSlash(pDialog.FileName);
-
-            Properties.Settings.Default.LastOutputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
-            Properties.Settings.Default.Save();
-
-            if (pSaveWorkerThread.IsBusy) return;
-            pProgress = new ProgressWindow {
-                Path = sPath,
-                Stream = pNode.Tag as IPackStreamVerBase
-            };
-            pProgress.Show(this);
-            // Why do you make this so complicated C#?
-            int x = DesktopBounds.Left + (Width - pProgress.Width) / 2;
-            int y = DesktopBounds.Top + (Height - pProgress.Height) / 2;
-            pProgress.SetDesktopLocation(x, y);
-
-            pSaveWorkerThread.RunWorkerAsync();
-        } else {
-            NotifyMessage("Please select a Packed Data File file to save.", MessageBoxIcon.Information);
+        if (pNodeList is null || pNodeList.Entries.Count == 0) {
+            NotifyMessage("There are no files to save.", MessageBoxIcon.Information);
+            return;
         }
+
+        PackNode pNode = pTreeView.SelectedNode as PackNode;
+        pNode ??= pTreeView.Nodes[0] as PackNode;
+        int i = 0;
+        while (pNode?.Tag is not IPackStreamVerBase) {
+            if (i++ > 10) {
+                NotifyMessage("Unable to find the root node to save.", MessageBoxIcon.Error);
+                return;
+            }
+            pNode = pNode?.Parent as PackNode;
+        }
+
+        SaveFileDialog pDialog = new SaveFileDialog {
+            Title = "Select the destination to save the file",
+            Filter = "MapleStory2 Files|*.m2d",
+            InitialDirectory = Properties.Settings.Default.LastOutputFolder
+        };
+
+        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        string sPath = Dir_BackSlashToSlash(pDialog.FileName);
+
+        Properties.Settings.Default.LastOutputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
+        Properties.Settings.Default.Save();
+
+        if (pSaveWorkerThread.IsBusy) return;
+        pProgress = new ProgressWindow {
+            Path = sPath,
+            Stream = pNode.Tag as IPackStreamVerBase
+        };
+        pProgress.Show(this);
+        // Why do you make this so complicated C#?
+        int x = DesktopBounds.Left + (Width - pProgress.Width) / 2;
+        int y = DesktopBounds.Top + (Height - pProgress.Height) / 2;
+        pProgress.SetDesktopLocation(x, y);
+
+        pSaveWorkerThread.RunWorkerAsync();
     } // Save
 
     private void OnReloadFile(object sender, EventArgs e) {
@@ -349,9 +364,16 @@ public partial class MainWindow : Form {
             if (pStream == null) return;
 
             pTreeView.Nodes.Clear();
-            pTreeView.Refresh();
 
-            InitializeTree(pStream);
+            pNodeList.InternalRelease();
+            pNodeList = null;
+
+            if (pDataMappedMemFile != null) {
+                pDataMappedMemFile.Dispose();
+                pDataMappedMemFile = null;
+            }
+
+            InitializeStream(sDataUOL);
             UpdatePanel("Empty", null);
             return;
         }
@@ -403,12 +425,6 @@ public partial class MainWindow : Form {
             return;
         }
 
-        PackNode pNode = pTreeView.SelectedNode as PackNode;
-        if (pNode?.Tag is PackFileEntry) {
-            NotifyMessage("Please select a directory to add into!", MessageBoxIcon.Exclamation);
-            return;
-        }
-
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select files to add",
             Filter = "MapleStory2 Files|*",
@@ -417,50 +433,79 @@ public partial class MainWindow : Form {
 
         if (pDialog.ShowDialog() != DialogResult.OK) return;
 
-        foreach (string fileName in pDialog.FileNames) {
-            string sHeaderUOL = Dir_BackSlashToSlash(fileName);
-            string sHeaderName = sHeaderUOL[(sHeaderUOL.LastIndexOf('/') + 1)..];
-
-            if (!File.Exists(sHeaderUOL)) {
-                NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            PackNodeList pList;
-            if (pNode.Level == 0)
-                // If they're trying to add to the root of the file,
-                // then just use the root node list of this tree.
-                pList = pNodeList;
-            else
-                pList = pNode.Tag as PackNodeList;
-
-            byte[] pData = File.ReadAllBytes(fileName);
-
-            PackFileEntry pEntry = new PackFileEntry {
-                Name = sHeaderName,
-                Hash = Helpers.CreateHash(sHeaderUOL),
-                Index = 1,
-                Changed = true,
-                TreeName = sHeaderName,
-                Data = pData
-            };
-
-            if (pList.Entries.ContainsKey(pEntry.TreeName)) {
-                NotifyMessage($"The file '{pEntry.TreeName}' already exists in the directory.", MessageBoxIcon.Exclamation);
-                continue;
-            }
-
-            AddFileEntry(pEntry);
-            pList.Entries.Add(pEntry.TreeName, pEntry);
-
-            PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
-            pNode.Nodes.Add(pChild);
-
-            pEntry.Name = pChild.Path;
+        PackNode pNode = pTreeView.SelectedNode as PackNode;
+        if (pNode?.Tag is PackFileEntry) {
+            pNode = pNode.Parent as PackNode;
         }
+
+        foreach (string fileName in pDialog.FileNames) {
+            AddFileInternal(pNode, fileName);
+        }
+
+        pTreeView.Sort();
     } // Add
 
+    private void AddFileInternal(PackNode pRoot, string fileName) {
+        string sHeaderUOL = Dir_BackSlashToSlash(fileName);
+        string sHeaderName = sHeaderUOL[(sHeaderUOL.LastIndexOf('/') + 1)..];
+
+        if (!File.Exists(sHeaderUOL)) {
+            NotifyMessage($"Unable to load the {sHeaderName} file.\r\nPlease make sure it exists and is not being used.",
+                MessageBoxIcon.Error);
+            return;
+        }
+
+        PackNodeList pList;
+        if (pRoot.Level == 0) {
+            // If they're trying to add to the root of the file,
+            // then just use the root node list of this tree.
+            pList = pNodeList;
+        } else {
+            pList = pRoot.Tag as PackNodeList;
+            DoubleClickNode();
+        }
+
+        byte[] pData = File.ReadAllBytes(fileName);
+
+        PackFileEntry pEntry = new PackFileEntry {
+            Name = sHeaderName,
+            Hash = Helpers.CreateHash(sHeaderUOL),
+            Index = 1,
+            Changed = true,
+            TreeName = sHeaderName,
+            Data = pData
+        };
+
+        if (pList.Entries.ContainsKey(pEntry.TreeName)) {
+            DialogResult result = MessageBox.Show(this, $"The file '{pEntry.TreeName}' already exists in the directory.\nIf you want to replace, select Yes\nIf you want to keep both, select No", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Cancel) return;
+
+            if (result == DialogResult.No) {
+                string sName = pEntry.TreeName.Split('.')[0];
+                string sExtension = pEntry.TreeName.Split('.')[1];
+                int nCount = 1;
+                while (pList.Entries.ContainsKey(pEntry.TreeName)) {
+                    pEntry.TreeName = $"{sName}_{nCount}.{sExtension}";
+                    nCount++;
+                }
+            } else {
+                PackFileEntry oldEntry = pList.Entries[pEntry.TreeName];
+
+                pList.Entries.Remove(oldEntry.TreeName);
+                pRoot.Nodes.Remove(pRoot.Nodes.Find(oldEntry.TreeName, false)[0]);
+            }
+        }
+
+        AddFileEntry(pEntry);
+        pList.Entries.Add(pEntry.TreeName, pEntry);
+
+        PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
+        pRoot.Nodes.Add(pChild);
+
+        pEntry.Name = pChild.Path;
+        pTreeView.SelectedNode = pChild;
+    }
 
     private void OnAddFolder(object sender, EventArgs e) {
         if (pNodeList == null) {
@@ -468,14 +513,19 @@ public partial class MainWindow : Form {
             return;
         }
 
-        if (pTreeView.SelectedNode is not PackNode pNode) return;
+        PackNode pNode = pTreeView.SelectedNode as PackNode;
+        pNode ??= pTreeView.Nodes[0] as PackNode;
+        for (int i = 0; i < 3; i++) {
+            if (pNode?.Tag is PackNodeList) {
+                break;
+            }
+            pNode = pNode?.Parent as PackNode;
+        }
 
-        if (pNode.Tag is PackFileEntry) {
+        if (pNode.Tag is not PackNodeList pList) {
             NotifyMessage("Please select a directory to add into!", MessageBoxIcon.Exclamation);
             return;
         }
-
-        PackNodeList pList = pNode.Tag as PackNodeList;
 
         string nodeName = ShowDialog("Type the folder name");
         if (string.IsNullOrEmpty(nodeName)) return;
@@ -567,9 +617,9 @@ public partial class MainWindow : Form {
 
         object pObj;
         if (pData.GetDataPresent(PackFileEntry.DATA_FORMAT)) {
-            pObj = (PackFileEntry)pData.GetData(PackFileEntry.DATA_FORMAT);
+            pObj = (PackFileEntry) pData.GetData(PackFileEntry.DATA_FORMAT);
         } else if (pData.GetDataPresent(PackNodeList.DATA_FORMAT)) {
-            pObj = (PackNodeList)pData.GetData(PackNodeList.DATA_FORMAT);
+            pObj = (PackNodeList) pData.GetData(PackNodeList.DATA_FORMAT);
         } else {
             NotifyMessage("No files or directories are currently copied to clipboard.", MessageBoxIcon.Exclamation);
             return;
@@ -853,11 +903,13 @@ public partial class MainWindow : Form {
     }
 
     private void OnDoubleClickNode(object sender, TreeNodeMouseClickEventArgs e) {
+        DoubleClickNode();
+    }
+
+    private void DoubleClickNode() {
         if (pTreeView.SelectedNode is not PackNode pNode || pNode.Nodes.Count != 0) return;
 
-        object pObj = pNode.Tag;
-
-        if (pObj is not PackNodeList pList) return;
+        if (pNode.Tag is not PackNodeList pList) return;
 
         // Iterate all further directories within the list
         foreach (KeyValuePair<string, PackNodeList> pChild in pList.Children) {
@@ -870,18 +922,6 @@ public partial class MainWindow : Form {
         }
 
         pNode.Expand();
-        /*else if (pObj is PackFileEntry)
-        {
-            PackFileEntry pEntry = pObj as PackFileEntry;
-            PackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
-
-            if (pFileHeader != null)
-            {
-                byte[] pBuffer = CryptoMan.DecryptData(pFileHeader, pDataMappedMemFile);
-
-                UpdatePanel(pEntry.TreeName.Split('.')[1].ToLower(), pBuffer);
-            }
-        }*/
     }
 
     private void OnWindowClosing(object sender, FormClosingEventArgs e) {
@@ -967,20 +1007,13 @@ public partial class MainWindow : Form {
                 Properties.Settings.Default.Reload();
                 string editorTheme = Properties.Settings.Default.EditorTheme;
                 string wordWrap = Properties.Settings.Default.EditorWordWrap ? "on" : "off";
-                string language = "xml";
-                switch (sExtension) {
-                    case "ini":
-                        language = "ini";
-                        break;
-                    case "nt":
-                        language = "txt";
-                        break;
-                    case "lua":
-                        language = "lua";
-                        break;
-                    default:
-                        break;
-                }
+                string language = sExtension switch {
+                    "ini" => "ini",
+                    "nt" => "txt",
+                    "lua" => "lua",
+                    _ => "xml"
+                };
+
                 JObject json = new()
                 {
                     { "type", "updateSettings" },
@@ -1036,11 +1069,7 @@ public partial class MainWindow : Form {
     }
 
     private static string Dir_BackSlashToSlash(string sDir) {
-        while (sDir.Contains('\\')) {
-            sDir = sDir.Replace("\\", "/");
-        }
-
-        return sDir;
+        return sDir.Replace("\\", "/");
     }
 
     #endregion
@@ -1057,7 +1086,7 @@ public partial class MainWindow : Form {
         pProgress.Start();
         pStream.GetFileList().Sort();
         SaveData(pProgress.Path, pStream.GetFileList());
-        uint dwFileCount = (uint)pStream.GetFileList().Count;
+        uint dwFileCount = (uint) pStream.GetFileList().Count;
         StringBuilder sFileString = new StringBuilder();
         foreach (PackFileEntry pEntry in pStream.GetFileList()) sFileString.Append(pEntry);
         pSaveWorkerThread.ReportProgress(96);
@@ -1107,7 +1136,6 @@ public partial class MainWindow : Form {
             { "type", "saveFile" }
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
-
     }
 
     private void OnSaveProgress(object sender, ProgressChangedEventArgs e) {
@@ -1219,7 +1247,7 @@ public partial class MainWindow : Form {
                 uOffset += pHeader.GetEncodedFileSize();
 
                 // Allow the remaining 5% for header file write progression
-                pSaveWorkerThread.ReportProgress((int)((nCurIndex - 1) / (double)aEntry.Count * 95.0d));
+                pSaveWorkerThread.ReportProgress((int) ((nCurIndex - 1) / (double) aEntry.Count * 95.0d));
                 continue;
             }
             // If the entry is unchanged, parse the block from the original offsets
@@ -1231,10 +1259,10 @@ public partial class MainWindow : Form {
             if (pHeader.GetVer() != uVer) uVer = pHeader.GetVer();
 
             // Access the current encrypted block data from the memory map initially loaded
-            using (MemoryMappedViewStream pBuffer = pDataMappedMemFile.CreateViewStream((long)pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
+            using (MemoryMappedViewStream pBuffer = pDataMappedMemFile.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
                 byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                if (pBuffer.Read(pSrc, 0, (int)pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
+                if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
                 // Modify the header's file index to the updated offset after entry changes
                 pHeader.SetFileIndex(nCurIndex);
                 // Modify the header's offset to the updated offset after entry changes
@@ -1250,7 +1278,7 @@ public partial class MainWindow : Form {
             }
 
             // Allow the remaining 5% for header file write progression
-            pSaveWorkerThread.ReportProgress((int)((nCurIndex - 1) / (double)aEntry.Count * 95.0d));
+            pSaveWorkerThread.ReportProgress((int) ((nCurIndex - 1) / (double) aEntry.Count * 95.0d));
         }
 
         // close mapped memory file since dont need it anymore
@@ -1372,5 +1400,67 @@ public partial class MainWindow : Form {
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
         Properties.Settings.Default.EditorTheme = "vs";
         Properties.Settings.Default.Save();
+    }
+
+    private void pTreeView_DragEnter(object sender, DragEventArgs e) {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            e.Effect = DragDropEffects.Copy;
+        }
+    }
+
+    private void pTreeView_DragLeave(object sender, EventArgs e) {
+
+    }
+
+    private void pTreeView_DragDrop(object sender, DragEventArgs e) {
+        // request focus
+        BringToFront();
+        string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+        if (files is null) return;
+        if (files.Count(x => x.Contains(".m2d")) > 1) {
+            NotifyMessage("Please select only one file to open.", MessageBoxIcon.Exclamation);
+            return;
+        }
+
+        if (files.Count(x => x.Contains(".m2d")) == 1) {
+            if (pTreeView.Nodes.Count > 0) {
+                NotifyMessage("Please unload the current file first.", MessageBoxIcon.Information);
+                return;
+            }
+
+            string file = files.First(x => x.Contains(".m2d"));
+            sDataUOL = Dir_BackSlashToSlash(file);
+            if (!SetHeaderUOL()) {
+                return;
+            }
+
+            // Window title
+            Text = "Orion2 Repacker | " + file.Split('\\').Last();
+            InitializeStream(sDataUOL);
+            return;
+        }
+
+        PackNode pNode = pTreeView.SelectedNode as PackNode;
+        if (pNode?.Tag is PackFileEntry) {
+            pNode = pNode.Parent as PackNode;
+        }
+
+        foreach (string file in files) {
+            AddFileInternal(pNode, file);
+        }
+
+        pTreeView.Sort();
+    }
+
+    private void pTreeView_DragOver(object sender, DragEventArgs e) {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            Point p = pTreeView.PointToClient(new Point(e.X, e.Y));
+
+            TreeNode node = pTreeView.GetNodeAt(p);
+            if (node is not null) {
+                pTreeView.SelectedNode = node;
+                Focus();
+            }
+        }
     }
 }
