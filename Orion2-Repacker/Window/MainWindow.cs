@@ -185,7 +185,9 @@ public partial class MainWindow : Form {
                 IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
                 if (pFileHeader != null)
                     pNode.Data ??= DecryptData(pFileHeader, pDataMappedMemFile);
-                UpdatePanel(pEntry.TreeName.Split('.')[1].ToLower(), pNode.Data);
+                string[] splitFileName = pEntry.TreeName.Split('.');
+                string extension = splitFileName.Length > 1 ? splitFileName[^1].ToLower() : "unknown";
+                UpdatePanel(extension.ToLower(), pNode.Data);
             } else if (pNode.Tag is IPackStreamVerBase) {
                 UpdatePanel("Packed Data File", null);
             } else {
@@ -611,8 +613,7 @@ public partial class MainWindow : Form {
 
         if (pTreeView.SelectedNode is not PackNode pNode) return;
 
-        if (pNode.Tag is PackFileEntry) //wtf are they thinking?
-        {
+        if (pNode.Tag is PackFileEntry) {
             NotifyMessage("Please select a directory to paste into!", MessageBoxIcon.Exclamation);
             return;
         }
@@ -1467,5 +1468,46 @@ public partial class MainWindow : Form {
 
     private void SetWindowTitle(string fileName) {
         Text = "Orion2 Repacker | " + fileName;
+    }
+
+    private void pTreeView_MouseClick(object sender, MouseEventArgs e) {
+        // if right click
+        if (e.Button != MouseButtons.Right) {
+            return;
+        }
+
+        // get the node that was clicked
+        TreeNode node = pTreeView.GetNodeAt(e.Location);
+        if (node is null) return;
+
+        // select the node
+        pTreeView.SelectedNode = node;
+
+        // if the node is a file entry
+        if (node is not PackNode pNode) {
+            return;
+        }
+
+        // create a context menu
+        ContextMenuStrip menu = new() {
+            BackColor = Color.FromArgb(240, 240, 240)
+        };
+
+        AddItemToContextMenu(menu, "Remove", OnRemoveFile);
+        AddItemToContextMenu(menu, "Export", OnExport);
+        AddItemToContextMenu(menu, "Copy", OnCopyNode);
+        AddItemToContextMenu(menu, "Paste", OnPasteNode);
+
+        // show the context menu
+        menu.Show(pTreeView, e.Location);
+    }
+
+    private static void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
+        var item = new ToolStripMenuItem(text) {
+            BackColor = Color.FromArgb(240, 240, 240),
+            ForeColor = Color.Black
+        };
+        item.Click += handler;
+        menu.Items.Add(item);
     }
 }
