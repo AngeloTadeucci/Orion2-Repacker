@@ -346,9 +346,9 @@ public partial class MainWindow : Form {
         Properties.Settings.Default.Save();
 
         if (pSaveWorkerThread.IsBusy) return;
-        pProgress = new ProgressWindow {
+        pProgress = new ProgressWindow(lightToolStripTheme.Checked) {
             Path = sPath,
-            Stream = pNode.Tag as IPackStreamVerBase
+            Stream = pNode.Tag as IPackStreamVerBase,
         };
         pProgress.Show(this);
         // Why do you make this so complicated C#?

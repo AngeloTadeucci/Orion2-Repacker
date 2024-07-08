@@ -16,15 +16,27 @@
  */
 
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using Orion.Crypto.Stream;
 
 namespace Orion.Window;
 public partial class ProgressWindow : Form {
     private Stopwatch pStopWatch;
     private string sPath;
+    public bool isLightTheme;
+    public string initialText;
 
-    public ProgressWindow() {
+    public ProgressWindow(bool isLightTheme) {
         InitializeComponent();
+
+        if (isLightTheme) {
+            this.BackColor = Color.FromArgb(240, 240, 240);
+            this.ForeColor = Color.FromArgb(39, 39, 39);
+        } 
+        else {
+            this.BackColor = Color.FromArgb(39, 39, 39);
+            this.ForeColor = Color.FromArgb(240, 240, 240);
+        }
     }
 
     public string FileName { get; set; }
