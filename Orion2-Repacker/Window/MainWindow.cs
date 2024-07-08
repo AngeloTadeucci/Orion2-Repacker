@@ -1470,6 +1470,47 @@ public partial class MainWindow : Form {
         Text = "Orion2 Repacker | " + fileName;
     }
 
+    private void pTreeView_MouseClick(object sender, MouseEventArgs e) {
+        // if right click
+        if (e.Button != MouseButtons.Right) {
+            return;
+        }
+
+        // get the node that was clicked
+        TreeNode node = pTreeView.GetNodeAt(e.Location);
+        if (node is null) return;
+
+        // select the node
+        pTreeView.SelectedNode = node;
+
+        // if the node is a file entry
+        if (node is not PackNode pNode) {
+            return;
+        }
+
+        // create a context menu
+        ContextMenuStrip menu = new() {
+            BackColor = Color.FromArgb(240, 240, 240)
+        };
+
+        AddItemToContextMenu(menu, "Remove", OnRemoveFile);
+        AddItemToContextMenu(menu, "Export", OnExport);
+        AddItemToContextMenu(menu, "Copy", OnCopyNode);
+        AddItemToContextMenu(menu, "Paste", OnPasteNode);
+
+        // show the context menu
+        menu.Show(pTreeView, e.Location);
+    }
+
+    private static void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
+        var item = new ToolStripMenuItem(text) {
+            BackColor = Color.FromArgb(240, 240, 240),
+            ForeColor = Color.Black
+        };
+        item.Click += handler;
+        menu.Items.Add(item);
+    }
+
     private void lightToolStripTheme_Click(object sender, EventArgs e) {
         lightToolStripTheme.Checked = true;
         darkToolStripTheme.Checked = false;
@@ -1492,7 +1533,7 @@ public partial class MainWindow : Form {
         var toolStripItems = new ToolStripItem[]
         {
         toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
-        editorSettingsToolStripMenuItem, themeUiToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
+        editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
         themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
         aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
         addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
@@ -1541,7 +1582,7 @@ public partial class MainWindow : Form {
         var toolStripItems = new ToolStripItem[]
         {
         toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
-        editorSettingsToolStripMenuItem, themeUiToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
+        editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
         themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
         aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
         addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
