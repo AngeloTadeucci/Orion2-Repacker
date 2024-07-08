@@ -1470,44 +1470,101 @@ public partial class MainWindow : Form {
         Text = "Orion2 Repacker | " + fileName;
     }
 
-    private void pTreeView_MouseClick(object sender, MouseEventArgs e) {
-        // if right click
-        if (e.Button != MouseButtons.Right) {
-            return;
-        }
+    private void lightToolStripTheme_Click(object sender, EventArgs e) {
+        lightToolStripTheme.Checked = true;
+        darkToolStripTheme.Checked = false;
 
-        // get the node that was clicked
-        TreeNode node = pTreeView.GetNodeAt(e.Location);
-        if (node is null) return;
+        // Define color settings
+        Color backColor = Color.FromArgb(181, 181, 181);
+        Color foreColor = Color.FromArgb(60, 60, 60);
+        Color pBackColor = Color.FromArgb(240, 240, 240);
+        Color pForeColor = Color.FromArgb(39, 39, 39);
 
-        // select the node
-        pTreeView.SelectedNode = node;
+        // Set form background and foreground colors
+        this.BackColor = backColor;
+        this.ForeColor = foreColor;
 
-        // if the node is a file entry
-        if (node is not PackNode pNode) {
-            return;
-        }
+        // Set TreeView colors
+        pTreeView.BackColor = pBackColor;
+        pTreeView.ForeColor = pForeColor;
 
-        // create a context menu
-        ContextMenuStrip menu = new() {
-            BackColor = Color.FromArgb(240, 240, 240)
+        // Define an array of ToolStripItems to apply the same color settings
+        var toolStripItems = new ToolStripItem[]
+        {
+        toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
+        editorSettingsToolStripMenuItem, themeUiToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
+        themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
+        aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
+        addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
+        pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
+        pUnloadMenuItem, exitToolStripMenuItem
         };
 
-        AddItemToContextMenu(menu, "Remove", OnRemoveFile);
-        AddItemToContextMenu(menu, "Export", OnExport);
-        AddItemToContextMenu(menu, "Copy", OnCopyNode);
-        AddItemToContextMenu(menu, "Paste", OnPasteNode);
+        // Apply color settings to all ToolStripItems
+        foreach (var item in toolStripItems) {
+            item.BackColor = pBackColor;
+            item.ForeColor = pForeColor;
+        }
 
-        // show the context menu
-        menu.Show(pTreeView, e.Location);
+        // Define an array of controls (e.g., buttons, panels) to apply the same color settings
+        var controls = new Control[]
+        {
+        pMenuStrip, pEntryValue, pEntryName, pChangeImageBtn, pUpdateDataBtn
+        };
+
+        // Apply color settings to all controls
+        foreach (var control in controls) {
+            control.BackColor = pBackColor;
+            control.ForeColor = pForeColor;
+        }
     }
 
-    private static void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
-        var item = new ToolStripMenuItem(text) {
-            BackColor = Color.FromArgb(240, 240, 240),
-            ForeColor = Color.Black
+    private void darkToolStripTheme_Click(object sender, EventArgs e) {
+        lightToolStripTheme.Checked = false;
+        darkToolStripTheme.Checked = true;
+
+        // Define color settings
+        Color backColor = Color.FromArgb(45, 45, 45);
+        Color foreColor = Color.FromArgb(255, 255, 255);
+        Color pBackColor = Color.FromArgb(39, 39, 39);
+        Color pForeColor = Color.FromArgb(240, 240, 240);
+
+        // Set form background and foreground colors
+        this.BackColor = backColor;
+        this.ForeColor = foreColor;
+
+        // Set TreeView colors
+        pTreeView.BackColor = pBackColor;
+        pTreeView.ForeColor = pForeColor;
+
+        // Define an array of ToolStripItems to apply the same color settings
+        var toolStripItems = new ToolStripItem[]
+        {
+        toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
+        editorSettingsToolStripMenuItem, themeUiToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
+        themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
+        aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
+        addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
+        pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
+        pUnloadMenuItem, exitToolStripMenuItem
         };
-        item.Click += handler;
-        menu.Items.Add(item);
+
+        // Apply color settings to all ToolStripItems
+        foreach (var item in toolStripItems) {
+            item.BackColor = pBackColor;
+            item.ForeColor = pForeColor;
+        }
+
+        // Define an array of controls (e.g., buttons, panels) to apply the same color settings
+        var controls = new Control[]
+        {
+        pMenuStrip, pEntryValue, pEntryName, pChangeImageBtn, pUpdateDataBtn
+        };
+
+        // Apply color settings to all controls
+        foreach (var control in controls) {
+            control.BackColor = pBackColor;
+            control.ForeColor = pForeColor;
+        }
     }
 }
