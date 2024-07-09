@@ -5,12 +5,13 @@
 - Exporting progress bar. No more "App is not responding";
 - .NET 8 instead of .NET Framework.
 - Drag and drop files
+- Dark theme by [@Dready](https://github.com/Dreary)
 
 # Orion2 Repacker
 
 Orion2 Repacker - A HaRepacker for MapleStory2!
 
-[![N|Solid](https://user-images.githubusercontent.com/15664821/233808955-e1bb6e6e-f72f-4666-961b-16221c826d1d.png)](https://github.com/AngeloTadeucci/Orion2-Repacker)
+[![image](https://github.com/AngeloTadeucci/Orion2-Repacker/assets/15664821/6943f397-17c0-46ec-b098-fd9397947f9a)](https://github.com/AngeloTadeucci/Orion2-Repacker)
 
 ---
 
