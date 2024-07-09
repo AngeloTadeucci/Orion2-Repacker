@@ -52,7 +52,7 @@ partial class ProgressWindow {
         this.pSaveInfo.Name = "pSaveInfo";
         this.pSaveInfo.Size = new System.Drawing.Size(299, 22);
         this.pSaveInfo.TabIndex = 0;
-        this.pSaveInfo.Text = "Saving ...";
+        this.pSaveInfo.Text = "Starting ...";
         this.pSaveInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         //
         // pProgressBar
