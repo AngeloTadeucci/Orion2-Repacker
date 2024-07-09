@@ -16,15 +16,19 @@
  */
 
 using System.Reflection;
+using Orion.Window.Common;
 
 namespace Orion.Window;
 internal partial class About : Form {
-    public About() {
+    public About(ITheme currentTheme) {
         InitializeComponent();
 
+        BackColor = currentTheme.BackColor2;
+        ForeColor = currentTheme.ForeColor2;
+
         Text = $"About {AssemblyTitle}";
-        labelProductName.Text = AssemblyProduct;
-        labelVersion.Text = $"    Version {AssemblyVersion}";
+        labelProductName.Text = AssemblyProduct + $" - Version {AssemblyVersion}";
+
         labelCreator.Text = "Created by Eric. This current version is a fork of Orion2 maintained by Tadeucci.";
         labelSpecialThanks.Text = "Special Thanks: @inumedia, @DinoChiesa, @andburn";
         textBoxDescription.Text = "Orion2 Repacker - A MapleStory2 Data File Utility"
@@ -35,6 +39,17 @@ internal partial class About : Form {
                                   + "\r\n* Ability to extract the selected file(s) to disk"
                                   + "\r\n* Edit/Add data within the files"
                                   + "\r\n* Save your changes by re-packing the data to file";
+
+        Label[] labels = [labelProductName, labelCreator, labelSpecialThanks];
+        foreach (Label label in labels) {
+            label.ForeColor = currentTheme.ForeColor2;
+        }
+
+        textBoxDescription.BackColor = currentTheme.BackColor2;
+        textBoxDescription.ForeColor = currentTheme.ForeColor2;
+
+        okButton.BackColor = currentTheme.BackColor2;
+        okButton.ForeColor = currentTheme.ForeColor2;
     }
 
     #region Assembly Attribute Accessors
@@ -47,7 +62,7 @@ internal partial class About : Form {
                 if (titleAttribute.Title != "") return titleAttribute.Title;
             }
 
-            return Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+            return Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
         }
     }
 

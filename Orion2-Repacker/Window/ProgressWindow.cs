@@ -17,18 +17,23 @@
 
 using System.Diagnostics;
 using Orion.Crypto.Stream;
+using Orion.Window.Common;
 
 namespace Orion.Window;
 public partial class ProgressWindow : Form {
     private Stopwatch pStopWatch;
     private string sPath;
 
-    public ProgressWindow() {
+    public ProgressWindow(ITheme currentTheme) {
         InitializeComponent();
+
+        BackColor = currentTheme.BackColor2;
+        ForeColor = currentTheme.ForeColor2;
     }
 
     public string FileName { get; set; }
     public IPackStreamVerBase Stream { get; set; }
+    public PackNode PackNode { get; set; }
     public long ElapsedTime { get; set; }
 
     public string Path {
@@ -42,7 +47,11 @@ public partial class ProgressWindow : Form {
 
     public void UpdateProgressBar(int nProgress) {
         pProgressBar.Value = nProgress;
-        pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
+        if (PackNode is null) {
+            pSaveInfo.Text = $"Saving {FileName}... {pProgressBar.Value}%";
+        } else {
+            pSaveInfo.Text = "Extracting...";
+        }
     }
 
     public void Start() {
@@ -52,5 +61,11 @@ public partial class ProgressWindow : Form {
     public void Finish() {
         ElapsedTime = pStopWatch.ElapsedMilliseconds;
         pStopWatch.Stop();
+    }
+
+    public void SetProgressBarSize(int size) {
+        pProgressBar.Maximum = size;
+        pProgressBar.Step = 1;
+        pProgressBar.Value = 0;
     }
 }

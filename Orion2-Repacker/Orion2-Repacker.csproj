@@ -57,13 +57,13 @@
   </ItemGroup>
   <PropertyGroup>
     <UseWindowsForms>True</UseWindowsForms>
-    <Version>2.2.2</Version>
+    <Version>2.3.0</Version>
     <Authors>Orion2-Repacker</Authors>
     <Company>Orion2-Repacker</Company>
     <Product>Orion2-Repacker</Product>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>2.2.2</AssemblyVersion>
-    <FileVersion>2.2.2</FileVersion>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
+    <FileVersion>2.3.0</FileVersion>
     <PackageId>Orion2-Repacker</PackageId>
   </PropertyGroup>
   <PropertyGroup>

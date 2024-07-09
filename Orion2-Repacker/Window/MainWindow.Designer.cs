@@ -104,13 +104,16 @@ partial class MainWindow {
         exportToolStripMenuItem = new ToolStripMenuItem();
         searchToolStripMenuItem = new ToolStripMenuItem();
         createItemToolStripMenuItem = new ToolStripMenuItem();
-        helpToolStripMenuItem = new ToolStripMenuItem();
-        aboutToolStripMenuItem = new ToolStripMenuItem();
         editorSettingsToolStripMenuItem = new ToolStripMenuItem();
         themeToolStripMenuItem = new ToolStripMenuItem();
         lightToolStripMenuItem = new ToolStripMenuItem();
         darkToolStripMenuItem = new ToolStripMenuItem();
         wordWrapToolStripMenuItem = new ToolStripMenuItem();
+        testToolStripMenuItem = new ToolStripMenuItem();
+        lightToolStripTheme = new ToolStripMenuItem();
+        darkToolStripTheme = new ToolStripMenuItem();
+        helpToolStripMenuItem = new ToolStripMenuItem();
+        aboutToolStripMenuItem = new ToolStripMenuItem();
         pTreeView = new TreeView();
         pEntryName = new TextBox();
         pImageData = new PictureBox();
@@ -130,7 +133,7 @@ partial class MainWindow {
         // pMenuStrip
         //
         pMenuStrip.BackColor = Color.FromArgb(240, 240, 240);
-        pMenuStrip.Items.AddRange(new ToolStripItem[] { pFileMenuStripItem, editToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem, editorSettingsToolStripMenuItem });
+        pMenuStrip.Items.AddRange(new ToolStripItem[] { pFileMenuStripItem, editToolStripMenuItem, toolsToolStripMenuItem, editorSettingsToolStripMenuItem, testToolStripMenuItem, helpToolStripMenuItem });
         pMenuStrip.Location = new Point(0, 0);
         pMenuStrip.Name = "pMenuStrip";
         pMenuStrip.Padding = new Padding(7, 2, 0, 2);
@@ -212,7 +215,7 @@ partial class MainWindow {
         addToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
         addToolStripMenuItem.ForeColor = Color.Black;
         addToolStripMenuItem.Name = "addToolStripMenuItem";
-        addToolStripMenuItem.Size = new Size(180, 22);
+        addToolStripMenuItem.Size = new Size(157, 22);
         addToolStripMenuItem.Text = "Add items";
         addToolStripMenuItem.Click += OnAddFile;
         //
@@ -221,7 +224,7 @@ partial class MainWindow {
         addFolderToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
         addFolderToolStripMenuItem.ForeColor = Color.Black;
         addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-        addFolderToolStripMenuItem.Size = new Size(180, 22);
+        addFolderToolStripMenuItem.Size = new Size(157, 22);
         addFolderToolStripMenuItem.Text = "Add folder";
         addFolderToolStripMenuItem.Click += OnAddFolder;
         //
@@ -232,7 +235,7 @@ partial class MainWindow {
         removeToolStripMenuItem.Name = "removeToolStripMenuItem";
         removeToolStripMenuItem.ShortcutKeyDisplayString = "";
         removeToolStripMenuItem.ShortcutKeys = Keys.Delete;
-        removeToolStripMenuItem.Size = new Size(180, 22);
+        removeToolStripMenuItem.Size = new Size(157, 22);
         removeToolStripMenuItem.Text = "Remove";
         removeToolStripMenuItem.Click += OnRemoveFile;
         //
@@ -242,7 +245,7 @@ partial class MainWindow {
         copyToolStripMenuItem.ForeColor = Color.Black;
         copyToolStripMenuItem.Name = "copyToolStripMenuItem";
         copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-        copyToolStripMenuItem.Size = new Size(180, 22);
+        copyToolStripMenuItem.Size = new Size(157, 22);
         copyToolStripMenuItem.Text = "Copy";
         copyToolStripMenuItem.Click += OnCopyNode;
         //
@@ -252,7 +255,7 @@ partial class MainWindow {
         pasteToolStripMenuItem.ForeColor = Color.Black;
         pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
         pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-        pasteToolStripMenuItem.Size = new Size(180, 22);
+        pasteToolStripMenuItem.Size = new Size(157, 22);
         pasteToolStripMenuItem.Text = "Paste";
         pasteToolStripMenuItem.Click += OnPasteNode;
         //
@@ -262,7 +265,7 @@ partial class MainWindow {
         allNodesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { expandToolStripMenuItem, collapseToolStripMenuItem });
         allNodesToolStripMenuItem.ForeColor = Color.Black;
         allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-        allNodesToolStripMenuItem.Size = new Size(180, 22);
+        allNodesToolStripMenuItem.Size = new Size(157, 22);
         allNodesToolStripMenuItem.Text = "All Nodes";
         //
         // expandToolStripMenuItem
@@ -320,6 +323,74 @@ partial class MainWindow {
         createItemToolStripMenuItem.Text = "Add item helper";
         createItemToolStripMenuItem.Click += OnCreateItem;
         //
+        // editorSettingsToolStripMenuItem
+        //
+        editorSettingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { themeToolStripMenuItem, wordWrapToolStripMenuItem });
+        editorSettingsToolStripMenuItem.ForeColor = Color.Black;
+        editorSettingsToolStripMenuItem.Name = "editorSettingsToolStripMenuItem";
+        editorSettingsToolStripMenuItem.Size = new Size(95, 20);
+        editorSettingsToolStripMenuItem.Text = "Editor Settings";
+        //
+        // themeToolStripMenuItem
+        //
+        themeToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
+        themeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lightToolStripMenuItem, darkToolStripMenuItem });
+        themeToolStripMenuItem.ForeColor = Color.Black;
+        themeToolStripMenuItem.Name = "themeToolStripMenuItem";
+        themeToolStripMenuItem.Size = new Size(134, 22);
+        themeToolStripMenuItem.Text = "Themes";
+        //
+        // lightToolStripMenuItem
+        //
+        lightToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
+        lightToolStripMenuItem.ForeColor = Color.Black;
+        lightToolStripMenuItem.Name = "lightToolStripMenuItem";
+        lightToolStripMenuItem.Size = new Size(101, 22);
+        lightToolStripMenuItem.Text = "Light";
+        lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
+        //
+        // darkToolStripMenuItem
+        //
+        darkToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
+        darkToolStripMenuItem.ForeColor = Color.Black;
+        darkToolStripMenuItem.Name = "darkToolStripMenuItem";
+        darkToolStripMenuItem.Size = new Size(101, 22);
+        darkToolStripMenuItem.Text = "Dark";
+        darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
+        //
+        // wordWrapToolStripMenuItem
+        //
+        wordWrapToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
+        wordWrapToolStripMenuItem.Checked = true;
+        wordWrapToolStripMenuItem.CheckState = CheckState.Checked;
+        wordWrapToolStripMenuItem.ForeColor = Color.Black;
+        wordWrapToolStripMenuItem.Name = "wordWrapToolStripMenuItem";
+        wordWrapToolStripMenuItem.Size = new Size(134, 22);
+        wordWrapToolStripMenuItem.Text = "Word Wrap";
+        wordWrapToolStripMenuItem.Click += wordWrapToolStripMenuItem_Click;
+        //
+        // testToolStripMenuItem
+        //
+        testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lightToolStripTheme, darkToolStripTheme });
+        testToolStripMenuItem.ForeColor = Color.Black;
+        testToolStripMenuItem.Name = "testToolStripMenuItem";
+        testToolStripMenuItem.Size = new Size(55, 20);
+        testToolStripMenuItem.Text = "Theme";
+        //
+        // lightToolStripTheme
+        //
+        lightToolStripTheme.Name = "lightToolStripTheme";
+        lightToolStripTheme.Size = new Size(180, 22);
+        lightToolStripTheme.Text = "Light";
+        lightToolStripTheme.Click += lightToolStripTheme_Click;
+        //
+        // darkToolStripTheme
+        //
+        darkToolStripTheme.Name = "darkToolStripTheme";
+        darkToolStripTheme.Size = new Size(180, 22);
+        darkToolStripTheme.Text = "Dark";
+        darkToolStripTheme.Click += darkToolStripTheme_Click;
+        //
         // helpToolStripMenuItem
         //
         helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
@@ -333,55 +404,9 @@ partial class MainWindow {
         aboutToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
         aboutToolStripMenuItem.ForeColor = Color.Black;
         aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-        aboutToolStripMenuItem.Size = new Size(107, 22);
+        aboutToolStripMenuItem.Size = new Size(180, 22);
         aboutToolStripMenuItem.Text = "About";
         aboutToolStripMenuItem.Click += OnAbout;
-        //
-        // editorSettingsToolStripMenuItem
-        //
-        editorSettingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { themeToolStripMenuItem, wordWrapToolStripMenuItem });
-        editorSettingsToolStripMenuItem.ForeColor = Color.Black;
-        editorSettingsToolStripMenuItem.Name = "editorSettingsToolStripMenuItem";
-        editorSettingsToolStripMenuItem.Size = new Size(95, 20);
-        editorSettingsToolStripMenuItem.Text = "Editor Settings";
-        //
-        // themeToolStripMenuItem
-        //
-        themeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lightToolStripMenuItem, darkToolStripMenuItem });
-        themeToolStripMenuItem.Name = "themeToolStripMenuItem";
-        themeToolStripMenuItem.Size = new Size(134, 22);
-        themeToolStripMenuItem.Text = "Themes";
-        themeToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
-        themeToolStripMenuItem.ForeColor = Color.Black;
-        //
-        // lightToolStripMenuItem
-        //
-        lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-        lightToolStripMenuItem.Size = new Size(101, 22);
-        lightToolStripMenuItem.Text = "Light";
-        lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
-        lightToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
-        lightToolStripMenuItem.ForeColor = Color.Black;
-        //
-        // darkToolStripMenuItem
-        //
-        darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-        darkToolStripMenuItem.Size = new Size(101, 22);
-        darkToolStripMenuItem.Text = "Dark";
-        darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
-        darkToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
-        darkToolStripMenuItem.ForeColor = Color.Black;
-        //
-        // wordWrapToolStripMenuItem
-        //
-        wordWrapToolStripMenuItem.Checked = true;
-        wordWrapToolStripMenuItem.CheckState = CheckState.Checked;
-        wordWrapToolStripMenuItem.Name = "wordWrapToolStripMenuItem";
-        wordWrapToolStripMenuItem.Size = new Size(134, 22);
-        wordWrapToolStripMenuItem.Text = "Word Wrap";
-        wordWrapToolStripMenuItem.Click += wordWrapToolStripMenuItem_Click;
-        wordWrapToolStripMenuItem.BackColor = Color.FromArgb(240, 240, 240);
-        wordWrapToolStripMenuItem.ForeColor = Color.Black;
         //
         // pTreeView
         //
@@ -574,5 +599,8 @@ partial class MainWindow {
     private ToolStripMenuItem themeToolStripMenuItem;
     private ToolStripMenuItem lightToolStripMenuItem;
     private ToolStripMenuItem darkToolStripMenuItem;
+    private ToolStripMenuItem testToolStripMenuItem;
+    private ToolStripMenuItem lightToolStripTheme;
+    private ToolStripMenuItem darkToolStripTheme;
 }
 
