@@ -36,16 +36,10 @@ public class CustomMenuRenderer : ToolStripProfessionalRenderer {
             _currentTheme = currentTheme;
         }
 
-        public override Color MenuStripGradientBegin {
-            get { return Color.Yellow; }
-        }
-        public override Color MenuStripGradientEnd {
-            get { return Color.Yellow; }
-        }
-
         public override Color MenuItemSelectedGradientBegin {
             get { return _currentTheme.MenuItemHover; }
         }
+
         public override Color MenuItemSelectedGradientEnd {
             get { return _currentTheme.MenuItemHover; }
         }

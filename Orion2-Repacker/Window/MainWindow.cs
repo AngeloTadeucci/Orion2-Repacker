@@ -1563,13 +1563,33 @@ public partial class MainWindow : Form {
 
         // Define an array of ToolStripItems to apply the same color settings
         ToolStripItem[] toolStripItems = [
-            toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
-            editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
-            themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
-            aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
-            addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
-            pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
-            pUnloadMenuItem, exitToolStripMenuItem
+            toolsToolStripMenuItem,
+            editToolStripMenuItem,
+            pFileMenuStripItem,
+            helpToolStripMenuItem,
+            editorSettingsToolStripMenuItem,
+            testToolStripMenuItem,
+            lightToolStripTheme,
+            darkToolStripTheme,
+            themeToolStripMenuItem,
+            wordWrapToolStripMenuItem,
+            lightToolStripMenuItem,
+            darkToolStripMenuItem,
+            aboutToolStripMenuItem,
+            exportToolStripMenuItem,
+            searchToolStripMenuItem,
+            createItemToolStripMenuItem,
+            addToolStripMenuItem,
+            addFolderToolStripMenuItem,
+            removeToolStripMenuItem,
+            copyToolStripMenuItem,
+            pasteToolStripMenuItem,
+            allNodesToolStripMenuItem,
+            pOpenMenuItem,
+            pSaveMenuItem,
+            pReloadMenuItem,
+            pUnloadMenuItem,
+            exitToolStripMenuItem
         ];
 
         // Apply color settings to all ToolStripItems
