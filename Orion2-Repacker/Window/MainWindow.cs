@@ -1374,7 +1374,6 @@ public partial class MainWindow : Form {
             { "wordWrap", wordWrapValue }
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
-
         Properties.Settings.Default.EditorWordWrap = wordWrapToolStripMenuItem.Checked;
         Properties.Settings.Default.Save();
     }
@@ -1515,6 +1514,9 @@ public partial class MainWindow : Form {
         lightToolStripTheme.Checked = true;
         darkToolStripTheme.Checked = false;
 
+        Properties.Settings.Default.LightTheme = lightToolStripTheme.Checked;
+        Properties.Settings.Default.Save();
+
         // Define color settings
         Color backColor = Color.FromArgb(181, 181, 181);
         Color foreColor = Color.FromArgb(60, 60, 60);
@@ -1563,6 +1565,9 @@ public partial class MainWindow : Form {
     private void darkToolStripTheme_Click(object sender, EventArgs e) {
         lightToolStripTheme.Checked = false;
         darkToolStripTheme.Checked = true;
+
+        Properties.Settings.Default.LightTheme = darkToolStripTheme.Checked;
+        Properties.Settings.Default.Save();
 
         // Define color settings
         Color backColor = Color.FromArgb(45, 45, 45);
