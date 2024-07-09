@@ -28,14 +28,24 @@ using static Orion.Crypto.CryptoMan;
 
 namespace Orion.Window;
 public partial class MainWindow : Form {
-    private ExtractWindow extractWindow;
     private MemoryMappedFile pDataMappedMemFile;
     private PackNodeList pNodeList;
-    private ProgressWindow pProgress;
+    private ProgressWindow progressWindow;
     private string headerFilePath;
     private string dataFilePath;
 
+    private ITheme currentTheme;
+    private ITheme CurrentTheme {
+        get { return currentTheme; }
+        set {
+            currentTheme = value;
+            pMenuStrip.Renderer = new CustomMenuRenderer(value);
+        }
+    }
+
     public MainWindow() {
+        Properties.Settings.Default.Reload();
+
         InitializeComponent();
 
         pImagePanel.AutoScroll = true;
@@ -43,7 +53,7 @@ public partial class MainWindow : Form {
         pImageData.BorderStyle = BorderStyle.None;
         pImageData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
 
-        pMenuStrip.Renderer = new MenuRenderer();
+        CurrentTheme = Properties.Settings.Default.LightTheme ? new LightTheme() : new DarkTheme();
 
         pPrevSize = Size;
 
@@ -51,11 +61,10 @@ public partial class MainWindow : Form {
 
         pNodeList = null;
         pDataMappedMemFile = null;
-        pProgress = null;
+        progressWindow = null;
 
         UpdatePanel("Empty", null);
 
-        Properties.Settings.Default.Reload();
         wordWrapToolStripMenuItem.Checked = Properties.Settings.Default.EditorWordWrap;
         if (Properties.Settings.Default.EditorTheme == "vs") {
             lightToolStripMenuItem.Checked = true;
@@ -63,23 +72,12 @@ public partial class MainWindow : Form {
             darkToolStripMenuItem.Checked = true;
         }
 
-        if (Properties.Settings.Default.LightTheme == true) {
+        if (Properties.Settings.Default.LightTheme) {
             lightToolStripTheme.Checked = true;
-
-            Color backColor = Color.FromArgb(181, 181, 181);
-            Color foreColor = Color.FromArgb(60, 60, 60);
-            Color pBackColor = Color.FromArgb(240, 240, 240);
-            Color pForeColor = Color.FromArgb(39, 39, 39);
-            SetUiColors(backColor, foreColor, pBackColor, pForeColor);
         } else {
             darkToolStripTheme.Checked = true;
-
-            Color backColor = Color.FromArgb(45, 45, 45);
-            Color foreColor = Color.FromArgb(255, 255, 255);
-            Color pBackColor = Color.FromArgb(39, 39, 39);
-            Color pForeColor = Color.FromArgb(240, 240, 240);
-            SetUiColors(backColor, foreColor, pBackColor, pForeColor);
         }
+        SetUiColors();
 
         InitializeWebViewAsync();
     }
@@ -172,7 +170,7 @@ public partial class MainWindow : Form {
     #region About
 
     private void OnAbout(object sender, EventArgs e) {
-        About pAbout = new About {
+        About pAbout = new About(CurrentTheme) {
             Owner = this
         };
 
@@ -364,15 +362,15 @@ public partial class MainWindow : Form {
         Properties.Settings.Default.Save();
 
         if (pSaveWorkerThread.IsBusy) return;
-        pProgress = new ProgressWindow(lightToolStripTheme.Checked) {
+        progressWindow = new ProgressWindow(CurrentTheme) {
             Path = sPath,
-            Stream = pNode.Tag as IPackStreamVerBase,
+            Stream = pNode.Tag as IPackStreamVerBase
         };
-        pProgress.Show(this);
+        progressWindow.Show(this);
         // Why do you make this so complicated C#?
-        int x = DesktopBounds.Left + (Width - pProgress.Width) / 2;
-        int y = DesktopBounds.Top + (Height - pProgress.Height) / 2;
-        pProgress.SetDesktopLocation(x, y);
+        int x = DesktopBounds.Left + (Width - progressWindow.Width) / 2;
+        int y = DesktopBounds.Top + (Height - progressWindow.Height) / 2;
+        progressWindow.SetDesktopLocation(x, y);
 
         pSaveWorkerThread.RunWorkerAsync();
     } // Save
@@ -412,16 +410,14 @@ public partial class MainWindow : Form {
         NotifyMessage("There is no package to be unloaded.", MessageBoxIcon.Warning);
     } // Unload
 
-    private void UnloadFiles(bool resetWindowName = false) {
+    private void UnloadFiles() {
         pTreeView.Nodes.Clear();
 
         pNodeList.InternalRelease();
         pNodeList = null;
 
         headerFilePath = "";
-        if (resetWindowName) {
-            Text = "Orion2 Repacker";
-        }
+        Text = "Orion2 Repacker";
 
         if (pDataMappedMemFile != null) {
             pDataMappedMemFile.Dispose();
@@ -753,21 +749,21 @@ public partial class MainWindow : Form {
                     // Create root directory
                     if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
 
-                    extractWindow = new ExtractWindow {
+                    progressWindow = new ProgressWindow(CurrentTheme) {
                         Path = sPath.ToString(),
-                        PackNode = pNode
+                        PackNode = pNode,
+                        Text = "Export"
                     };
 
-                    extractWindow.Show(this);
+                    progressWindow.Show(this);
                     // Why do you make this so complicated C#?
-                    int x = DesktopBounds.Left + (Width - extractWindow.Width) / 2;
-                    int y = DesktopBounds.Top + (Height - extractWindow.Height) / 2;
-                    extractWindow.SetDesktopLocation(x, y);
-                    extractWindow.SetProgressBarSize(pNode.Nodes.Count);
+                    int x = DesktopBounds.Left + (Width - progressWindow.Width) / 2;
+                    int y = DesktopBounds.Top + (Height - progressWindow.Height) / 2;
+                    progressWindow.SetDesktopLocation(x, y);
+                    progressWindow.SetProgressBarSize(pNode.Nodes.Count);
 
                     extractWorkerThread.WorkerReportsProgress = true;
                     extractWorkerThread.RunWorkerAsync();
-
                     break;
                 }
             case PackFileEntry tag: {
@@ -1100,13 +1096,13 @@ public partial class MainWindow : Form {
     private void OnSaveBegin(object sender, DoWorkEventArgs e) {
         if (sender is not BackgroundWorker) return;
 
-        IPackStreamVerBase pStream = pProgress.Stream;
+        IPackStreamVerBase pStream = progressWindow.Stream;
 
         if (pStream == null) return;
 
-        pProgress.Start();
+        progressWindow.Start();
         pStream.GetFileList().Sort();
-        SaveData(pProgress.Path, pStream.GetFileList());
+        SaveData(progressWindow.Path, pStream.GetFileList());
         uint dwFileCount = (uint) pStream.GetFileList().Count;
         StringBuilder sFileString = new StringBuilder();
         foreach (PackFileEntry pEntry in pStream.GetFileList()) sFileString.Append(pEntry);
@@ -1135,7 +1131,7 @@ public partial class MainWindow : Form {
         pStream.SetDataSize(uDataLen);
         pStream.SetCompressedDataSize(uCompressedDataLen);
         pStream.SetEncodedDataSize(uEncodedDataLen);
-        using (BinaryWriter pWriter = new BinaryWriter(File.Create(pProgress.Path.Replace(".m2d", ".m2h")))) {
+        using (BinaryWriter pWriter = new BinaryWriter(File.Create(progressWindow.Path.Replace(".m2d", ".m2h")))) {
             pWriter.Write(pStream.GetVer());
             pStream.Encode(pWriter);
             pWriter.Write(pHeader);
@@ -1160,21 +1156,21 @@ public partial class MainWindow : Form {
     }
 
     private void OnSaveProgress(object sender, ProgressChangedEventArgs e) {
-        pProgress.UpdateProgressBar(e.ProgressPercentage);
+        progressWindow.UpdateProgressBar(e.ProgressPercentage);
     }
 
     private void OnSaveComplete(object sender, RunWorkerCompletedEventArgs e) {
-        if (e.Error != null) MessageBox.Show(pProgress, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        if (e.Error != null) MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-        pProgress.Finish();
-        pProgress.Close();
+        progressWindow.Finish();
+        progressWindow.Close();
 
-        TimeSpan pInterval = TimeSpan.FromMilliseconds(pProgress.ElapsedTime);
+        TimeSpan pInterval = TimeSpan.FromMilliseconds(progressWindow.ElapsedTime);
         NotifyMessage($"Successfully saved in {pInterval.Minutes} minutes and {pInterval.Seconds} seconds!",
             MessageBoxIcon.Information);
 
         // Clean current open files
-        UnloadFiles(true);
+        UnloadFiles();
 
         // Perform heavy cleanup
         GC.Collect();
@@ -1188,12 +1184,12 @@ public partial class MainWindow : Form {
     }
 
     private void OnExtractComplete(object sender, RunWorkerCompletedEventArgs e) {
-        if (e.Error != null) MessageBox.Show(extractWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        if (e.Error != null) MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-        extractWindow.Finish();
-        extractWindow.Close();
+        progressWindow.Finish();
+        progressWindow.Close();
 
-        TimeSpan pInterval = TimeSpan.FromMilliseconds(extractWindow.ElapsedTime);
+        TimeSpan pInterval = TimeSpan.FromMilliseconds(progressWindow.ElapsedTime);
         NotifyMessage($"Successfully exported in {pInterval.Minutes} minutes and {pInterval.Seconds} seconds!",
             MessageBoxIcon.Information);
 
@@ -1202,7 +1198,7 @@ public partial class MainWindow : Form {
     }
 
     private void OnExtractProgress(object sender, ProgressChangedEventArgs e) {
-        extractWindow.UpdateProgressBar(e.ProgressPercentage);
+        progressWindow.UpdateProgressBar(e.ProgressPercentage);
     }
 
     private void SaveData(string sDataPath, List<PackFileEntry> aEntry) {
@@ -1346,11 +1342,11 @@ public partial class MainWindow : Form {
     private void extractWorkerThread_DoWork(object sender, DoWorkEventArgs e) {
         if (sender is not BackgroundWorker) return;
 
-        string sPath = extractWindow.Path;
-        PackNode pNode = extractWindow.PackNode;
+        string sPath = progressWindow.Path;
+        PackNode pNode = progressWindow.PackNode;
         if (pNode is null) return;
 
-        extractWindow.Start();
+        progressWindow.Start();
         int i = 0;
         foreach (PackNode pRootChild in pNode.Nodes) {
             switch (pRootChild.Tag) {
@@ -1505,9 +1501,12 @@ public partial class MainWindow : Form {
             return;
         }
 
+        ITheme theme = lightToolStripTheme.Checked ? new LightTheme() : new DarkTheme();
+
         // create a context menu
         ContextMenuStrip menu = new() {
-            BackColor = Color.FromArgb(240, 240, 240)
+            BackColor = theme.BackColor2,
+            Renderer = new CustomMenuRenderer(theme)
         };
 
         AddItemToContextMenu(menu, "Remove", OnRemoveFile);
@@ -1519,11 +1518,12 @@ public partial class MainWindow : Form {
         menu.Show(pTreeView, e.Location);
     }
 
-    private static void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
-        var item = new ToolStripMenuItem(text) {
-            BackColor = Color.FromArgb(240, 240, 240),
-            ForeColor = Color.Black
+    private void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
+        ToolStripMenuItem item = new ToolStripMenuItem(text) {
+            BackColor = CurrentTheme.BackColor2,
+            ForeColor = CurrentTheme.ForeColor2,
         };
+
         item.Click += handler;
         menu.Items.Add(item);
     }
@@ -1535,12 +1535,9 @@ public partial class MainWindow : Form {
         Properties.Settings.Default.LightTheme = lightToolStripTheme.Checked;
         Properties.Settings.Default.Save();
 
-        // Define color settings
-        Color backColor = Color.FromArgb(181, 181, 181);
-        Color foreColor = Color.FromArgb(60, 60, 60);
-        Color pBackColor = Color.FromArgb(240, 240, 240);
-        Color pForeColor = Color.FromArgb(39, 39, 39);
-        SetUiColors(backColor, foreColor, pBackColor, pForeColor);
+        CurrentTheme = new LightTheme();
+
+        SetUiColors();
     }
 
     private void darkToolStripTheme_Click(object sender, EventArgs e) {
@@ -1550,51 +1547,44 @@ public partial class MainWindow : Form {
         Properties.Settings.Default.LightTheme = lightToolStripTheme.Checked;
         Properties.Settings.Default.Save();
 
-        // Define color settings
-        Color backColor = Color.FromArgb(45, 45, 45);
-        Color foreColor = Color.FromArgb(255, 255, 255);
-        Color pBackColor = Color.FromArgb(39, 39, 39);
-        Color pForeColor = Color.FromArgb(240, 240, 240);
-        SetUiColors(backColor, foreColor, pBackColor, pForeColor);
+        CurrentTheme = new DarkTheme();
+
+        SetUiColors();
     }
 
-    private void SetUiColors(Color backColor, Color foreColor, Color pBackColor, Color pForeColor) {
+    private void SetUiColors() {
         // Set form background and foreground colors
-        this.BackColor = backColor;
-        this.ForeColor = foreColor;
+        BackColor = CurrentTheme.BackColor;
+        ForeColor = CurrentTheme.ForeColor;
 
         // Set TreeView colors
-        pTreeView.BackColor = pBackColor;
-        pTreeView.ForeColor = pForeColor;
+        pTreeView.BackColor = CurrentTheme.BackColor;
+        pTreeView.ForeColor = CurrentTheme.ForeColor;
 
         // Define an array of ToolStripItems to apply the same color settings
-        var toolStripItems = new ToolStripItem[]
-        {
-        toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
-        editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
-        themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
-        aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
-        addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
-        pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
-        pUnloadMenuItem, exitToolStripMenuItem
-        };
+        ToolStripItem[] toolStripItems = [
+            toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
+            editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
+            themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
+            aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
+            addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
+            pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
+            pUnloadMenuItem, exitToolStripMenuItem
+        ];
 
         // Apply color settings to all ToolStripItems
-        foreach (var item in toolStripItems) {
-            item.BackColor = pBackColor;
-            item.ForeColor = pForeColor;
+        foreach (ToolStripItem item in toolStripItems) {
+            item.BackColor = CurrentTheme.BackColor2;
+            item.ForeColor = CurrentTheme.ForeColor2;
         }
 
         // Define an array of controls (e.g., buttons, panels) to apply the same color settings
-        var controls = new Control[]
-        {
-        pMenuStrip, pEntryValue, pEntryName, pChangeImageBtn, pUpdateDataBtn
-        };
+        Control[] controls = [pMenuStrip, pEntryValue, pEntryName, pChangeImageBtn, pUpdateDataBtn];
 
         // Apply color settings to all controls
-        foreach (var control in controls) {
-            control.BackColor = pBackColor;
-            control.ForeColor = pForeColor;
+        foreach (Control control in controls) {
+            control.BackColor = CurrentTheme.BackColor2;
+            control.ForeColor = CurrentTheme.ForeColor2;
         }
     }
 }

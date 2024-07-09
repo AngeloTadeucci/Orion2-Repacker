@@ -16,30 +16,24 @@
  */
 
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using Orion.Crypto.Stream;
+using Orion.Window.Common;
 
 namespace Orion.Window;
 public partial class ProgressWindow : Form {
     private Stopwatch pStopWatch;
     private string sPath;
-    public bool isLightTheme;
-    public string initialText;
 
-    public ProgressWindow(bool isLightTheme) {
+    public ProgressWindow(ITheme currentTheme) {
         InitializeComponent();
 
-        if (isLightTheme) {
-            this.BackColor = Color.FromArgb(240, 240, 240);
-            this.ForeColor = Color.FromArgb(39, 39, 39);
-        } else {
-            this.BackColor = Color.FromArgb(39, 39, 39);
-            this.ForeColor = Color.FromArgb(240, 240, 240);
-        }
+        BackColor = currentTheme.BackColor2;
+        ForeColor = currentTheme.ForeColor2;
     }
 
     public string FileName { get; set; }
     public IPackStreamVerBase Stream { get; set; }
+    public PackNode PackNode { get; set; }
     public long ElapsedTime { get; set; }
 
     public string Path {
@@ -53,7 +47,11 @@ public partial class ProgressWindow : Form {
 
     public void UpdateProgressBar(int nProgress) {
         pProgressBar.Value = nProgress;
-        pSaveInfo.Text = $"Saving {FileName} ... {pProgressBar.Value}%";
+        if (PackNode is null) {
+            pSaveInfo.Text = $"Saving {FileName}... {pProgressBar.Value}%";
+        } else {
+            pSaveInfo.Text = "Extracting...";
+        }
     }
 
     public void Start() {
@@ -65,7 +63,9 @@ public partial class ProgressWindow : Form {
         pStopWatch.Stop();
     }
 
-    private void ProgressWindow_Load(object sender, EventArgs e) {
-
+    public void SetProgressBarSize(int size) {
+        pProgressBar.Maximum = size;
+        pProgressBar.Step = 1;
+        pProgressBar.Value = 0;
     }
 }
