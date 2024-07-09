@@ -396,8 +396,6 @@ partial class MainWindow {
         // 
         // lightToolStripTheme
         // 
-        lightToolStripTheme.Checked = true;
-        lightToolStripTheme.CheckState = CheckState.Checked;
         lightToolStripTheme.Name = "lightToolStripTheme";
         lightToolStripTheme.Size = new Size(180, 22);
         lightToolStripTheme.Text = "Light";

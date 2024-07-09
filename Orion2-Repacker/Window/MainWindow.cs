@@ -63,6 +63,20 @@ public partial class MainWindow : Form {
             darkToolStripMenuItem.Checked = true;
         }
 
+        if (Properties.Settings.Default.LightTheme == true) {
+            Color backColor = Color.FromArgb(181, 181, 181);
+            Color foreColor = Color.FromArgb(60, 60, 60);
+            Color pBackColor = Color.FromArgb(240, 240, 240);
+            Color pForeColor = Color.FromArgb(39, 39, 39);
+            SetUiColors(backColor, foreColor, pBackColor, pForeColor);
+        } else {
+            Color backColor = Color.FromArgb(45, 45, 45);
+            Color foreColor = Color.FromArgb(255, 255, 255);
+            Color pBackColor = Color.FromArgb(39, 39, 39);
+            Color pForeColor = Color.FromArgb(240, 240, 240);
+            SetUiColors(backColor, foreColor, pBackColor, pForeColor);
+        }
+
         InitializeWebViewAsync();
     }
 
@@ -1522,51 +1536,14 @@ public partial class MainWindow : Form {
         Color foreColor = Color.FromArgb(60, 60, 60);
         Color pBackColor = Color.FromArgb(240, 240, 240);
         Color pForeColor = Color.FromArgb(39, 39, 39);
-
-        // Set form background and foreground colors
-        this.BackColor = backColor;
-        this.ForeColor = foreColor;
-
-        // Set TreeView colors
-        pTreeView.BackColor = pBackColor;
-        pTreeView.ForeColor = pForeColor;
-
-        // Define an array of ToolStripItems to apply the same color settings
-        var toolStripItems = new ToolStripItem[]
-        {
-        toolsToolStripMenuItem, editToolStripMenuItem, pFileMenuStripItem, helpToolStripMenuItem,
-        editorSettingsToolStripMenuItem, testToolStripMenuItem, lightToolStripTheme, darkToolStripTheme,
-        themeToolStripMenuItem, wordWrapToolStripMenuItem, lightToolStripMenuItem, darkToolStripMenuItem,
-        aboutToolStripMenuItem, exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem,
-        addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem,
-        pasteToolStripMenuItem, allNodesToolStripMenuItem, pOpenMenuItem, pSaveMenuItem, pReloadMenuItem,
-        pUnloadMenuItem, exitToolStripMenuItem
-        };
-
-        // Apply color settings to all ToolStripItems
-        foreach (var item in toolStripItems) {
-            item.BackColor = pBackColor;
-            item.ForeColor = pForeColor;
-        }
-
-        // Define an array of controls (e.g., buttons, panels) to apply the same color settings
-        var controls = new Control[]
-        {
-        pMenuStrip, pEntryValue, pEntryName, pChangeImageBtn, pUpdateDataBtn
-        };
-
-        // Apply color settings to all controls
-        foreach (var control in controls) {
-            control.BackColor = pBackColor;
-            control.ForeColor = pForeColor;
-        }
+        SetUiColors(backColor, foreColor, pBackColor, pForeColor);
     }
 
     private void darkToolStripTheme_Click(object sender, EventArgs e) {
         lightToolStripTheme.Checked = false;
         darkToolStripTheme.Checked = true;
 
-        Properties.Settings.Default.LightTheme = darkToolStripTheme.Checked;
+        Properties.Settings.Default.LightTheme = lightToolStripTheme.Checked;
         Properties.Settings.Default.Save();
 
         // Define color settings
@@ -1574,7 +1551,10 @@ public partial class MainWindow : Form {
         Color foreColor = Color.FromArgb(255, 255, 255);
         Color pBackColor = Color.FromArgb(39, 39, 39);
         Color pForeColor = Color.FromArgb(240, 240, 240);
+        SetUiColors(backColor, foreColor, pBackColor, pForeColor);
+    }
 
+    private void SetUiColors(Color backColor, Color foreColor, Color pBackColor, Color pForeColor) {
         // Set form background and foreground colors
         this.BackColor = backColor;
         this.ForeColor = foreColor;

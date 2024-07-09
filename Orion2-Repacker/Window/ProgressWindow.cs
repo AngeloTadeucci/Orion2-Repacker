@@ -32,8 +32,7 @@ public partial class ProgressWindow : Form {
         if (isLightTheme) {
             this.BackColor = Color.FromArgb(240, 240, 240);
             this.ForeColor = Color.FromArgb(39, 39, 39);
-        } 
-        else {
+        } else {
             this.BackColor = Color.FromArgb(39, 39, 39);
             this.ForeColor = Color.FromArgb(240, 240, 240);
         }
@@ -64,5 +63,9 @@ public partial class ProgressWindow : Form {
     public void Finish() {
         ElapsedTime = pStopWatch.ElapsedMilliseconds;
         pStopWatch.Stop();
+    }
+
+    private void ProgressWindow_Load(object sender, EventArgs e) {
+
     }
 }
