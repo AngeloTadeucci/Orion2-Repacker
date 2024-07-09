@@ -64,12 +64,16 @@ public partial class MainWindow : Form {
         }
 
         if (Properties.Settings.Default.LightTheme == true) {
+            lightToolStripTheme.Checked = true;
+
             Color backColor = Color.FromArgb(181, 181, 181);
             Color foreColor = Color.FromArgb(60, 60, 60);
             Color pBackColor = Color.FromArgb(240, 240, 240);
             Color pForeColor = Color.FromArgb(39, 39, 39);
             SetUiColors(backColor, foreColor, pBackColor, pForeColor);
         } else {
+            darkToolStripTheme.Checked = true;
+
             Color backColor = Color.FromArgb(45, 45, 45);
             Color foreColor = Color.FromArgb(255, 255, 255);
             Color pBackColor = Color.FromArgb(39, 39, 39);
