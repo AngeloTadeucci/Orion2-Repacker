@@ -1,73 +1,105 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>Orion</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Images\icon.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Orion.Program</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Pfim">
-      <HintPath>Resources\Pfim.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Images\icon.ico" />
-    <Content Include="Images\outline_remove_black_24dp.png" />
-    <Content Include="Images\outline_add_black_24dp.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="MonacoEditor\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1777-prerelease" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="Window\EditorSettings.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <PropertyGroup>
-    <UseWindowsForms>True</UseWindowsForms>
-    <Version>2.3.0</Version>
-    <Authors>Orion2-Repacker</Authors>
-    <Company>Orion2-Repacker</Company>
-    <Product>Orion2-Repacker</Product>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>2.3.0</AssemblyVersion>
-    <FileVersion>2.3.0</FileVersion>
-    <PackageId>Orion2-Repacker</PackageId>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>Orion</RootNamespace>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ApplicationIcon>Images\icon.ico</ApplicationIcon>
+    </PropertyGroup>
+    <PropertyGroup>
+        <StartupObject>Orion.Program</StartupObject>
+    </PropertyGroup>
+    <PropertyGroup>
+        <GenerateManifests>true</GenerateManifests>
+    </PropertyGroup>
+    <PropertyGroup>
+        <SignManifests>true</SignManifests>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Pfim">
+            <HintPath>Resources\Pfim.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="vgmtutil">
+            <HintPath>deps\vgmtutil.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Images\icon.ico"/>
+        <Content Include="Images\outline_remove_black_24dp.png"/>
+        <Content Include="Images\outline_add_black_24dp.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="MonacoEditor\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="vgmstream\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="LibVLCSharp" Version="3.9.0"/>
+        <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.0"/>
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1777-prerelease"/>
+        <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.6"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Remove="Window\EditorSettings.resx"/>
+    </ItemGroup>
+    <ItemGroup>
+        <COMReference Include="WMPLib">
+            <WrapperTool>tlbimp</WrapperTool>
+            <VersionMinor>0</VersionMinor>
+            <VersionMajor>1</VersionMajor>
+            <Guid>6bf52a50-394a-11d3-b153-00c04f79faa6</Guid>
+            <Lcid>0</Lcid>
+            <Isolated>false</Isolated>
+            <EmbedInteropTypes>true</EmbedInteropTypes>
+        </COMReference>
+        <COMReference Include="AxWMPLib">
+            <WrapperTool>aximp</WrapperTool>
+            <VersionMinor>0</VersionMinor>
+            <VersionMajor>1</VersionMajor>
+            <Guid>6bf52a50-394a-11d3-b153-00c04f79faa6</Guid>
+            <Lcid>0</Lcid>
+            <Isolated>false</Isolated>
+        </COMReference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="..\.editorconfig" Link=".editorconfig"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Settings.Designer.cs">
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Settings.settings</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="Properties\Settings.settings">
+            <Generator>SettingsSingleFileGenerator</Generator>
+            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+    <PropertyGroup>
+        <UseWindowsForms>True</UseWindowsForms>
+        <Version>2.4.0</Version>
+        <Authors>Orion2-Repacker</Authors>
+        <Company>Orion2-Repacker</Company>
+        <Product>Orion2-Repacker</Product>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AssemblyVersion>2.4.0</AssemblyVersion>
+        <FileVersion>2.4.0</FileVersion>
+        <PackageId>Orion2-Repacker</PackageId>
+    </PropertyGroup>
+    <PropertyGroup>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 </Project>

@@ -17,12 +17,15 @@
 
 using System.ComponentModel;
 using System.IO.MemoryMappedFiles;
+using System.Reflection;
 using System.Text;
+using LibVLCSharp.Shared;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json.Linq;
 using Orion.Crypto.Common;
 using Orion.Crypto.Stream;
 using Orion.Crypto.Stream.DDS;
+using Orion.VGMToolbox;
 using Orion.Window.Common;
 using static Orion.Crypto.CryptoMan;
 
@@ -33,6 +36,9 @@ public partial class MainWindow : Form {
     private ProgressWindow progressWindow;
     private string headerFilePath;
     private string dataFilePath;
+
+    private LibVLC libVLC;
+    private MediaPlayer mediaPlayer;
 
     private ITheme currentTheme;
     private ITheme CurrentTheme {
@@ -45,7 +51,11 @@ public partial class MainWindow : Form {
 
     public MainWindow() {
         Properties.Settings.Default.Reload();
+        Properties.Settings.Default.AlwaysConvert = false;
+        Properties.Settings.Default.Save();
 
+
+        Core.Initialize();
         InitializeComponent();
 
         pImagePanel.AutoScroll = true;
@@ -62,6 +72,11 @@ public partial class MainWindow : Form {
         pNodeList = null;
         pDataMappedMemFile = null;
         progressWindow = null;
+
+        libVLC = new LibVLC();
+        mediaPlayer = new MediaPlayer(libVLC) {
+            Volume = 30,
+        };
 
         UpdatePanel("Empty", null);
 
@@ -203,7 +218,7 @@ public partial class MainWindow : Form {
                     pNode.Data ??= DecryptData(pFileHeader, pDataMappedMemFile);
                 string[] splitFileName = pEntry.TreeName.Split('.');
                 string extension = splitFileName.Length > 1 ? splitFileName[^1].ToLower() : "unknown";
-                UpdatePanel(extension.ToLower(), pNode.Data);
+                UpdatePanel(extension.ToLower(), pEntry);
             } else if (pNode.Tag is IPackStreamVerBase) {
                 UpdatePanel("Packed Data File", null);
             } else {
@@ -700,7 +715,7 @@ public partial class MainWindow : Form {
         }
 
         switch (pNode.Tag) {
-            case PackNodeList tag: {
+            case PackNodeList nodeList: {
                     FolderBrowserDialog pDialog = new FolderBrowserDialog {
                         Description = "Select the destination folder to export to",
                         InitialDirectory = Properties.Settings.Default.LastExportFolder
@@ -723,7 +738,7 @@ public partial class MainWindow : Form {
 
                     sPath.Append(pNode.Name);
 
-                    OnExportNodeList(sPath.ToString(), tag);
+                    OnExportNodeList(sPath.ToString(), nodeList);
 
                     NotifyMessage($"Successfully exported to {sPath}", MessageBoxIcon.Information);
 
@@ -742,15 +757,15 @@ public partial class MainWindow : Form {
                     Properties.Settings.Default.LastExportFolder = pDialog.SelectedPath + "\\";
                     Properties.Settings.Default.Save();
 
-                    StringBuilder sPath = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
-                    sPath.Append("/");
-                    sPath.Append(pNode.Name);
-                    sPath.Append("/");
+                    StringBuilder outputDir = new StringBuilder(Dir_BackSlashToSlash(pDialog.SelectedPath));
+                    outputDir.Append('/');
+                    outputDir.Append(pNode.Name);
+                    outputDir.Append('/');
                     // Create root directory
-                    if (!Directory.Exists(sPath.ToString())) Directory.CreateDirectory(sPath.ToString());
+                    if (!Directory.Exists(outputDir.ToString())) Directory.CreateDirectory(outputDir.ToString());
 
                     progressWindow = new ProgressWindow(CurrentTheme) {
-                        Path = sPath.ToString(),
+                        Path = outputDir.ToString(),
                         PackNode = pNode,
                         Text = "Export"
                     };
@@ -766,9 +781,9 @@ public partial class MainWindow : Form {
                     extractWorkerThread.RunWorkerAsync();
                     break;
                 }
-            case PackFileEntry tag: {
-                    string sName = tag.TreeName.Split('.')[0];
-                    string sExtension = tag.TreeName.Split('.')[1];
+            case PackFileEntry nodeEntry: {
+                    string sName = nodeEntry.TreeName.Split('.')[0];
+                    string sExtension = nodeEntry.TreeName.Split('.')[1];
 
                     SaveFileDialog pDialog = new SaveFileDialog {
                         Title = "Select the destination to export the file",
@@ -784,7 +799,7 @@ public partial class MainWindow : Form {
                     Properties.Settings.Default.LastExportFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')] + "\\";
                     Properties.Settings.Default.Save();
 
-                    IPackFileHeaderVerBase pFileHeader = tag.FileHeader;
+                    IPackFileHeaderVerBase pFileHeader = nodeEntry.FileHeader;
                     if (pFileHeader != null) {
                         if (pNode.Data == null) {
                             pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
@@ -799,11 +814,61 @@ public partial class MainWindow : Form {
                     }
 
                     NotifyMessage($"Successfully exported to {pDialog.FileName}", MessageBoxIcon.Information);
-
                     break;
                 }
         }
     } // Export
+
+    private void OnConvertToMP4(object sender, EventArgs e) {
+        if (!Helpers.CheckIfmpegInstalled()) {
+            NotifyMessage("FFmpeg is not installed. Please install FFmpeg to proceed.", MessageBoxIcon.Warning);
+            return;
+        }
+
+        if (pTreeView.SelectedNode is not PackNode pNode) {
+            NotifyMessage("Please select a file to convert.", MessageBoxIcon.Asterisk);
+            return;
+        }
+
+        if (pNode.Tag is not PackFileEntry nodeEntry) {
+            NotifyMessage("Please select a file to convert.", MessageBoxIcon.Asterisk);
+            return;
+        }
+
+        string sName = nodeEntry.TreeName.Split('.')[0];
+        string sExtension = nodeEntry.TreeName.Split('.')[1];
+
+        SaveFileDialog pDialog = new SaveFileDialog {
+            Title = "Select the destination to export the file",
+            FileName = sName,
+            Filter = $"mp4 File|*.mp4",
+            InitialDirectory = Properties.Settings.Default.LastExportFolder
+        };
+
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
+
+        Properties.Settings.Default.LastExportFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')] + "\\";
+        Properties.Settings.Default.Save();
+
+        IPackFileHeaderVerBase pFileHeader = nodeEntry.FileHeader;
+        if (pFileHeader != null) {
+            if (pNode.Data == null) {
+                pNode.Data = DecryptData(pFileHeader, pDataMappedMemFile);
+                File.WriteAllBytes(pDialog.FileName, pNode.Data);
+
+                // Nullify the data as it was previously.
+                pNode.Data = null;
+                return;
+            }
+
+            File.WriteAllBytes(pDialog.FileName, pNode.Data);
+        }
+
+        Helpers.ConvertUSMToMP4(pDialog.FileName);
+        NotifyMessage($"Successfully converted {pDialog.FileName}", MessageBoxIcon.Information);
+    }
 
     private void OnSearch(object sender, EventArgs e) {
         NotifyMessage("TODO: Search all files for string?");
@@ -886,7 +951,7 @@ public partial class MainWindow : Form {
 
         pEntry.Data = pData;
         pEntry.Changed = true;
-        UpdatePanel(sExtension, pData);
+        UpdatePanel(sExtension, pEntry);
     }
 
     private void OnChangeWindowSize(object sender, EventArgs e) {
@@ -901,6 +966,11 @@ public partial class MainWindow : Form {
         pImagePanel.Size = new Size {
             Height = pImagePanel.Height + nHeight,
             Width = pImagePanel.Width + nWidth
+        };
+
+        videoView.Size = new Size {
+            Height = videoView.Height + nHeight,
+            Width = videoView.Width + nWidth
         };
 
         pTreeView.Size = new Size {
@@ -999,7 +1069,9 @@ public partial class MainWindow : Form {
         pImageData.Update();
     }
 
-    private void UpdatePanel(string sExtension, byte[] pBuffer) {
+    private void UpdatePanel(string sExtension, PackFileEntry? packNode) {
+
+        byte[] pBuffer = packNode?.Data;
         if (pBuffer == null) {
             pEntryValue.Text = sExtension;
             pEntryName.Visible = false;
@@ -1007,70 +1079,135 @@ public partial class MainWindow : Form {
             pImagePanel.Visible = false;
             pChangeImageBtn.Visible = false;
             webView.Visible = false;
-        } else {
-            pEntryValue.Text = $"{sExtension.ToUpper()} File";
-            pEntryName.Visible = true;
+            videoView.Visible = false;
+            return;
+        }
 
-            bool isText = sExtension.Equals("ini") || sExtension.Equals("nt") || sExtension.Equals("lua")
-                                                || sExtension.Equals("xml") || sExtension.Equals("flat") || sExtension.Equals("xblock")
-                                                || sExtension.Equals("diagram") || sExtension.Equals("preset") || sExtension.Equals("emtproj");
-            webView.Visible = isText;
-            pUpdateDataBtn.Visible = isText;
+        pEntryValue.Text = $"{sExtension.ToUpper()} File";
+        pEntryName.Visible = true;
 
-            pImagePanel.Visible = sExtension.Equals("png") || sExtension.Equals("dds");
-            pChangeImageBtn.Visible = pImagePanel.Visible;
+        bool isText = sExtension.Equals("ini") || sExtension.Equals("nt") || sExtension.Equals("lua")
+                                            || sExtension.Equals("xml") || sExtension.Equals("flat") || sExtension.Equals("xblock")
+                                            || sExtension.Equals("diagram") || sExtension.Equals("preset") || sExtension.Equals("emtproj");
+        webView.Visible = isText;
+        pUpdateDataBtn.Visible = isText;
 
-            if (isText) {
-                Properties.Settings.Default.Reload();
-                string editorTheme = Properties.Settings.Default.EditorTheme;
-                string wordWrap = Properties.Settings.Default.EditorWordWrap ? "on" : "off";
-                string language = sExtension switch {
-                    "ini" => "ini",
-                    "nt" => "txt",
-                    "lua" => "lua",
-                    _ => "xml"
-                };
+        pImagePanel.Visible = sExtension.Equals("png") || sExtension.Equals("dds");
+        pChangeImageBtn.Visible = pImagePanel.Visible;
 
-                JObject json = new()
-                {
+        if (isText) {
+            Properties.Settings.Default.Reload();
+            string editorTheme = Properties.Settings.Default.EditorTheme;
+            string wordWrap = Properties.Settings.Default.EditorWordWrap ? "on" : "off";
+            string language = sExtension switch {
+                "ini" => "ini",
+                "nt" => "txt",
+                "lua" => "lua",
+                _ => "xml"
+            };
+
+            JObject json = new()
+            {
                     { "type", "updateSettings" },
                     { "theme", editorTheme },
                     { "wordWrap", wordWrap },
                     { "language", language }
                 };
-                webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
 
-                string content = Encoding.UTF8.GetString(pBuffer);
-                json = new JObject
-                {
+            string content = Encoding.UTF8.GetString(pBuffer);
+            json = new JObject
+            {
                     { "type", "updateContent" },
                     { "content", content }
                 };
 
-                if (content.Contains("encoding=\"euc-kr\"")) {
-                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            if (content.Contains("encoding=\"euc-kr\"")) {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-                    json = new JObject
-                    {
+                json = new JObject
+                {
                         { "type", "updateContent" },
                         { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) }
                     };
-                }
-
-                webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
-            } else if (pImagePanel.Visible) {
-                Bitmap pImage;
-                if (sExtension.Equals("png")) {
-                    using (MemoryStream pStream = new MemoryStream(pBuffer)) {
-                        pImage = new Bitmap(pStream);
-                    }
-                } else //if (sExtension.Equals("dds"))
-                  {
-                    pImage = DDS.LoadImage(pBuffer);
-                }
-
-                pImageData.Image = pImage;
             }
+
+            webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
+        } else if (pImagePanel.Visible) {
+            Bitmap pImage;
+            if (sExtension.Equals("png")) {
+                using (MemoryStream pStream = new MemoryStream(pBuffer)) {
+                    pImage = new Bitmap(pStream);
+                }
+            } else {
+                pImage = DDS.LoadImage(pBuffer);
+            }
+
+            pImageData.Image = pImage;
+        } else if (sExtension.Equals("usm")) {
+            if (!Helpers.CheckIfmpegInstalled()) {
+                NotifyMessage("FFmpeg is not installed. Please install FFmpeg to proceed.", MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (videoView.MediaPlayer is not null) {
+                videoView.MediaPlayer.Stop();
+            }
+
+            string outputDir = Helpers.GetAppDataFolder();
+
+            IPackFileHeaderVerBase pFileHeader = packNode.FileHeader;
+            if (pFileHeader == null) {
+                return;
+            }
+
+            string outputFilePath = Path.Combine(outputDir, packNode.Name.Split("/").Last());
+            if (!File.Exists(outputFilePath)) {
+                if (!Properties.Settings.Default.AlwaysConvert) {
+                    var dialog = new ConvertConfirmation(currentTheme);
+                    DialogResult dialogResult = dialog.ShowDialog();
+
+                    if (dialogResult is DialogResult.Cancel) {
+                        return;
+                    }
+
+                    if (dialogResult is DialogResult.OK) {
+                        // always
+                        Properties.Settings.Default.AlwaysConvert = true;
+                        Properties.Settings.Default.Save();
+                        Properties.Settings.Default.Reload();
+                    }
+                }
+
+                if (!Directory.Exists(outputDir)) {
+                    Directory.CreateDirectory(outputDir);
+                }
+
+                if (pBuffer is null) {
+                    pBuffer = DecryptData(pFileHeader, pDataMappedMemFile);
+                    File.WriteAllBytes(outputFilePath, pBuffer);
+
+                    // Nullify the data as it was previously.
+                    pBuffer = null;
+                    return;
+                }
+
+                File.WriteAllBytes(outputFilePath, pBuffer);
+
+                if (!Helpers.ConvertUSMToMP4(outputFilePath)) {
+                    NotifyMessage("Failed to convert USM to MP4");
+                    return;
+                }
+            }
+
+            videoView.Visible = true;
+            videoView.MediaPlayer = mediaPlayer;
+
+            string mp4FilePath = outputFilePath.Replace(".usm", ".mp4");
+            Media media = new Media(libVLC, new Uri(mp4FilePath));
+
+            videoView.MediaPlayer.Play(media);
+            videoView.MediaPlayer.EndReached += (sender, args) => ThreadPool.QueueUserWorkItem(_ => mediaPlayer.Play(media));
         }
 
         /*
@@ -1501,6 +1638,7 @@ public partial class MainWindow : Form {
             return;
         }
 
+
         ITheme theme = lightToolStripTheme.Checked ? new LightTheme() : new DarkTheme();
 
         // create a context menu
@@ -1511,12 +1649,17 @@ public partial class MainWindow : Form {
 
         AddItemToContextMenu(menu, "Remove", OnRemoveFile);
         AddItemToContextMenu(menu, "Export", OnExport);
+        if (pNode.Name.Contains("usm")) {
+            AddItemToContextMenu(menu, "Convert to MP4", OnConvertToMP4);
+        }
         AddItemToContextMenu(menu, "Copy", OnCopyNode);
         AddItemToContextMenu(menu, "Paste", OnPasteNode);
 
         // show the context menu
         menu.Show(pTreeView, e.Location);
     }
+
+
 
     private void AddItemToContextMenu(ContextMenuStrip menu, string text, EventHandler handler) {
         ToolStripMenuItem item = new ToolStripMenuItem(text) {

@@ -94,5 +94,29 @@ namespace Orion.Properties {
                 this["LightTheme"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AlwaysConvert {
+            get {
+                return ((bool)(this["AlwaysConvert"]));
+            }
+            set {
+                this["AlwaysConvert"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FfmpegInstalled {
+            get {
+                return ((bool)(this["FfmpegInstalled"]));
+            }
+            set {
+                this["FfmpegInstalled"] = value;
+            }
+        }
     }
 }
