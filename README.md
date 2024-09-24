@@ -6,6 +6,7 @@
 - .NET 8 instead of .NET Framework.
 - Drag and drop files
 - Dark theme by [@Dready](https://github.com/Dreary)
+- Convert USM files to MP4
 
 # Orion2 Repacker
 
@@ -27,7 +28,7 @@ Orion2 Repacker - A HaRepacker for MapleStory2!
 
 ## Rendering
 
-Currently the Orion2 Repacker is able to display the following formats:
+Currently, the Orion2 Repacker is able to display the following formats:
 
 - Initialization Files (.ini)
 - N-Triple Files (.nt)
@@ -39,10 +40,10 @@ Currently the Orion2 Repacker is able to display the following formats:
 - Preset Files (.preset)
 - PNG Image Files (.png)
 - DDS Image Files (.dds)
+- USM Movie Files (.usm)
 
 The following are currently unable to be rendered, but these external applications can:
 
-- USM Movie Files (.usm) - [VGMToolbox](https://sourceforge.net/projects/vgmtoolbox/)
 - Gamebryo NIF/KF Files (.nif, .kf, .kfm) - [Noesis](https://richwhitehouse.com/index.php?content=inc_projects.php&showproject=91)
 
 ## Dependencies
@@ -51,3 +52,5 @@ The Orion2 Repacker utilizes these great libraries:
 
 - [Monaco Editor](https://github.com/microsoft/monaco-editor) The Monaco Editor is the code editor that powers VS Code.
 - [Pfim](https://github.com/nickbabcock/Pfim) DDS decoder
+- [VGMToolbox](https://sourceforge.net/projects/vgmtoolbox/) USM decoder
+  - Thanks [https://github.com/Rikux3/UsmToolkit](https://github.com/Rikux3/UsmToolkit) for the examples 

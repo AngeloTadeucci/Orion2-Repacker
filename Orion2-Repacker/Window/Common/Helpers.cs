@@ -84,10 +84,10 @@ public static class Helpers {
 
         ExecuteProcess("ffmpeg", CreateFFmpegParameters(usmStream, pureFileName, outputDir));
 
-        File.Delete(Path.ChangeExtension(usmStream.FilePath, "wav"));
-        File.Delete(Path.ChangeExtension(usmStream.FilePath, "adx"));
-        File.Delete(Path.ChangeExtension(usmStream.FilePath, "hca"));
-        File.Delete(Path.ChangeExtension(usmStream.FilePath, "m2v"));
+        File.Delete(Path.ChangeExtension(usmStream.FilePath, "wav")!);
+        File.Delete(Path.ChangeExtension(usmStream.FilePath, "adx")!);
+        File.Delete(Path.ChangeExtension(usmStream.FilePath, "hca")!);
+        File.Delete(Path.ChangeExtension(usmStream.FilePath, "m2v")!);
         return true;
     }
 
