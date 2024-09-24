@@ -25,7 +25,7 @@ namespace Orion.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("vs")]
+        [global::System.Configuration.DefaultSettingValueAttribute("vs-dark")]
         public string EditorTheme {
             get {
                 return ((string)(this["EditorTheme"]));

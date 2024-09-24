@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="EditorTheme" Type="System.String" Scope="User">
-      <Value Profile="(Default)">vs</Value>
+      <Value Profile="(Default)">vs-dark</Value>
     </Setting>
     <Setting Name="EditorWordWrap" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

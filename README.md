@@ -7,6 +7,7 @@
 - Drag and drop files
 - Dark theme by [@Dready](https://github.com/Dreary)
 - Convert USM files to MP4
+- VLC Player for MP4 files
 
 # Orion2 Repacker
 
@@ -53,4 +54,6 @@ The Orion2 Repacker utilizes these great libraries:
 - [Monaco Editor](https://github.com/microsoft/monaco-editor) The Monaco Editor is the code editor that powers VS Code.
 - [Pfim](https://github.com/nickbabcock/Pfim) DDS decoder
 - [VGMToolbox](https://sourceforge.net/projects/vgmtoolbox/) USM decoder
-  - Thanks [https://github.com/Rikux3/UsmToolkit](https://github.com/Rikux3/UsmToolkit) for the examples 
+  - Thanks [https://github.com/Rikux3/UsmToolkit](https://github.com/Rikux3/UsmToolkit) for the examples
+- [vgmstream](https://vgmstream.org/) .adx audio decoder
+- [libVLC](https://www.videolan.org/vlc/libvlc.html) VLC Player
