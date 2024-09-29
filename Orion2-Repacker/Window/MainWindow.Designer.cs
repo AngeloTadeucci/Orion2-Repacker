@@ -444,7 +444,7 @@ partial class MainWindow {
         // 
         // pImageData
         // 
-        pImageData.Location = new Point(1, 0);
+        pImageData.Location = new Point(0, 0);
         pImageData.Margin = new Padding(4, 3, 4, 3);
         pImageData.Name = "pImageData";
         pImageData.Size = new Size(580, 579);
@@ -456,7 +456,6 @@ partial class MainWindow {
         // pImagePanel
         // 
         pImagePanel.Controls.Add(pImageData);
-        pImagePanel.Controls.Add(webView);
         pImagePanel.Location = new Point(528, 65);
         pImagePanel.Margin = new Padding(4, 3, 4, 3);
         pImagePanel.Name = "pImagePanel";
@@ -468,7 +467,7 @@ partial class MainWindow {
         webView.AllowExternalDrop = true;
         webView.CreationProperties = null;
         webView.DefaultBackgroundColor = Color.White;
-        webView.Location = new Point(0, 0);
+        webView.Location = new Point(529, 65);
         webView.Margin = new Padding(4, 3, 4, 3);
         webView.Name = "webView";
         webView.Size = new Size(580, 579);
@@ -479,7 +478,7 @@ partial class MainWindow {
         // videoView
         // 
         videoView.BackColor = Color.Black;
-        videoView.Location = new Point(528, 65);
+        videoView.Location = new Point(530, 65);
         videoView.MediaPlayer = null;
         videoView.Name = "videoView";
         videoView.Size = new Size(580, 579);
@@ -548,6 +547,7 @@ partial class MainWindow {
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = Color.FromArgb(  180,   180,   180);
         ClientSize = new Size(1112, 647);
+        Controls.Add(webView);
         Controls.Add(videoView);
         Controls.Add(pEntryValue);
         Controls.Add(pChangeImageBtn);

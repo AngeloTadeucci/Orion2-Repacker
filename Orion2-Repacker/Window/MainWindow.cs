@@ -1108,29 +1108,29 @@ public partial class MainWindow : Form {
 
             JObject json = new()
             {
-                    { "type", "updateSettings" },
-                    { "theme", editorTheme },
-                    { "wordWrap", wordWrap },
-                    { "language", language }
-                };
+                { "type", "updateSettings" },
+                { "theme", editorTheme },
+                { "wordWrap", wordWrap },
+                { "language", language }
+            };
             webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
 
             string content = Encoding.UTF8.GetString(pBuffer);
-            json = new JObject
-            {
+            if (content.Contains("encoding=\"euc-kr\"")) {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                json = new JObject
+                {
+                    { "type", "updateContent" },
+                    { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) }
+                };
+            } else {
+                json = new JObject
+                {
                     { "type", "updateContent" },
                     { "content", content }
                 };
-
-            if (content.Contains("encoding=\"euc-kr\"")) {
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-                json = new JObject
-                {
-                        { "type", "updateContent" },
-                        { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) }
-                    };
             }
+
 
             webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
         } else if (pImagePanel.Visible) {
