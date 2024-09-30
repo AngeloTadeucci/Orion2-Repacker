@@ -348,7 +348,7 @@ public partial class MainWindow : Form {
     }
 
     private void OnSaveFile(object sender, EventArgs e) {
-        if (pNodeList is null || pNodeList.Entries.Count == 0) {
+        if (pNodeList is null) {
             NotifyMessage("There are no files to save.", MessageBoxIcon.Information);
             return;
         }

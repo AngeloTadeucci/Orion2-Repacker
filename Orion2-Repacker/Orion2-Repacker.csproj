@@ -27,9 +27,9 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Images\icon.ico"/>
-        <Content Include="Images\outline_remove_black_24dp.png"/>
-        <Content Include="Images\outline_add_black_24dp.png"/>
+        <Content Include="Images\icon.ico" />
+        <Content Include="Images\outline_remove_black_24dp.png" />
+        <Content Include="Images\outline_add_black_24dp.png" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="MonacoEditor\**">
@@ -42,15 +42,15 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="LibVLCSharp" Version="3.9.0"/>
-        <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.0"/>
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1777-prerelease"/>
-        <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.6"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21"/>
+        <PackageReference Include="LibVLCSharp" Version="3.9.0" />
+        <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.0" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1777-prerelease" />
+        <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.6" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Remove="Window\EditorSettings.resx"/>
+        <EmbeddedResource Remove="Window\EditorSettings.resx" />
     </ItemGroup>
     <ItemGroup>
         <COMReference Include="WMPLib">
@@ -72,7 +72,7 @@
         </COMReference>
     </ItemGroup>
     <ItemGroup>
-        <None Include="..\.editorconfig" Link=".editorconfig"/>
+        <None Include="..\.editorconfig" Link=".editorconfig" />
     </ItemGroup>
     <ItemGroup>
         <Compile Update="Properties\Settings.Designer.cs">
@@ -89,13 +89,13 @@
     </ItemGroup>
     <PropertyGroup>
         <UseWindowsForms>True</UseWindowsForms>
-        <Version>2.4.0</Version>
+        <Version>2.4.2</Version>
         <Authors>Orion2-Repacker</Authors>
         <Company>Orion2-Repacker</Company>
         <Product>Orion2-Repacker</Product>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AssemblyVersion>2.4.0</AssemblyVersion>
-        <FileVersion>2.4.0</FileVersion>
+        <AssemblyVersion>2.4.2</AssemblyVersion>
+        <FileVersion>2.4.2</FileVersion>
         <PackageId>Orion2-Repacker</PackageId>
     </PropertyGroup>
     <PropertyGroup>
