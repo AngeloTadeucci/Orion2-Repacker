@@ -409,10 +409,11 @@ partial class MainWindow {
         aboutToolStripMenuItem.Size = new Size(107, 22);
         aboutToolStripMenuItem.Text = "About";
         aboutToolStripMenuItem.Click += OnAbout;
-        // 
+        //
         // pTreeView
-        // 
+        //
         pTreeView.AllowDrop = true;
+        pTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
         pTreeView.BackColor = Color.White;
         pTreeView.ForeColor = Color.Black;
         pTreeView.Location = new Point(0, 28);

@@ -63,6 +63,8 @@ public partial class MainWindow : Form {
         pImageData.BorderStyle = BorderStyle.None;
         pImageData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
 
+        pTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+
         CurrentTheme = Properties.Settings.Default.LightTheme ? new LightTheme() : new DarkTheme();
 
         pPrevSize = Size;

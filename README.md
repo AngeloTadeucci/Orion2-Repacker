@@ -1,5 +1,5 @@
 ## This fork changes
-
+- try to fix windows error
 - Add folder and item button;
 - VS Code Editor instead of ScintillaNET;
 - Exporting progress bar. No more "App is not responding";

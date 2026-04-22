@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 Orion2-Repacker.backup/
+/0000MainWindow.cs
