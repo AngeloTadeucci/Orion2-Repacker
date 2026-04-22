@@ -269,7 +269,7 @@ public partial class MainWindow : Form {
 
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the MS2 file to load",
-            Filter = "MapleStory2 Files|*.m2d",
+            Filter = "MapleStory2 Files|*.m2d;*.m2h",
             Multiselect = false,
             InitialDirectory = Properties.Settings.Default.LastInputFolder
         };
