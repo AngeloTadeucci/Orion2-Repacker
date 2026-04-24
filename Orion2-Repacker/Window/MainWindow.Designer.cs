@@ -139,7 +139,7 @@ partial class MainWindow {
         pMenuStrip.Location = new Point(0, 0);
         pMenuStrip.Name = "pMenuStrip";
         pMenuStrip.Padding = new Padding(7, 2, 0, 2);
-        pMenuStrip.Size = new Size(1112, 24);
+        pMenuStrip.Size = new Size(1112, 25);
         pMenuStrip.TabIndex = 0;
         pMenuStrip.Text = "menuStrip1";
         // 
@@ -148,7 +148,7 @@ partial class MainWindow {
         pFileMenuStripItem.DropDownItems.AddRange(new ToolStripItem[] { pOpenMenuItem, pSaveMenuItem, pReloadMenuItem, pUnloadMenuItem, exitToolStripMenuItem });
         pFileMenuStripItem.ForeColor = Color.Black;
         pFileMenuStripItem.Name = "pFileMenuStripItem";
-        pFileMenuStripItem.Size = new Size(37, 20);
+        pFileMenuStripItem.Size = new Size(39, 21);
         pFileMenuStripItem.Text = "File";
         // 
         // pOpenMenuItem
@@ -158,7 +158,7 @@ partial class MainWindow {
         pOpenMenuItem.Name = "pOpenMenuItem";
         pOpenMenuItem.ShortcutKeyDisplayString = "Ctrl+O";
         pOpenMenuItem.ShortcutKeys =  Keys.Control | Keys.O;
-        pOpenMenuItem.Size = new Size(154, 22);
+        pOpenMenuItem.Size = new Size(164, 22);
         pOpenMenuItem.Text = "Open";
         pOpenMenuItem.Click += OnLoadFile;
         // 
@@ -169,7 +169,7 @@ partial class MainWindow {
         pSaveMenuItem.Name = "pSaveMenuItem";
         pSaveMenuItem.ShortcutKeyDisplayString = "Ctrl+S";
         pSaveMenuItem.ShortcutKeys =  Keys.Control | Keys.S;
-        pSaveMenuItem.Size = new Size(154, 22);
+        pSaveMenuItem.Size = new Size(164, 22);
         pSaveMenuItem.Text = "Save";
         pSaveMenuItem.Click += OnSaveFile;
         // 
@@ -180,7 +180,7 @@ partial class MainWindow {
         pReloadMenuItem.Name = "pReloadMenuItem";
         pReloadMenuItem.ShortcutKeyDisplayString = "Ctrl+R";
         pReloadMenuItem.ShortcutKeys =  Keys.Control | Keys.R;
-        pReloadMenuItem.Size = new Size(154, 22);
+        pReloadMenuItem.Size = new Size(164, 22);
         pReloadMenuItem.Text = "Reload";
         pReloadMenuItem.Click += OnReloadFile;
         // 
@@ -191,7 +191,7 @@ partial class MainWindow {
         pUnloadMenuItem.Name = "pUnloadMenuItem";
         pUnloadMenuItem.ShortcutKeyDisplayString = "Ctrl+U";
         pUnloadMenuItem.ShortcutKeys =  Keys.Control | Keys.U;
-        pUnloadMenuItem.Size = new Size(154, 22);
+        pUnloadMenuItem.Size = new Size(164, 22);
         pUnloadMenuItem.Text = "Unload";
         pUnloadMenuItem.Click += OnUnloadFile;
         // 
@@ -200,7 +200,7 @@ partial class MainWindow {
         exitToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         exitToolStripMenuItem.ForeColor = Color.Black;
         exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-        exitToolStripMenuItem.Size = new Size(154, 22);
+        exitToolStripMenuItem.Size = new Size(164, 22);
         exitToolStripMenuItem.Text = "Exit";
         exitToolStripMenuItem.Click += OnExit;
         // 
@@ -209,7 +209,7 @@ partial class MainWindow {
         editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addToolStripMenuItem, addFolderToolStripMenuItem, removeToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, allNodesToolStripMenuItem });
         editToolStripMenuItem.ForeColor = Color.Black;
         editToolStripMenuItem.Name = "editToolStripMenuItem";
-        editToolStripMenuItem.Size = new Size(39, 20);
+        editToolStripMenuItem.Size = new Size(42, 21);
         editToolStripMenuItem.Text = "Edit";
         // 
         // addToolStripMenuItem
@@ -217,7 +217,7 @@ partial class MainWindow {
         addToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         addToolStripMenuItem.ForeColor = Color.Black;
         addToolStripMenuItem.Name = "addToolStripMenuItem";
-        addToolStripMenuItem.Size = new Size(157, 22);
+        addToolStripMenuItem.Size = new Size(168, 22);
         addToolStripMenuItem.Text = "Add items";
         addToolStripMenuItem.Click += OnAddFile;
         // 
@@ -226,7 +226,7 @@ partial class MainWindow {
         addFolderToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         addFolderToolStripMenuItem.ForeColor = Color.Black;
         addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-        addFolderToolStripMenuItem.Size = new Size(157, 22);
+        addFolderToolStripMenuItem.Size = new Size(168, 22);
         addFolderToolStripMenuItem.Text = "Add folder";
         addFolderToolStripMenuItem.Click += OnAddFolder;
         // 
@@ -237,7 +237,7 @@ partial class MainWindow {
         removeToolStripMenuItem.Name = "removeToolStripMenuItem";
         removeToolStripMenuItem.ShortcutKeyDisplayString = "";
         removeToolStripMenuItem.ShortcutKeys = Keys.Delete;
-        removeToolStripMenuItem.Size = new Size(157, 22);
+        removeToolStripMenuItem.Size = new Size(168, 22);
         removeToolStripMenuItem.Text = "Remove";
         removeToolStripMenuItem.Click += OnRemoveFile;
         // 
@@ -247,7 +247,7 @@ partial class MainWindow {
         copyToolStripMenuItem.ForeColor = Color.Black;
         copyToolStripMenuItem.Name = "copyToolStripMenuItem";
         copyToolStripMenuItem.ShortcutKeyDisplayString = "";
-        copyToolStripMenuItem.Size = new Size(157, 22);
+        copyToolStripMenuItem.Size = new Size(168, 22);
         copyToolStripMenuItem.Text = "Copy";
         copyToolStripMenuItem.Click += OnCopyNode;
         // 
@@ -257,7 +257,7 @@ partial class MainWindow {
         pasteToolStripMenuItem.ForeColor = Color.Black;
         pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
         pasteToolStripMenuItem.ShortcutKeyDisplayString = "";
-        pasteToolStripMenuItem.Size = new Size(157, 22);
+        pasteToolStripMenuItem.Size = new Size(168, 22);
         pasteToolStripMenuItem.Text = "Paste";
         pasteToolStripMenuItem.Click += OnPasteNode;
         // 
@@ -267,7 +267,7 @@ partial class MainWindow {
         allNodesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { expandToolStripMenuItem, collapseToolStripMenuItem });
         allNodesToolStripMenuItem.ForeColor = Color.Black;
         allNodesToolStripMenuItem.Name = "allNodesToolStripMenuItem";
-        allNodesToolStripMenuItem.Size = new Size(157, 22);
+        allNodesToolStripMenuItem.Size = new Size(168, 22);
         allNodesToolStripMenuItem.Text = "All Nodes";
         // 
         // expandToolStripMenuItem
@@ -275,7 +275,7 @@ partial class MainWindow {
         expandToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         expandToolStripMenuItem.ForeColor = Color.Black;
         expandToolStripMenuItem.Name = "expandToolStripMenuItem";
-        expandToolStripMenuItem.Size = new Size(119, 22);
+        expandToolStripMenuItem.Size = new Size(126, 22);
         expandToolStripMenuItem.Text = "Expand";
         expandToolStripMenuItem.Click += OnExpandNodes;
         // 
@@ -284,7 +284,7 @@ partial class MainWindow {
         collapseToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         collapseToolStripMenuItem.ForeColor = Color.Black;
         collapseToolStripMenuItem.Name = "collapseToolStripMenuItem";
-        collapseToolStripMenuItem.Size = new Size(119, 22);
+        collapseToolStripMenuItem.Size = new Size(126, 22);
         collapseToolStripMenuItem.Text = "Collapse";
         collapseToolStripMenuItem.Click += OnCollapseNodes;
         // 
@@ -293,7 +293,7 @@ partial class MainWindow {
         toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportToolStripMenuItem, searchToolStripMenuItem, createItemToolStripMenuItem });
         toolsToolStripMenuItem.ForeColor = Color.Black;
         toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-        toolsToolStripMenuItem.Size = new Size(46, 20);
+        toolsToolStripMenuItem.Size = new Size(52, 21);
         toolsToolStripMenuItem.Text = "Tools";
         // 
         // exportToolStripMenuItem
@@ -301,7 +301,7 @@ partial class MainWindow {
         exportToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         exportToolStripMenuItem.ForeColor = Color.Black;
         exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-        exportToolStripMenuItem.Size = new Size(159, 22);
+        exportToolStripMenuItem.Size = new Size(170, 22);
         exportToolStripMenuItem.Text = "Export";
         exportToolStripMenuItem.Click += OnExport;
         // 
@@ -312,7 +312,7 @@ partial class MainWindow {
         searchToolStripMenuItem.Name = "searchToolStripMenuItem";
         searchToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+F";
         searchToolStripMenuItem.ShortcutKeys =  Keys.Control | Keys.F;
-        searchToolStripMenuItem.Size = new Size(159, 22);
+        searchToolStripMenuItem.Size = new Size(170, 22);
         searchToolStripMenuItem.Text = "Search";
         searchToolStripMenuItem.Click += OnSearch;
         // 
@@ -321,7 +321,7 @@ partial class MainWindow {
         createItemToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         createItemToolStripMenuItem.ForeColor = Color.Black;
         createItemToolStripMenuItem.Name = "createItemToolStripMenuItem";
-        createItemToolStripMenuItem.Size = new Size(159, 22);
+        createItemToolStripMenuItem.Size = new Size(170, 22);
         createItemToolStripMenuItem.Text = "Add item helper";
         createItemToolStripMenuItem.Click += OnCreateItem;
         // 
@@ -330,7 +330,7 @@ partial class MainWindow {
         editorSettingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { themeToolStripMenuItem, wordWrapToolStripMenuItem });
         editorSettingsToolStripMenuItem.ForeColor = Color.Black;
         editorSettingsToolStripMenuItem.Name = "editorSettingsToolStripMenuItem";
-        editorSettingsToolStripMenuItem.Size = new Size(95, 20);
+        editorSettingsToolStripMenuItem.Size = new Size(105, 21);
         editorSettingsToolStripMenuItem.Text = "Editor Settings";
         // 
         // themeToolStripMenuItem
@@ -339,7 +339,7 @@ partial class MainWindow {
         themeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lightToolStripMenuItem, darkToolStripMenuItem });
         themeToolStripMenuItem.ForeColor = Color.Black;
         themeToolStripMenuItem.Name = "themeToolStripMenuItem";
-        themeToolStripMenuItem.Size = new Size(134, 22);
+        themeToolStripMenuItem.Size = new Size(145, 22);
         themeToolStripMenuItem.Text = "Themes";
         // 
         // lightToolStripMenuItem
@@ -347,7 +347,7 @@ partial class MainWindow {
         lightToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         lightToolStripMenuItem.ForeColor = Color.Black;
         lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-        lightToolStripMenuItem.Size = new Size(101, 22);
+        lightToolStripMenuItem.Size = new Size(104, 22);
         lightToolStripMenuItem.Text = "Light";
         lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
         // 
@@ -356,7 +356,7 @@ partial class MainWindow {
         darkToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         darkToolStripMenuItem.ForeColor = Color.Black;
         darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-        darkToolStripMenuItem.Size = new Size(101, 22);
+        darkToolStripMenuItem.Size = new Size(104, 22);
         darkToolStripMenuItem.Text = "Dark";
         darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
         // 
@@ -367,7 +367,7 @@ partial class MainWindow {
         wordWrapToolStripMenuItem.CheckState = CheckState.Checked;
         wordWrapToolStripMenuItem.ForeColor = Color.Black;
         wordWrapToolStripMenuItem.Name = "wordWrapToolStripMenuItem";
-        wordWrapToolStripMenuItem.Size = new Size(134, 22);
+        wordWrapToolStripMenuItem.Size = new Size(145, 22);
         wordWrapToolStripMenuItem.Text = "Word Wrap";
         wordWrapToolStripMenuItem.Click += wordWrapToolStripMenuItem_Click;
         // 
@@ -376,20 +376,20 @@ partial class MainWindow {
         testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lightToolStripTheme, darkToolStripTheme });
         testToolStripMenuItem.ForeColor = Color.Black;
         testToolStripMenuItem.Name = "testToolStripMenuItem";
-        testToolStripMenuItem.Size = new Size(55, 20);
+        testToolStripMenuItem.Size = new Size(59, 21);
         testToolStripMenuItem.Text = "Theme";
         // 
         // lightToolStripTheme
         // 
         lightToolStripTheme.Name = "lightToolStripTheme";
-        lightToolStripTheme.Size = new Size(101, 22);
+        lightToolStripTheme.Size = new Size(104, 22);
         lightToolStripTheme.Text = "Light";
         lightToolStripTheme.Click += lightToolStripTheme_Click;
         // 
         // darkToolStripTheme
         // 
         darkToolStripTheme.Name = "darkToolStripTheme";
-        darkToolStripTheme.Size = new Size(101, 22);
+        darkToolStripTheme.Size = new Size(104, 22);
         darkToolStripTheme.Text = "Dark";
         darkToolStripTheme.Click += darkToolStripTheme_Click;
         // 
@@ -398,7 +398,7 @@ partial class MainWindow {
         helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
         helpToolStripMenuItem.ForeColor = Color.Black;
         helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-        helpToolStripMenuItem.Size = new Size(44, 20);
+        helpToolStripMenuItem.Size = new Size(47, 21);
         helpToolStripMenuItem.Text = "Help";
         // 
         // aboutToolStripMenuItem
@@ -406,7 +406,7 @@ partial class MainWindow {
         aboutToolStripMenuItem.BackColor = Color.FromArgb(  240,   240,   240);
         aboutToolStripMenuItem.ForeColor = Color.Black;
         aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-        aboutToolStripMenuItem.Size = new Size(107, 22);
+        aboutToolStripMenuItem.Size = new Size(111, 22);
         aboutToolStripMenuItem.Text = "About";
         aboutToolStripMenuItem.Click += OnAbout;
         // 
@@ -415,10 +415,10 @@ partial class MainWindow {
         pTreeView.AllowDrop = true;
         pTreeView.BackColor = Color.White;
         pTreeView.ForeColor = Color.Black;
-        pTreeView.Location = new Point(0, 28);
+        pTreeView.Location = new Point(0, 32);
         pTreeView.Margin = new Padding(4, 3, 4, 3);
         pTreeView.Name = "pTreeView";
-        pTreeView.Size = new Size(521, 612);
+        pTreeView.Size = new Size(521, 698);
         pTreeView.TabIndex = 1;
         pTreeView.AfterSelect += OnSelectNode;
         pTreeView.NodeMouseDoubleClick += OnDoubleClickNode;
@@ -433,7 +433,7 @@ partial class MainWindow {
         pEntryName.BackColor = Color.White;
         pEntryName.Font = new Font("Microsoft Sans Serif", 10F);
         pEntryName.ForeColor = Color.Black;
-        pEntryName.Location = new Point(528, 31);
+        pEntryName.Location = new Point(528, 35);
         pEntryName.Margin = new Padding(4, 3, 4, 3);
         pEntryName.Name = "pEntryName";
         pEntryName.ReadOnly = true;
@@ -456,10 +456,10 @@ partial class MainWindow {
         // pImagePanel
         // 
         pImagePanel.Controls.Add(pImageData);
-        pImagePanel.Location = new Point(528, 65);
+        pImagePanel.Location = new Point(528, 74);
         pImagePanel.Margin = new Padding(4, 3, 4, 3);
         pImagePanel.Name = "pImagePanel";
-        pImagePanel.Size = new Size(580, 579);
+        pImagePanel.Size = new Size(580, 656);
         pImagePanel.TabIndex = 5;
         // 
         // webView
@@ -467,10 +467,10 @@ partial class MainWindow {
         webView.AllowExternalDrop = true;
         webView.CreationProperties = null;
         webView.DefaultBackgroundColor = Color.White;
-        webView.Location = new Point(529, 65);
+        webView.Location = new Point(529, 74);
         webView.Margin = new Padding(4, 3, 4, 3);
         webView.Name = "webView";
-        webView.Size = new Size(580, 579);
+        webView.Size = new Size(580, 656);
         webView.TabIndex = 20;
         webView.Visible = false;
         webView.ZoomFactor = 1D;
@@ -478,10 +478,10 @@ partial class MainWindow {
         // videoView
         // 
         videoView.BackColor = Color.Black;
-        videoView.Location = new Point(530, 65);
+        videoView.Location = new Point(530, 74);
         videoView.MediaPlayer = null;
         videoView.Name = "videoView";
-        videoView.Size = new Size(580, 579);
+        videoView.Size = new Size(580, 656);
         videoView.TabIndex = 0;
         videoView.Text = "videoView";
         // 
@@ -490,10 +490,10 @@ partial class MainWindow {
         pUpdateDataBtn.BackColor = Color.White;
         pUpdateDataBtn.FlatStyle = FlatStyle.Flat;
         pUpdateDataBtn.ForeColor = Color.Black;
-        pUpdateDataBtn.Location = new Point(867, 30);
+        pUpdateDataBtn.Location = new Point(867, 34);
         pUpdateDataBtn.Margin = new Padding(4, 3, 4, 3);
         pUpdateDataBtn.Name = "pUpdateDataBtn";
-        pUpdateDataBtn.Size = new Size(115, 29);
+        pUpdateDataBtn.Size = new Size(115, 33);
         pUpdateDataBtn.TabIndex = 6;
         pUpdateDataBtn.Text = "Save Changes";
         pUpdateDataBtn.UseVisualStyleBackColor = false;
@@ -505,10 +505,10 @@ partial class MainWindow {
         pChangeImageBtn.BackColor = Color.White;
         pChangeImageBtn.FlatStyle = FlatStyle.Flat;
         pChangeImageBtn.ForeColor = Color.Black;
-        pChangeImageBtn.Location = new Point(867, 30);
+        pChangeImageBtn.Location = new Point(867, 34);
         pChangeImageBtn.Margin = new Padding(4, 3, 4, 3);
         pChangeImageBtn.Name = "pChangeImageBtn";
-        pChangeImageBtn.Size = new Size(115, 29);
+        pChangeImageBtn.Size = new Size(115, 33);
         pChangeImageBtn.TabIndex = 7;
         pChangeImageBtn.Text = "Change Image";
         pChangeImageBtn.UseVisualStyleBackColor = false;
@@ -529,7 +529,7 @@ partial class MainWindow {
         pEntryValue.Location = new Point(977, 0);
         pEntryValue.Margin = new Padding(4, 0, 4, 0);
         pEntryValue.Name = "pEntryValue";
-        pEntryValue.Size = new Size(122, 24);
+        pEntryValue.Size = new Size(122, 27);
         pEntryValue.TabIndex = 8;
         pEntryValue.Text = "Empty";
         pEntryValue.TextAlign = ContentAlignment.MiddleRight;
@@ -543,10 +543,10 @@ partial class MainWindow {
         // MainWindow
         // 
         AllowDrop = true;
-        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleDimensions = new SizeF(7F, 17F);
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = Color.FromArgb(  180,   180,   180);
-        ClientSize = new Size(1112, 647);
+        ClientSize = new Size(1112, 733);
         Controls.Add(webView);
         Controls.Add(videoView);
         Controls.Add(pEntryValue);
