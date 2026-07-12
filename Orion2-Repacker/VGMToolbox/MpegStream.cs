@@ -27,7 +27,7 @@ public abstract class MpegStream {
     public enum PacketSizeType {
         Static,
         SizeBytes,
-        Eof
+        Eof,
     }
 
     public struct MpegDemuxOptions {

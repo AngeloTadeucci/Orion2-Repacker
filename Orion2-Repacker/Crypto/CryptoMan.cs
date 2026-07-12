@@ -158,7 +158,9 @@ public class CryptoMan {
         }
 
         uBlock = uLen & 3;
-        if (uBlock == 0) return pSrc;
+        if (uBlock == 0) {
+            return pSrc;
+        }
 
         int nStart = (int) (4 * uBlockOffset);
 

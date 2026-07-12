@@ -115,7 +115,7 @@ public class PackFileHeaderVer1 : IPackFileHeaderVerBase {
             uOffset = uOffset,
             uEncodedFileSize = uEncodedLen,
             uCompressedFileSize = uCompressedLen,
-            uFileSize = uLen
+            uFileSize = uLen,
         };
     }
 }

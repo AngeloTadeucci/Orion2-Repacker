@@ -8,7 +8,9 @@ using System.Text;
 namespace Orion.Window.Common;
 public static class Helpers {
     public static string CreateHash(string sHeaderUOL) {
-        if (!File.Exists(sHeaderUOL)) return "";
+        if (!File.Exists(sHeaderUOL)) {
+            return "";
+        }
 
         using (MD5 md5 = MD5.Create()) {
             using (FileStream stream = File.OpenRead(sHeaderUOL)) {
@@ -27,7 +29,7 @@ public static class Helpers {
         };
 
         Process process = new Process {
-            StartInfo = startInfo
+            StartInfo = startInfo,
         };
 
         process.Start();
@@ -38,13 +40,15 @@ public static class Helpers {
         StringBuilder sb = new StringBuilder();
         sb.Append($"-i \"{Path.ChangeExtension(usmStream.FilePath, usmStream.FileExtensionVideo)}\" ");
 
-        if (usmStream.HasAudio)
+        if (usmStream.HasAudio) {
             sb.Append($"-i \"{Path.ChangeExtension(usmStream.FilePath, usmStream.FinalAudioExtension)}\" ");
+        }
 
         sb.Append($"-c:v copy ");
 
-        if (usmStream.HasAudio)
+        if (usmStream.HasAudio) {
             sb.Append($"-c:a ac3 -b:a 640k -af pan='stereo|FL=FL+FC+0.5*BL+BR|FR=FR+LFE+0.5*BL+BR' ");
+        }
 
         sb.Append($"\"{Path.Combine(outputDir ?? string.Empty, $"{pureFileName}.mp4")}\"");
 
@@ -60,7 +64,7 @@ public static class Helpers {
             AddPlaybackHacks = false,
             ExtractAudio = true,
             ExtractVideo = true,
-            SplitAudioStreams = false
+            SplitAudioStreams = false,
         });
 
 
@@ -104,7 +108,7 @@ public static class Helpers {
         };
 
         Process process = new Process {
-            StartInfo = startInfo
+            StartInfo = startInfo,
         };
 
         try {

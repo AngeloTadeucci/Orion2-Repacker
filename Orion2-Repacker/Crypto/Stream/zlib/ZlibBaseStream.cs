@@ -30,7 +30,7 @@ namespace Orion.Crypto.Stream.zlib;
 internal enum ZlibStreamFlavor {
     ZLIB = 1950,
     DEFLATE = 1951,
-    GZIP = 1952
+    GZIP = 1952,
 }
 
 internal class ZlibBaseStream : System.IO.Stream {
@@ -55,7 +55,9 @@ internal class ZlibBaseStream : System.IO.Stream {
 
     internal int Crc32 {
         get {
-            if (crc == null) return 0;
+            if (crc == null) {
+                return 0;
+            }
             return crc.Crc32Result;
         }
     }
@@ -73,7 +75,9 @@ internal class ZlibBaseStream : System.IO.Stream {
         _flavor = flavor;
         _level = level;
         // workitem 7159
-        if (flavor == ZlibStreamFlavor.GZIP) crc = new CRC32();
+        if (flavor == ZlibStreamFlavor.GZIP) {
+            crc = new CRC32();
+        }
     }
 
     protected internal bool _wantCompress => _compressionMode == CompressionMode.Compress;
@@ -97,8 +101,9 @@ internal class ZlibBaseStream : System.IO.Stream {
 
     private byte[] workingBuffer {
         get {
-            if (_workingBuffer == null)
+            if (_workingBuffer == null) {
                 _workingBuffer = new byte[_bufferSize];
+            }
             return _workingBuffer;
         }
     }
@@ -106,16 +111,19 @@ internal class ZlibBaseStream : System.IO.Stream {
     public override void Write(byte[] buffer, int offset, int count) {
         // workitem 7159
         // calculate the CRC on the unccompressed data  (before writing)
-        if (crc != null)
+        if (crc != null) {
             crc.SlurpBlock(buffer, offset, count);
+        }
 
-        if (_streamMode == StreamMode.Undefined)
+        if (_streamMode == StreamMode.Undefined) {
             _streamMode = StreamMode.Writer;
-        else if (_streamMode != StreamMode.Writer)
+        } else if (_streamMode != StreamMode.Writer) {
             throw new ZlibException("Cannot Write after Reading.");
+        }
 
-        if (count == 0)
+        if (count == 0) {
             return;
+        }
 
         // first reference of z property will initialize the private var _z
         z.InputBuffer = buffer;
@@ -129,8 +137,9 @@ internal class ZlibBaseStream : System.IO.Stream {
             int rc = _wantCompress
                 ? _z.Deflate(_flushMode)
                 : _z.Inflate(_flushMode);
-            if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
+            if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END) {
                 throw new ZlibException((_wantCompress ? "de" : "in") + "flating: " + _z.Message);
+            }
 
             //if (_workingBuffer.Length - _z.AvailableBytesOut > 0)
             _stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
@@ -138,13 +147,16 @@ internal class ZlibBaseStream : System.IO.Stream {
             done = _z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0;
 
             // If GZIP and de-compress, we're done when 8 bytes remain.
-            if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress)
+            if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress) {
                 done = _z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0;
+            }
         } while (!done);
     }
 
     private void finish() {
-        if (_z == null) return;
+        if (_z == null) {
+            return;
+        }
 
         if (_streamMode == StreamMode.Writer) {
             bool done = false;
@@ -158,17 +170,21 @@ internal class ZlibBaseStream : System.IO.Stream {
 
                 if (rc != ZlibConstants.Z_STREAM_END && rc != ZlibConstants.Z_OK) {
                     string verb = (_wantCompress ? "de" : "in") + "flating";
-                    if (_z.Message == null)
+                    if (_z.Message == null) {
                         throw new ZlibException($"{verb}: (rc = {rc})");
+                    }
                     throw new ZlibException(verb + ": " + _z.Message);
                 }
 
-                if (_workingBuffer.Length - _z.AvailableBytesOut > 0) _stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
+                if (_workingBuffer.Length - _z.AvailableBytesOut > 0) {
+                    _stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
+                }
 
                 done = _z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0;
                 // If GZIP and de-compress, we're done when 8 bytes remain.
-                if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress)
+                if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress) {
                     done = _z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0;
+                }
             } while (!done);
 
             Flush();
@@ -191,8 +207,9 @@ internal class ZlibBaseStream : System.IO.Stream {
             if (_flavor == ZlibStreamFlavor.GZIP) {
                 if (!_wantCompress) {
                     // workitem 8501: handle edge case (decompress empty stream)
-                    if (_z.TotalBytesOut == 0L)
+                    if (_z.TotalBytesOut == 0L) {
                         return;
+                    }
 
                     // Read and potentially verify the GZIP trailer:
                     // CRC32 and size mod 2^32
@@ -206,8 +223,9 @@ internal class ZlibBaseStream : System.IO.Stream {
                         int bytesRead = _stream.Read(trailer,
                             _z.AvailableBytesIn,
                             bytesNeeded);
-                        if (bytesNeeded != bytesRead)
+                        if (bytesNeeded != bytesRead) {
                             throw new ZlibException($"Missing or incomplete GZIP trailer. Expected 8 bytes, got {_z.AvailableBytesIn + bytesRead}.");
+                        }
                     } else {
                         Array.Copy(_z.InputBuffer, _z.NextIn, trailer, 0, trailer.Length);
                     }
@@ -217,12 +235,14 @@ internal class ZlibBaseStream : System.IO.Stream {
                     int isize_expected = BitConverter.ToInt32(trailer, 4);
                     int isize_actual = (int) (_z.TotalBytesOut & 0x00000000FFFFFFFF);
 
-                    if (crc32_actual != crc32_expected)
+                    if (crc32_actual != crc32_expected) {
                         throw new ZlibException(
                             $"Bad CRC32 in GZIP trailer. (actual({crc32_actual:X8})!=expected({crc32_expected:X8}))");
+                    }
 
-                    if (isize_actual != isize_expected)
+                    if (isize_actual != isize_expected) {
                         throw new ZlibException($"Bad size in GZIP trailer. (actual({isize_actual})!=expected({isize_expected}))");
+                    }
                 } else {
                     throw new ZlibException("Reading with compression is not supported.");
                 }
@@ -231,22 +251,28 @@ internal class ZlibBaseStream : System.IO.Stream {
     }
 
     private void end() {
-        if (z == null)
+        if (z == null) {
             return;
-        if (_wantCompress)
+        }
+        if (_wantCompress) {
             _z.EndDeflate();
-        else
+        } else {
             _z.EndInflate();
+        }
         _z = null;
     }
 
     public override void Close() {
-        if (_stream == null) return;
+        if (_stream == null) {
+            return;
+        }
         try {
             finish();
         } finally {
             end();
-            if (!_leaveOpen) _stream.Close();
+            if (!_leaveOpen) {
+                _stream.Close();
+            }
             _stream = null;
         }
     }
@@ -356,7 +382,9 @@ internal class ZlibBaseStream : System.IO.Stream {
         // (c) if not EOF, then return at least 1 byte, up to <count> bytes
 
         if (_streamMode == StreamMode.Undefined) {
-            if (!_stream.CanRead) throw new ZlibException("The stream is not readable.");
+            if (!_stream.CanRead) {
+                throw new ZlibException("The stream is not readable.");
+            }
             // for the first read, set up some controls.
             _streamMode = StreamMode.Reader;
             // (The first reference to _z goes through the private accessor which
@@ -365,20 +393,34 @@ internal class ZlibBaseStream : System.IO.Stream {
             if (_flavor == ZlibStreamFlavor.GZIP) {
                 _gzipHeaderByteCount = _ReadAndValidateGzipHeader();
                 // workitem 8501: handle edge case (decompress empty stream)
-                if (_gzipHeaderByteCount == 0)
+                if (_gzipHeaderByteCount == 0) {
                     return 0;
+                }
             }
         }
 
-        if (_streamMode != StreamMode.Reader)
+        if (_streamMode != StreamMode.Reader) {
             throw new ZlibException("Cannot Read after Writing.");
+        }
 
-        if (count == 0) return 0;
-        if (nomoreinput && _wantCompress) return 0; // workitem 8557
-        if (buffer == null) throw new ArgumentNullException("buffer");
-        if (count < 0) throw new ArgumentOutOfRangeException("count");
-        if (offset < buffer.GetLowerBound(0)) throw new ArgumentOutOfRangeException("offset");
-        if (offset + count > buffer.GetLength(0)) throw new ArgumentOutOfRangeException("count");
+        if (count == 0) {
+            return 0;
+        }
+        if (nomoreinput && _wantCompress) {
+            return 0; // workitem 8557
+        }
+        if (buffer == null) {
+            throw new ArgumentNullException("buffer");
+        }
+        if (count < 0) {
+            throw new ArgumentOutOfRangeException("count");
+        }
+        if (offset < buffer.GetLowerBound(0)) {
+            throw new ArgumentOutOfRangeException("offset");
+        }
+        if (offset + count > buffer.GetLength(0)) {
+            throw new ArgumentOutOfRangeException("count");
+        }
 
         int rc = 0;
 
@@ -398,8 +440,9 @@ internal class ZlibBaseStream : System.IO.Stream {
                 // No data available, so try to Read data from the captive stream.
                 _z.NextIn = 0;
                 _z.AvailableBytesIn = _stream.Read(_workingBuffer, 0, _workingBuffer.Length);
-                if (_z.AvailableBytesIn == 0)
+                if (_z.AvailableBytesIn == 0) {
                     nomoreinput = true;
+                }
             }
 
             // we have data in InputBuffer; now compress or decompress as appropriate
@@ -407,14 +450,17 @@ internal class ZlibBaseStream : System.IO.Stream {
                 ? _z.Deflate(_flushMode)
                 : _z.Inflate(_flushMode);
 
-            if (nomoreinput && rc == ZlibConstants.Z_BUF_ERROR)
+            if (nomoreinput && rc == ZlibConstants.Z_BUF_ERROR) {
                 return 0;
+            }
 
-            if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
+            if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END) {
                 throw new ZlibException($"{(_wantCompress ? "de" : "in")}flating:  rc={rc}  msg={_z.Message}");
+            }
 
-            if ((nomoreinput || rc == ZlibConstants.Z_STREAM_END) && _z.AvailableBytesOut == count)
+            if ((nomoreinput || rc == ZlibConstants.Z_STREAM_END) && _z.AvailableBytesOut == count) {
                 break; // nothing more to read
+            }
         }
         //while (_z.AvailableBytesOut == count && rc == ZlibConstants.Z_OK);
         while (_z.AvailableBytesOut > 0 && !nomoreinput && rc == ZlibConstants.Z_OK);
@@ -430,22 +476,26 @@ internal class ZlibBaseStream : System.IO.Stream {
             // are we completely done reading?
             if (nomoreinput)
                 // and in compression?
+            {
                 if (_wantCompress) {
                     // no more input data available; therefore we flush to
                     // try to complete the read
                     rc = _z.Deflate(FlushType.Finish);
 
-                    if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
+                    if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END) {
                         throw new ZlibException($"Deflating:  rc={rc}  msg={_z.Message}");
+                    }
                 }
+            }
         }
 
 
         rc = count - _z.AvailableBytesOut;
 
         // calculate CRC after reading
-        if (crc != null)
+        if (crc != null) {
             crc.SlurpBlock(buffer, offset, rc);
+        }
 
         return rc;
     }
@@ -466,7 +516,7 @@ internal class ZlibBaseStream : System.IO.Stream {
     internal enum StreamMode {
         Writer,
         Reader,
-        Undefined
+        Undefined,
     }
 
     public static void CompressString(string s, System.IO.Stream compressor) {

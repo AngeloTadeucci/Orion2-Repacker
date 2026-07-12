@@ -137,20 +137,25 @@ public class CRC32 {
     /// <param name="output">The stream into which to deflate the input</param>
     /// <returns>the CRC32 calculation</returns>
     public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output) {
-        if (input == null)
+        if (input == null) {
             throw new Exception("The input stream must not be null.");
+        }
 
         unchecked {
             byte[] buffer = new byte[BUFFER_SIZE];
 
             TotalBytesRead = 0;
             int count = input.Read(buffer, 0, BUFFER_SIZE);
-            if (output != null) output.Write(buffer, 0, count);
+            if (output != null) {
+                output.Write(buffer, 0, count);
+            }
             TotalBytesRead += count;
             while (count > 0) {
                 SlurpBlock(buffer, 0, count);
                 count = input.Read(buffer, 0, BUFFER_SIZE);
-                if (output != null) output.Write(buffer, 0, count);
+                if (output != null) {
+                    output.Write(buffer, 0, count);
+                }
                 TotalBytesRead += count;
             }
 
@@ -181,8 +186,9 @@ public class CRC32 {
     /// <param name="offset">starting point in the block</param>
     /// <param name="count">how many bytes within the block to slurp</param>
     public void SlurpBlock(byte[] block, int offset, int count) {
-        if (block == null)
+        if (block == null) {
             throw new Exception("The data buffer must not be null.");
+        }
 
         // bzip algorithm
         for (int i = 0; i < count; i++) {
@@ -272,14 +278,16 @@ public class CRC32 {
             do {
                 dwCrc = i;
                 for (byte j = 8; j > 0; j--)
-                    if ((dwCrc & 1) == 1)
+                    if ((dwCrc & 1) == 1) {
                         dwCrc = (dwCrc >> 1) ^ dwPolynomial;
-                    else
+                    } else {
                         dwCrc >>= 1;
-                if (reverseBits)
+                    }
+                if (reverseBits) {
                     crc32Table[ReverseBits(i)] = ReverseBits(dwCrc);
-                else
+                } else {
                     crc32Table[i] = dwCrc;
+                }
                 i++;
             } while (i != 0);
         }
@@ -305,8 +313,9 @@ public class CRC32 {
         uint sum = 0;
         int i = 0;
         while (vec != 0) {
-            if ((vec & 0x01) == 0x01)
+            if ((vec & 0x01) == 0x01) {
                 sum ^= matrix[i];
+            }
             vec >>= 1;
             i++;
         }
@@ -334,8 +343,9 @@ public class CRC32 {
         uint[] even = new uint[32]; // even-power-of-two zeros operator
         uint[] odd = new uint[32]; // odd-power-of-two zeros operator
 
-        if (length == 0)
+        if (length == 0) {
             return;
+        }
 
         uint crc1 = ~_register;
         uint crc2 = (uint) crc;
@@ -362,17 +372,20 @@ public class CRC32 {
             // apply zeros operator for this bit of len2
             gf2_matrix_square(even, odd);
 
-            if ((len2 & 1) == 1)
+            if ((len2 & 1) == 1) {
                 crc1 = gf2_matrix_times(even, crc1);
+            }
             len2 >>= 1;
 
-            if (len2 == 0)
+            if (len2 == 0) {
                 break;
+            }
 
             // another iteration of the loop with odd and even swapped
             gf2_matrix_square(odd, even);
-            if ((len2 & 1) == 1)
+            if ((len2 & 1) == 1) {
                 crc1 = gf2_matrix_times(odd, crc1);
+            }
             len2 >>= 1;
         } while (len2 != 0);
 
@@ -473,8 +486,9 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     /// <param name="length">The length of the stream to slurp</param>
     public CrcCalculatorStream(System.IO.Stream stream, long length)
         : this(true, length, stream, null) {
-        if (length < 0)
+        if (length < 0) {
             throw new ArgumentException("length");
+        }
     }
 
     /// <summary>
@@ -496,8 +510,9 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     /// </param>
     public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen)
         : this(leaveOpen, length, stream, null) {
-        if (length < 0)
+        if (length < 0) {
             throw new ArgumentException("length");
+        }
     }
 
     /// <summary>
@@ -521,8 +536,9 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen,
         CRC32 crc32)
         : this(leaveOpen, length, stream, crc32) {
-        if (length < 0)
+        if (length < 0) {
             throw new ArgumentException("length");
+        }
     }
 
     // This ctor is private - no validation is done here.  This is to allow the use
@@ -595,8 +611,9 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     /// </summary>
     public override long Length {
         get {
-            if (_lengthLimit == UnsetLengthLimit)
+            if (_lengthLimit == UnsetLengthLimit) {
                 return _innerStream.Length;
+            }
             return _lengthLimit;
         }
     }
@@ -634,13 +651,19 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
         // corrupt string.  The length limits that, prevents that problem.
 
         if (_lengthLimit != UnsetLengthLimit) {
-            if (_Crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
+            if (_Crc32.TotalBytesRead >= _lengthLimit) {
+                return 0; // EOF
+            }
             long bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
-            if (bytesRemaining < count) bytesToRead = (int) bytesRemaining;
+            if (bytesRemaining < count) {
+                bytesToRead = (int) bytesRemaining;
+            }
         }
 
         int n = _innerStream.Read(buffer, offset, bytesToRead);
-        if (n > 0) _Crc32.SlurpBlock(buffer, offset, n);
+        if (n > 0) {
+            _Crc32.SlurpBlock(buffer, offset, n);
+        }
         return n;
     }
 
@@ -651,7 +674,9 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     /// <param name="offset">the offset at which to start writing</param>
     /// <param name="count">the number of bytes to write</param>
     public override void Write(byte[] buffer, int offset, int count) {
-        if (count > 0) _Crc32.SlurpBlock(buffer, offset, count);
+        if (count > 0) {
+            _Crc32.SlurpBlock(buffer, offset, count);
+        }
         _innerStream.Write(buffer, offset, count);
     }
 
@@ -687,7 +712,8 @@ public class CrcCalculatorStream : System.IO.Stream, IDisposable {
     /// </summary>
     public override void Close() {
         base.Close();
-        if (!LeaveOpen)
+        if (!LeaveOpen) {
             _innerStream.Close();
+        }
     }
 }

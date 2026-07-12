@@ -22,21 +22,21 @@ public class CriUsmStream : MpegStream {
         0x23, 0x48, 0x45, 0x41, 0x44, 0x45, 0x52, 0x20,
         0x45, 0x4E, 0x44, 0x20, 0x20, 0x20, 0x20, 0x20,
         0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D,
-        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00
+        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00,
     ];
 
     protected static readonly byte[] METADATA_END_BYTES = [
         0x23, 0x4D, 0x45, 0x54, 0x41, 0x44, 0x41, 0x54,
         0x41, 0x20, 0x45, 0x4E, 0x44, 0x20, 0x20, 0x20,
         0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D,
-        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00
+        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00,
     ];
 
     protected static readonly byte[] CONTENTS_END_BYTES = [
         0x23, 0x43, 0x4F, 0x4E, 0x54, 0x45, 0x4E, 0x54,
         0x53, 0x20, 0x45, 0x4E, 0x44, 0x20, 0x20, 0x20,
         0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D,
-        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00
+        0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x3D, 0x00,
     ];
 
     public CriUsmStream(string path) : base(path) {
@@ -61,7 +61,7 @@ public class CriUsmStream : MpegStream {
         OffsetDescription od = new OffsetDescription {
             OffsetByteOrder = Constants.BigEndianByteOrder,
             OffsetSize = "2",
-            OffsetValue = "8"
+            OffsetValue = "8",
         };
 
         ushort checkBytes = (ushort) ParseFile.GetVaryingByteValueAtRelativeOffset(readStream, od, currentOffset);
@@ -73,7 +73,7 @@ public class CriUsmStream : MpegStream {
         OffsetDescription od = new OffsetDescription {
             OffsetByteOrder = Constants.BigEndianByteOrder,
             OffsetSize = "2",
-            OffsetValue = "8"
+            OffsetValue = "8",
         };
 
         var checkBytes = (ushort) ParseFile.GetVaryingByteValueAtRelativeOffset(readStream, od, currentOffset);
@@ -99,7 +99,7 @@ public class CriUsmStream : MpegStream {
         OffsetDescription od = new OffsetDescription {
             OffsetByteOrder = Constants.BigEndianByteOrder,
             OffsetSize = "2",
-            OffsetValue = "0xA"
+            OffsetValue = "0xA",
         };
 
         var checkBytes = (ushort) ParseFile.GetVaryingByteValueAtRelativeOffset(readStream, od, currentOffset);
@@ -111,7 +111,7 @@ public class CriUsmStream : MpegStream {
         OffsetDescription od = new OffsetDescription {
             OffsetByteOrder = Constants.BigEndianByteOrder,
             OffsetSize = "2",
-            OffsetValue = "0xA"
+            OffsetValue = "0xA",
         };
 
         var checkBytes = (ushort) ParseFile.GetVaryingByteValueAtRelativeOffset(readStream, od, currentOffset);

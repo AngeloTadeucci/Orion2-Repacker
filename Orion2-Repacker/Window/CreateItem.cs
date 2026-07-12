@@ -28,10 +28,14 @@ public partial class CreateItem : Form {
     }
 
     private void OnCreate(object sender, EventArgs e) {
-        if (!ValidateFields()) return;
+        if (!ValidateFields()) {
+            return;
+        }
 
         List<PackFileEntry> xmlEntries = GetEntriesForFile(XmlFilePath, out IPackStreamVerBase xmlStream, out MemoryMappedFile xmlMemFile);
-        if (xmlEntries is null) return;
+        if (xmlEntries is null) {
+            return;
+        }
         PackFileEntry itemNameXml = xmlEntries.FirstOrDefault(x => x.Name.Contains("en/itemname.xml"));
         PopulateDataForEntry(xmlMemFile, itemNameXml);
 
@@ -50,7 +54,9 @@ public partial class CreateItem : Form {
         SaveFile(xmlStream, xmlMemFile, "Xml.m2d");
 
         List<PackFileEntry> itemEntries = GetEntriesForFile(ItemFilePath, out IPackStreamVerBase itemStream, out MemoryMappedFile itemMemFile);
-        if (itemEntries is null) return;
+        if (itemEntries is null) {
+            return;
+        }
 
         if (!string.IsNullOrEmpty(MaleNifFilePath)) {
             string fileName = MaleNifFilePath[(MaleNifFilePath.LastIndexOf('\\') + 1)..];
@@ -75,7 +81,9 @@ public partial class CreateItem : Form {
         SaveFile(itemStream, itemMemFile, "Item.m2d");
 
         List<PackFileEntry> imageEntries = GetEntriesForFile(ImageFilePath, out IPackStreamVerBase imageStream, out MemoryMappedFile imageMemFile);
-        if (imageEntries is null) return;
+        if (imageEntries is null) {
+            return;
+        }
 
         if (imageEntries.Any(x => x.Name.Contains(slotIconFileStatus.Text))) {
             NotifyMessage($"There is already an entry with the same name '{slotIconFileStatus.Text}' in Image.m2d, fix it");
@@ -87,12 +95,16 @@ public partial class CreateItem : Form {
         SaveFile(imageStream, imageMemFile, "Image.m2d");
 
         List<PackFileEntry> textureEntries = GetEntriesForFile(TexturesFilePath, out IPackStreamVerBase textureStream, out MemoryMappedFile textureMemFile);
-        if (textureEntries is null) return;
+        if (textureEntries is null) {
+            return;
+        }
 
         foreach (string path in MaleTexturePaths) {
             string maleTextureFileName = path[(path.LastIndexOf('\\') + 1)..];
 
-            if (!textureEntries.Any(x => x.Name.Contains(maleTextureFileName))) continue;
+            if (!textureEntries.Any(x => x.Name.Contains(maleTextureFileName))) {
+                continue;
+            }
 
             NotifyMessage($"There is already an entry with the same name '{maleTextureFileName}' in Textures.m2d, fix it");
             return;
@@ -101,7 +113,9 @@ public partial class CreateItem : Form {
         foreach (string path in FemaleTexturePaths) {
             string femaleTextureFileName = path[(path.LastIndexOf('\\') + 1)..];
 
-            if (!textureEntries.Any(x => x.Name.Contains(femaleTextureFileName))) continue;
+            if (!textureEntries.Any(x => x.Name.Contains(femaleTextureFileName))) {
+                continue;
+            }
 
             NotifyMessage($"There is already an entry with the same name '{femaleTextureFileName}' in Textures.m2d, fix it");
             return;
@@ -124,7 +138,7 @@ public partial class CreateItem : Form {
             Index = 1,
             Changed = true,
             TreeName = "item/icon/" + fileName,
-            Data = pData
+            Data = pData,
         };
         imageStream.GetFileList().Add(pEntry);
     }
@@ -143,7 +157,7 @@ public partial class CreateItem : Form {
             Index = 1,
             Changed = true,
             TreeName = $"{firstDigit}/{next2Digits}/{fileName}",
-            Data = pData
+            Data = pData,
         };
         xmlStream.GetFileList().Add(pEntry);
     }
@@ -154,14 +168,16 @@ public partial class CreateItem : Form {
             string fileName = path[(path.LastIndexOf('\\') + 1)..];
 
             string itemSlot = GetItemSlotDescription(slotNameTextBox.Text);
-            if (string.IsNullOrEmpty(itemSlot)) return;
+            if (string.IsNullOrEmpty(itemSlot)) {
+                return;
+            }
             PackFileEntry pEntry = new PackFileEntry {
                 Name = itemSlot + "/" + fileName,
                 Hash = Helpers.CreateHash(path),
                 Index = 1,
                 Changed = true,
                 TreeName = itemSlot + "/" + fileName,
-                Data = pData
+                Data = pData,
             };
             textureStream.GetFileList().Add(pEntry);
         }
@@ -171,14 +187,16 @@ public partial class CreateItem : Form {
             string fileName = path[(path.LastIndexOf('\\') + 1)..];
 
             string itemSlot = GetItemSlotDescription(slotNameTextBox.Text);
-            if (string.IsNullOrEmpty(itemSlot)) return;
+            if (string.IsNullOrEmpty(itemSlot)) {
+                return;
+            }
             PackFileEntry pEntry = new PackFileEntry {
                 Name = itemSlot + "/" + fileName,
                 Hash = Helpers.CreateHash(path),
                 Index = 1,
                 Changed = true,
                 TreeName = itemSlot + "/" + fileName,
-                Data = pData
+                Data = pData,
             };
             textureStream.GetFileList().Add(pEntry);
         }
@@ -244,12 +262,14 @@ public partial class CreateItem : Form {
                 Index = 1,
                 Changed = true,
                 TreeName = firstDigit + "/" + next2Digits + "/" + fileName,
-                Data = pData
+                Data = pData,
             };
             itemStream.GetFileList().Add(pEntry);
         }
 
-        if (string.IsNullOrEmpty(FemaleNifFilePath)) return;
+        if (string.IsNullOrEmpty(FemaleNifFilePath)) {
+            return;
+        }
 
         {
             byte[] pData = File.ReadAllBytes(FemaleNifFilePath);
@@ -265,7 +285,7 @@ public partial class CreateItem : Form {
                 Index = 1,
                 Changed = true,
                 TreeName = firstDigit + "/" + next2Digits + "/" + fileName,
-                Data = pData
+                Data = pData,
             };
             itemStream.GetFileList().Add(pEntry);
         }
@@ -303,10 +323,12 @@ public partial class CreateItem : Form {
         SaveFileDialog pDialog = new SaveFileDialog {
             Title = $"Select the destination to save {fileName}",
             Filter = "MapleStory2 Files|*.m2d",
-            FileName = fileName
+            FileName = fileName,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
 
         string sPath = pDialog.FileName;
 
@@ -374,8 +396,12 @@ public partial class CreateItem : Form {
 
     private static void PopulateDataForEntry(MemoryMappedFile pDataMappedMemFile, PackFileEntry entry) {
         IPackFileHeaderVerBase pFileHeader2 = entry.FileHeader;
-        if (pFileHeader2 == null) return;
-        if (entry.Data != null) return;
+        if (pFileHeader2 == null) {
+            return;
+        }
+        if (entry.Data != null) {
+            return;
+        }
 
         entry.Data = DecryptData(pFileHeader2, pDataMappedMemFile);
     }
@@ -492,12 +518,13 @@ public partial class CreateItem : Form {
                     if (pHeader == null) {
                         // Hacky way of doing this, but this follows Nexon's current conventions.
                         uint dwBufferFlag;
-                        if (pEntry.Name.EndsWith(".usm"))
+                        if (pEntry.Name.EndsWith(".usm")) {
                             dwBufferFlag = BufferManipulation.XOR;
-                        else if (pEntry.Name.EndsWith(".png"))
+                        } else if (pEntry.Name.EndsWith(".png")) {
                             dwBufferFlag = BufferManipulation.AES;
-                        else
+                        } else {
                             dwBufferFlag = BufferManipulation.AES_ZLIB;
+                        }
 
                         switch (uVer) {
                             case PackVer.MS2F:
@@ -538,16 +565,22 @@ public partial class CreateItem : Form {
                 // If the entry is unchanged, parse the block from the original offsets
 
                 // Make sure the entry has a parsed file header from load
-                if (pHeader == null) continue;
+                if (pHeader == null) {
+                    continue;
+                }
                 // Update the initial versioning before any future crypto calls
-                if (pHeader.GetVer() != uVer) uVer = pHeader.GetVer();
+                if (pHeader.GetVer() != uVer) {
+                    uVer = pHeader.GetVer();
+                }
 
                 // Access the current encrypted block data from the memory map initially loaded
                 using (MemoryMappedViewStream pBuffer =
                        pDataMappedMemFile.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
                     byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                    if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
+                    if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) {
+                        continue;
+                    }
                     // Modify the header's file index to the updated offset after entry changes
                     pHeader.SetFileIndex(nCurIndex);
                     // Modify the header's offset to the updated offset after entry changes
@@ -657,10 +690,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the male nif file",
             Filter = "Nif file|*.nif",
-            Multiselect = false
+            Multiselect = false,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
 
         MaleNifFilePath = pDialog.FileName;
 
@@ -671,10 +706,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the female nif file",
             Filter = "Nif file|*.nif",
-            Multiselect = false
+            Multiselect = false,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         FemaleNifFilePath = pDialog.FileName;
 
         femaleNifFileStatus.Text = FemaleNifFilePath[(FemaleNifFilePath.LastIndexOf('\\') + 1)..];
@@ -684,10 +721,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the male texture files",
             Filter = "Texture files|*.dds",
-            Multiselect = true
+            Multiselect = true,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         MaleTexturePaths = pDialog.FileNames;
 
         List<string> filenames = MaleTexturePaths.Select(path => path[(path.LastIndexOf('\\') + 1)..]).ToList();
@@ -698,10 +737,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the female texture files",
             Filter = "Texture files|*.dds",
-            Multiselect = true
+            Multiselect = true,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         FemaleTexturePaths = pDialog.FileNames;
 
         List<string> filenames = FemaleTexturePaths.Select(path => path[(path.LastIndexOf('\\') + 1)..]).ToList();
@@ -712,10 +753,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the slot icon image",
             Filter = "Slot icon image|*.png",
-            Multiselect = false
+            Multiselect = false,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         SlotIconFilePath = pDialog.FileName;
 
         slotIconFileStatus.Text = SlotIconFilePath[(SlotIconFilePath.LastIndexOf('\\') + 1)..];
@@ -752,10 +795,12 @@ public partial class CreateItem : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the item xml file",
             Filter = "Item xml file|*.xml",
-            Multiselect = false
+            Multiselect = false,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         ItemXmlFilePath = pDialog.FileName;
 
         itemXmlStatus.Text = ItemXmlFilePath[(ItemXmlFilePath.LastIndexOf('\\') + 1)..];

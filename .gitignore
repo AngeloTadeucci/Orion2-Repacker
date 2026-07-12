@@ -260,3 +260,15 @@ paket-files/
 __pycache__/
 *.pyc
 Orion2-Repacker.backup/
+
+# Copied build/runtime artifacts (output next to the exe)
+/Launcher.exe
+/Orion2-Repacker.exe
+/Orion2-Repacker.dll.config
+/WebView2Loader.dll
+/sni.dll
+/MonacoEditor/
+/Orion2-Repacker.exe.WebView2/
+/libvlc/
+/runtimes/
+/vgmstream/

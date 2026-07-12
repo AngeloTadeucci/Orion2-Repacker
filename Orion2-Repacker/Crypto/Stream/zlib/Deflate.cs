@@ -71,13 +71,13 @@ internal enum BlockState {
     NeedMore = 0, // block not completed, need more input or more output
     BlockDone, // block flush performed
     FinishStarted, // finish started, need only more output at next deflate
-    FinishDone // finish done, accept no more input or output
+    FinishDone, // finish done, accept no more input or output
 }
 
 internal enum DeflateFlavor {
     Store,
     Fast,
-    Slow
+    Slow,
 }
 
 internal sealed class DeflateManager {
@@ -119,7 +119,7 @@ internal sealed class DeflateManager {
                 new Config(8, 16, 128, 128, DeflateFlavor.Slow),
                 new Config(8, 32, 128, 256, DeflateFlavor.Slow),
                 new Config(32, 128, 258, 1024, DeflateFlavor.Slow),
-                new Config(32, 258, 258, 4096, DeflateFlavor.Slow)
+                new Config(32, 258, 258, 4096, DeflateFlavor.Slow),
             };
         }
 
@@ -140,7 +140,7 @@ internal sealed class DeflateManager {
 
     private static readonly string[] _ErrorMessage =
     {
-        "need dictionary", "stream end", "", "file error", "stream error", "data error", "insufficient memory", "buffer error", "incompatible version", ""
+        "need dictionary", "stream end", "", "file error", "stream error", "data error", "insufficient memory", "buffer error", "incompatible version", "",
     };
 
     // preset dictionary flag in zlib header
@@ -375,10 +375,13 @@ internal sealed class DeflateManager {
         int j = k << 1; // left son of k
         while (j <= heap_len) {
             // Set j to the smallest of the two sons:
-            if (j < heap_len && _IsSmaller(tree, heap[j + 1], heap[j], depth)) j++;
+            if (j < heap_len && _IsSmaller(tree, heap[j + 1], heap[j], depth)) {
+                j++;
+            }
             // Exit if v is smaller than both sons
-            if (_IsSmaller(tree, v, heap[j], depth))
+            if (_IsSmaller(tree, v, heap[j], depth)) {
                 break;
+            }
 
             // Exchange v with the smallest son
             heap[k] = heap[j];
@@ -417,13 +420,16 @@ internal sealed class DeflateManager {
         for (n = 0; n <= max_code; n++) {
             curlen = nextlen;
             nextlen = tree[(n + 1) * 2 + 1];
-            if (++count < max_count && curlen == nextlen) continue;
+            if (++count < max_count && curlen == nextlen) {
+                continue;
+            }
 
             if (count < min_count) {
                 bl_tree[curlen * 2] = (short) (bl_tree[curlen * 2] + count);
             } else if (curlen != 0) {
-                if (curlen != prevlen)
+                if (curlen != prevlen) {
                     bl_tree[curlen * 2]++;
+                }
                 bl_tree[InternalConstants.REP_3_6 * 2]++;
             } else if (count <= 10) {
                 bl_tree[InternalConstants.REPZ_3_10 * 2]++;
@@ -464,8 +470,9 @@ internal sealed class DeflateManager {
         // requires that at least 4 bit length codes be sent. (appnote.txt says
         // 3 but the actual value used is 4.)
         for (max_blindex = InternalConstants.BL_CODES - 1; max_blindex >= 3; max_blindex--)
-            if (bl_tree[Tree.bl_order[max_blindex] * 2 + 1] != 0)
+            if (bl_tree[Tree.bl_order[max_blindex] * 2 + 1] != 0) {
                 break;
+            }
         // Update opt_len to include the bit length tree and counts
         opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
 
@@ -505,7 +512,9 @@ internal sealed class DeflateManager {
         for (n = 0; n <= max_code; n++) {
             curlen = nextlen;
             nextlen = tree[(n + 1) * 2 + 1];
-            if (++count < max_count && curlen == nextlen) continue;
+            if (++count < max_count && curlen == nextlen) {
+                continue;
+            }
 
             if (count < min_count) {
                 do {
@@ -654,8 +663,9 @@ internal sealed class DeflateManager {
             for (dcode = 0; dcode < InternalConstants.D_CODES; dcode++)
                 out_length = (int) (out_length + dyn_dtree[dcode * 2] * (5L + Tree.ExtraDistanceBits[dcode]));
             out_length >>= 3;
-            if (matches < last_lit / 2 && out_length < in_length / 2)
+            if (matches < last_lit / 2 && out_length < in_length / 2) {
                 return true;
+            }
         }
 
         return last_lit == lit_bufsize - 1 || last_lit == lit_bufsize;
@@ -673,7 +683,7 @@ internal sealed class DeflateManager {
         int code; // the code to send
         int extra; // number of extra bits to send
 
-        if (last_lit != 0)
+        if (last_lit != 0) {
             do {
                 int ix = _distanceOffset + lx * 2;
                 distance = ((pending[ix] << 8) & 0xff00) |
@@ -713,6 +723,7 @@ internal sealed class DeflateManager {
 
                 // Check that the overlay between pending and d_buf+l_buf is ok:
             } while (lx < last_lit);
+        }
 
         send_code(END_BLOCK, ltree);
         last_eob_len = ltree[END_BLOCK * 2 + 1];
@@ -779,7 +790,7 @@ internal sealed class DeflateManager {
         bi_windup(); // align on byte boundary
         last_eob_len = 8; // enough lookahead for inflate
 
-        if (header)
+        if (header) {
             unchecked {
                 //put_short((short)len);
                 pending[pendingCount++] = (byte) len;
@@ -788,6 +799,7 @@ internal sealed class DeflateManager {
                 pending[pendingCount++] = (byte) ~len;
                 pending[pendingCount++] = (byte) (~len >> 8);
             }
+        }
 
         put_bytes(window, buf, len);
     }
@@ -812,17 +824,21 @@ internal sealed class DeflateManager {
         int max_block_size = 0xffff;
         int max_start;
 
-        if (max_block_size > pending.Length - 5) max_block_size = pending.Length - 5;
+        if (max_block_size > pending.Length - 5) {
+            max_block_size = pending.Length - 5;
+        }
 
         // Copy as much as possible from input to output:
         while (true) {
             // Fill the window as much as possible:
             if (lookahead <= 1) {
                 _fillWindow();
-                if (lookahead == 0 && flush == FlushType.None)
+                if (lookahead == 0 && flush == FlushType.None) {
                     return BlockState.NeedMore;
-                if (lookahead == 0)
+                }
+                if (lookahead == 0) {
                     break; // flush the current block
+                }
             }
 
             strstart += lookahead;
@@ -836,22 +852,25 @@ internal sealed class DeflateManager {
                 strstart = max_start;
 
                 flush_block_only(false);
-                if (_codec.AvailableBytesOut == 0)
+                if (_codec.AvailableBytesOut == 0) {
                     return BlockState.NeedMore;
+                }
             }
 
             // Flush if we may have to slide, otherwise block_start may become
             // negative and the data will be gone:
             if (strstart - block_start >= w_size - MIN_LOOKAHEAD) {
                 flush_block_only(false);
-                if (_codec.AvailableBytesOut == 0)
+                if (_codec.AvailableBytesOut == 0) {
                     return BlockState.NeedMore;
+                }
             }
         }
 
         flush_block_only(flush == FlushType.Finish);
-        if (_codec.AvailableBytesOut == 0)
+        if (_codec.AvailableBytesOut == 0) {
             return flush == FlushType.Finish ? BlockState.FinishStarted : BlockState.NeedMore;
+        }
 
         return flush == FlushType.Finish ? BlockState.FinishDone : BlockState.BlockDone;
     }
@@ -871,8 +890,9 @@ internal sealed class DeflateManager {
         // Build the Huffman trees unless a stored block is forced
         if (compressionLevel > 0) {
             // Check if the file is ascii or binary
-            if (data_type == Z_UNKNOWN)
+            if (data_type == Z_UNKNOWN) {
                 set_data_type();
+            }
 
             // Construct the literal and distance trees
             treeLiterals.build_tree(this);
@@ -890,8 +910,9 @@ internal sealed class DeflateManager {
             opt_lenb = (opt_len + 3 + 7) >> 3;
             static_lenb = (static_len + 3 + 7) >> 3;
 
-            if (static_lenb <= opt_lenb)
+            if (static_lenb <= opt_lenb) {
                 opt_lenb = static_lenb;
+            }
         } else {
             opt_lenb = static_lenb = stored_len + 5; // force a stored block
         }
@@ -918,7 +939,9 @@ internal sealed class DeflateManager {
 
         _InitializeBlocks();
 
-        if (eof) bi_windup();
+        if (eof) {
+            bi_windup();
+        }
     }
 
     // Fill the window when the lookahead becomes insufficient.
@@ -978,8 +1001,9 @@ internal sealed class DeflateManager {
                 more += w_size;
             }
 
-            if (_codec.AvailableBytesIn == 0)
+            if (_codec.AvailableBytesIn == 0) {
                 return;
+            }
 
             // If there was no sliding:
             //    strstart <= WSIZE+MAX_DIST-1 && lookahead <= MIN_LOOKAHEAD - 1 &&
@@ -1022,9 +1046,12 @@ internal sealed class DeflateManager {
             // string following the next match.
             if (lookahead < MIN_LOOKAHEAD) {
                 _fillWindow();
-                if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None) return BlockState.NeedMore;
-                if (lookahead == 0)
+                if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None) {
+                    return BlockState.NeedMore;
+                }
+                if (lookahead == 0) {
                     break; // flush the current block
+                }
             }
 
             // Insert the string window[strstart .. strstart+2] in the
@@ -1045,8 +1072,11 @@ internal sealed class DeflateManager {
                 // To simplify the code, we prevent matches with the string
                 // of window index 0 (in particular we have to avoid a match
                 // of the string with itself at the start of the input file).
-                if (compressionStrategy != CompressionStrategy.HuffmanOnly)
+            {
+                if (compressionStrategy != CompressionStrategy.HuffmanOnly) {
                     match_length = longest_match(hash_head);
+                }
+            }
             // longest_match() sets match_start
             if (match_length >= MIN_MATCH) {
                 //        check_match(strstart, match_start, match_length);
@@ -1092,15 +1122,17 @@ internal sealed class DeflateManager {
 
             if (bflush) {
                 flush_block_only(false);
-                if (_codec.AvailableBytesOut == 0)
+                if (_codec.AvailableBytesOut == 0) {
                     return BlockState.NeedMore;
+                }
             }
         }
 
         flush_block_only(flush == FlushType.Finish);
         if (_codec.AvailableBytesOut == 0) {
-            if (flush == FlushType.Finish)
+            if (flush == FlushType.Finish) {
                 return BlockState.FinishStarted;
+            }
             return BlockState.NeedMore;
         }
 
@@ -1124,11 +1156,13 @@ internal sealed class DeflateManager {
 
             if (lookahead < MIN_LOOKAHEAD) {
                 _fillWindow();
-                if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None)
+                if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None) {
                     return BlockState.NeedMore;
+                }
 
-                if (lookahead == 0)
+                if (lookahead == 0) {
                     break; // flush the current block
+                }
             }
 
             // Insert the string window[strstart .. strstart+2] in the
@@ -1153,14 +1187,18 @@ internal sealed class DeflateManager {
                 // of window index 0 (in particular we have to avoid a match
                 // of the string with itself at the start of the input file).
 
-                if (compressionStrategy != CompressionStrategy.HuffmanOnly) match_length = longest_match(hash_head);
+                if (compressionStrategy != CompressionStrategy.HuffmanOnly) {
+                    match_length = longest_match(hash_head);
+                }
                 // longest_match() sets match_start
 
                 if (match_length <= 5 && (compressionStrategy == CompressionStrategy.Filtered ||
                                           match_length == MIN_MATCH && strstart - match_start > 4096))
                     // If prev_match is also MIN_MATCH, match_start is garbage
                     // but we will ignore the current match anyway.
+                {
                     match_length = MIN_MATCH - 1;
+                }
             }
 
             // If there was a match at the previous step and the current
@@ -1195,8 +1233,9 @@ internal sealed class DeflateManager {
 
                 if (bflush) {
                     flush_block_only(false);
-                    if (_codec.AvailableBytesOut == 0)
+                    if (_codec.AvailableBytesOut == 0) {
                         return BlockState.NeedMore;
+                    }
                 }
             } else if (match_available != 0) {
                 // If there was no match at the previous position, output a
@@ -1205,11 +1244,14 @@ internal sealed class DeflateManager {
 
                 bflush = _tr_tally(0, window[strstart - 1] & 0xff);
 
-                if (bflush) flush_block_only(false);
+                if (bflush) {
+                    flush_block_only(false);
+                }
                 strstart++;
                 lookahead--;
-                if (_codec.AvailableBytesOut == 0)
+                if (_codec.AvailableBytesOut == 0) {
                     return BlockState.NeedMore;
+                }
             } else {
                 // There is no previous match to compare with, wait for
                 // the next step to decide.
@@ -1228,8 +1270,9 @@ internal sealed class DeflateManager {
         flush_block_only(flush == FlushType.Finish);
 
         if (_codec.AvailableBytesOut == 0) {
-            if (flush == FlushType.Finish)
+            if (flush == FlushType.Finish) {
                 return BlockState.FinishStarted;
+            }
             return BlockState.NeedMore;
         }
 
@@ -1259,12 +1302,15 @@ internal sealed class DeflateManager {
         // It is easy to get rid of this optimization if necessary.
 
         // Do not waste too much time if we already have a good match:
-        if (prev_length >= config.GoodLength) chain_length >>= 2;
+        if (prev_length >= config.GoodLength) {
+            chain_length >>= 2;
+        }
 
         // Do not look for matches beyond the end of the input. This is necessary
         // to make deflate deterministic.
-        if (niceLength > lookahead)
+        if (niceLength > lookahead) {
             niceLength = lookahead;
+        }
 
         do {
             match = cur_match;
@@ -1274,8 +1320,9 @@ internal sealed class DeflateManager {
             if (window[match + best_len] != scan_end ||
                 window[match + best_len - 1] != scan_end1 ||
                 window[match] != window[scan] ||
-                window[++match] != window[scan + 1])
+                window[++match] != window[scan + 1]) {
                 continue;
+            }
 
             // The check at best_len-1 can be removed because it will be made
             // again later. (This heuristic is not always a win.)
@@ -1303,15 +1350,17 @@ internal sealed class DeflateManager {
             if (len > best_len) {
                 match_start = cur_match;
                 best_len = len;
-                if (len >= niceLength)
+                if (len >= niceLength) {
                     break;
+                }
                 scan_end1 = window[scan + best_len - 1];
                 scan_end = window[scan + best_len];
             }
         } while ((cur_match = prev[cur_match & wmask] & 0xffff) > limit && --chain_length != 0);
 
-        if (best_len <= lookahead)
+        if (best_len <= lookahead) {
             return best_len;
+        }
         return lookahead;
     }
 
@@ -1335,11 +1384,13 @@ internal sealed class DeflateManager {
         _codec.Message = null;
 
         // validation
-        if (windowBits < 9 || windowBits > 15)
+        if (windowBits < 9 || windowBits > 15) {
             throw new ZlibException("windowBits must be in the range 9..15.");
+        }
 
-        if (memLevel < 1 || memLevel > MEM_LEVEL_MAX)
+        if (memLevel < 1 || memLevel > MEM_LEVEL_MAX) {
             throw new ZlibException($"memLevel must be in the range 1.. {MEM_LEVEL_MAX}");
+        }
 
         _codec.dstate = this;
 
@@ -1399,7 +1450,9 @@ internal sealed class DeflateManager {
     }
 
     internal int End() {
-        if (status != INIT_STATE && status != BUSY_STATE && status != FINISH_STATE) return ZlibConstants.Z_STREAM_ERROR;
+        if (status != INIT_STATE && status != BUSY_STATE && status != FINISH_STATE) {
+            return ZlibConstants.Z_STREAM_ERROR;
+        }
         // Deallocate in reverse order of allocations:
         pending = null;
         head = null;
@@ -1433,7 +1486,9 @@ internal sealed class DeflateManager {
             // change in the deflate flavor (Fast vs slow vs none)?
             if (newConfig.Flavor != config.Flavor && _codec.TotalBytesIn != 0)
                 // Flush the last buffer:
+            {
                 result = _codec.Deflate(FlushType.Partial);
+            }
 
             compressionLevel = level;
             config = newConfig;
@@ -1450,13 +1505,15 @@ internal sealed class DeflateManager {
         int length = dictionary.Length;
         int index = 0;
 
-        if (dictionary == null || status != INIT_STATE)
+        if (dictionary == null || status != INIT_STATE) {
             throw new ZlibException("Stream error.");
+        }
 
         _codec._Adler32 = Adler.Adler32(_codec._Adler32, dictionary, 0, dictionary.Length);
 
-        if (length < MIN_MATCH)
+        if (length < MIN_MATCH) {
             return ZlibConstants.Z_OK;
+        }
         if (length > w_size - MIN_LOOKAHEAD) {
             length = w_size - MIN_LOOKAHEAD;
             index = dictionary.Length - length; // use the tail of the dictionary
@@ -1505,11 +1562,13 @@ internal sealed class DeflateManager {
             int header = (Z_DEFLATED + ((w_bits - 8) << 4)) << 8;
             int level_flags = (((int) compressionLevel - 1) & 0xff) >> 1;
 
-            if (level_flags > 3)
+            if (level_flags > 3) {
                 level_flags = 3;
+            }
             header |= level_flags << 6;
-            if (strstart != 0)
+            if (strstart != 0) {
                 header |= PRESET_DICT;
+            }
             header += 31 - header % 31;
 
             status = BUSY_STATE;
@@ -1573,9 +1632,13 @@ internal sealed class DeflateManager {
         if (_codec.AvailableBytesIn != 0 || lookahead != 0 || flush != FlushType.None && status != FINISH_STATE) {
             BlockState bstate = DeflateFunction(flush);
 
-            if (bstate == BlockState.FinishStarted || bstate == BlockState.FinishDone) status = FINISH_STATE;
+            if (bstate == BlockState.FinishStarted || bstate == BlockState.FinishDone) {
+                status = FINISH_STATE;
+            }
             if (bstate == BlockState.NeedMore || bstate == BlockState.FinishStarted) {
-                if (_codec.AvailableBytesOut == 0) last_flush = -1; // avoid BUF_ERROR next call, see above
+                if (_codec.AvailableBytesOut == 0) {
+                    last_flush = -1; // avoid BUF_ERROR next call, see above
+                }
                 return ZlibConstants.Z_OK;
                 // If flush != Z_NO_FLUSH && avail_out == 0, the next call
                 // of deflate should use the same flush parameter to make sure
@@ -1595,8 +1658,10 @@ internal sealed class DeflateManager {
                     // as a special marker by inflate_sync().
                     if (flush == FlushType.Full)
                         // clear hash (forget the history)
+                    {
                         for (int i = 0; i < hash_size; i++)
                             head[i] = 0;
+                    }
                 }
 
                 _codec.flush_pending();
@@ -1607,11 +1672,13 @@ internal sealed class DeflateManager {
             }
         }
 
-        if (flush != FlushType.Finish)
+        if (flush != FlushType.Finish) {
             return ZlibConstants.Z_OK;
+        }
 
-        if (!WantRfc1950HeaderBytes || Rfc1950BytesEmitted)
+        if (!WantRfc1950HeaderBytes || Rfc1950BytesEmitted) {
             return ZlibConstants.Z_STREAM_END;
+        }
 
         // Write the zlib trailer (adler32)
         pending[pendingCount++] = (byte) ((_codec._Adler32 & 0xFF000000) >> 24);

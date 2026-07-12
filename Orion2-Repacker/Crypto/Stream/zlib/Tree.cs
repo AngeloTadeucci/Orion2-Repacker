@@ -72,24 +72,24 @@ internal sealed class Tree {
     // extra bits for each length code
     internal static readonly int[] ExtraLengthBits =
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0,
     };
 
     // extra bits for each distance code
     internal static readonly int[] ExtraDistanceBits =
     {
-        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13
+        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13,
     };
 
     // extra bits for each bit length code
     internal static readonly int[] extra_blbits =
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7,
     };
 
     internal static readonly sbyte[] bl_order =
     {
-        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15,
     };
 
     // see definition of array dist_code below
@@ -608,7 +608,7 @@ internal sealed class Tree {
         29,
         29,
         29,
-        29
+        29,
     };
 
     internal static readonly sbyte[] LengthCode =
@@ -868,17 +868,17 @@ internal sealed class Tree {
         27,
         27,
         27,
-        28
+        28,
     };
 
     internal static readonly int[] LengthBase =
     {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 0
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 0,
     };
 
     internal static readonly int[] DistanceBase =
     {
-        0, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192, 12288, 16384, 24576
+        0, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192, 12288, 16384, 24576,
     };
 
     internal short[] dyn_tree; // the dynamic tree
@@ -936,21 +936,25 @@ internal sealed class Tree {
             tree[n * 2 + 1] = (short) bits;
             // We overwrite tree[n*2+1] which is no longer needed
 
-            if (n > max_code)
+            if (n > max_code) {
                 continue; // not a leaf node
+            }
 
             s.bl_count[bits]++;
             xbits = 0;
-            if (n >= base_Renamed)
+            if (n >= base_Renamed) {
                 xbits = extra[n - base_Renamed];
+            }
             f = tree[n * 2];
             s.opt_len += f * (bits + xbits);
-            if (stree != null)
+            if (stree != null) {
                 s.static_len += f * (stree[n * 2 + 1] + xbits);
+            }
         }
 
-        if (overflow == 0)
+        if (overflow == 0) {
             return;
+        }
 
         // This happens for example on obj2 and pic of the Calgary corpus
         // Find the first bit length which could increase:
@@ -970,8 +974,9 @@ internal sealed class Tree {
             n = s.bl_count[bits];
             while (n != 0) {
                 m = s.heap[--h];
-                if (m > max_code)
+                if (m > max_code) {
                     continue;
+                }
                 if (tree[m * 2 + 1] != bits) {
                     s.opt_len = (int) (s.opt_len + (bits - (long) tree[m * 2 + 1]) * tree[m * 2]);
                     tree[m * 2 + 1] = (short) bits;
@@ -1019,8 +1024,9 @@ internal sealed class Tree {
             tree[node * 2] = 1;
             s.depth[node] = 0;
             s.opt_len--;
-            if (stree != null)
+            if (stree != null) {
                 s.static_len -= stree[node * 2 + 1];
+            }
             // node is 0 or 1 so it does not have extra bits
         }
 
@@ -1094,8 +1100,9 @@ internal sealed class Tree {
 
         for (n = 0; n <= max_code; n++) {
             int len = tree[n * 2 + 1];
-            if (len == 0)
+            if (len == 0) {
                 continue;
+            }
             // Now reverse the bits
             tree[n * 2] = unchecked((short) bi_reverse(next_code[len]++, len));
         }

@@ -35,7 +35,7 @@ public class AESCipher {
 
         pAlgorithm = new AesManaged {
             Mode = CipherMode.ECB,
-            Padding = PaddingMode.None
+            Padding = PaddingMode.None,
         };
 
         pCounterEncryptor = pAlgorithm.CreateEncryptor(aUserKey, new byte[BlockSize]);
@@ -62,7 +62,9 @@ public class AESCipher {
             IncrementCounter();
 
             for (int j = 0; j < pXORBlock.Length; j++) {
-                if (i + j >= pDest.Length) break;
+                if (i + j >= pDest.Length) {
+                    break;
+                }
                 pDest[Dst + i + j] = (byte) (pSrc[uOffset + i + j] ^ pXORBlock[j]);
             }
         }
@@ -76,7 +78,8 @@ public class AESCipher {
     */
     private void IncrementCounter() {
         for (int i = aCounter.Length - 1; i >= 0; i--)
-            if (++aCounter[i] != 0)
+            if (++aCounter[i] != 0) {
                 break;
+            }
     }
 }

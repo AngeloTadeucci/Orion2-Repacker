@@ -126,13 +126,19 @@ public partial class MainWindow : Form {
     }
 
     private void SaveFile(object sender, CoreWebView2WebMessageReceivedEventArgs e) {
-        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) {
+            return;
+        }
 
-        if (pNode.Tag is not PackFileEntry pEntry) return;
+        if (pNode.Tag is not PackFileEntry pEntry) {
+            return;
+        }
 
         string sData = e.TryGetWebMessageAsString();
         byte[] pData = Encoding.UTF8.GetBytes(sData.ToCharArray());
-        if (pNode.Data == pData) return;
+        if (pNode.Data == pData) {
+            return;
+        }
 
         pEntry.Data = pData;
         pEntry.Changed = true;
@@ -186,7 +192,7 @@ public partial class MainWindow : Form {
 
     private void OnAbout(object sender, EventArgs e) {
         About pAbout = new About(CurrentTheme) {
-            Owner = this
+            Owner = this,
         };
 
         pAbout.ShowDialog();
@@ -197,9 +203,11 @@ public partial class MainWindow : Form {
     #region Helpers - File
 
     private void AddFileEntry(PackFileEntry pEntry) {
-        if (pTreeView.Nodes[0] is PackNode pRoot)
-            if (pRoot.Tag is IPackStreamVerBase pStream)
+        if (pTreeView.Nodes[0] is PackNode pRoot) {
+            if (pRoot.Tag is IPackStreamVerBase pStream) {
                 pStream.GetFileList().Add(pEntry);
+            }
+        }
     }
 
     #endregion
@@ -214,8 +222,9 @@ public partial class MainWindow : Form {
                 UpdatePanel("Packed Directory", null);
             } else if (pNode.Tag is PackFileEntry pEntry) {
                 IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
-                if (pFileHeader != null)
+                if (pFileHeader != null) {
                     pNode.Data ??= DecryptData(pFileHeader, pDataMappedMemFile);
+                }
                 string[] splitFileName = pEntry.TreeName.Split('.');
                 string extension = splitFileName.Length > 1 ? splitFileName[^1].ToLower() : "unknown";
                 UpdatePanel(extension.ToLower(), pEntry);
@@ -235,19 +244,19 @@ public partial class MainWindow : Form {
             Height = 80,
             FormBorderStyle = FormBorderStyle.FixedDialog,
             Text = caption,
-            StartPosition = FormStartPosition.CenterScreen
+            StartPosition = FormStartPosition.CenterScreen,
         };
         TextBox textBox = new TextBox {
             Left = 10,
             Top = 10,
-            Width = 200
+            Width = 200,
         };
         Button confirmation = new Button {
             Text = "Ok",
             Left = 220,
             Width = 50,
             Top = 9,
-            DialogResult = DialogResult.OK
+            DialogResult = DialogResult.OK,
         };
         confirmation.Click += (sender, e) => { prompt.Close(); };
         prompt.Controls.Add(textBox);
@@ -269,10 +278,12 @@ public partial class MainWindow : Form {
             Title = "Select the MS2 file to load",
             Filter = "MapleStory2 Files|*.m2d",
             Multiselect = false,
-            InitialDirectory = Properties.Settings.Default.LastInputFolder
+            InitialDirectory = Properties.Settings.Default.LastInputFolder,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
 
         Properties.Settings.Default.LastInputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
         Properties.Settings.Default.Save();
@@ -367,19 +378,23 @@ public partial class MainWindow : Form {
         SaveFileDialog pDialog = new SaveFileDialog {
             Title = "Select the destination to save the file",
             Filter = "MapleStory2 Files|*.m2d",
-            InitialDirectory = Properties.Settings.Default.LastOutputFolder
+            InitialDirectory = Properties.Settings.Default.LastOutputFolder,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
         string sPath = Dir_BackSlashToSlash(pDialog.FileName);
 
         Properties.Settings.Default.LastOutputFolder = pDialog.FileName[..pDialog.FileName.LastIndexOf('\\')];
         Properties.Settings.Default.Save();
 
-        if (pSaveWorkerThread.IsBusy) return;
+        if (pSaveWorkerThread.IsBusy) {
+            return;
+        }
         progressWindow = new ProgressWindow(CurrentTheme) {
             Path = sPath,
-            Stream = pNode.Tag as IPackStreamVerBase
+            Stream = pNode.Tag as IPackStreamVerBase,
         };
         progressWindow.Show(this);
         // Why do you make this so complicated C#?
@@ -392,9 +407,13 @@ public partial class MainWindow : Form {
 
     private void OnReloadFile(object sender, EventArgs e) {
         if (pNodeList != null) {
-            if (pTreeView.Nodes.Count <= 0) return;
+            if (pTreeView.Nodes.Count <= 0) {
+                return;
+            }
             IPackStreamVerBase pStream = pTreeView.Nodes[0].Tag as IPackStreamVerBase;
-            if (pStream == null) return;
+            if (pStream == null) {
+                return;
+            }
 
             pTreeView.Nodes.Clear();
 
@@ -459,10 +478,12 @@ public partial class MainWindow : Form {
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select files to add",
             Filter = "MapleStory2 Files|*",
-            Multiselect = true
+            Multiselect = true,
         };
 
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
 
         PackNode pNode = pTreeView.SelectedNode as PackNode;
         if (pNode?.Tag is PackFileEntry) {
@@ -504,13 +525,15 @@ public partial class MainWindow : Form {
             Index = 1,
             Changed = true,
             TreeName = sHeaderName,
-            Data = pData
+            Data = pData,
         };
 
         if (pList.Entries.ContainsKey(pEntry.TreeName)) {
             DialogResult result = MessageBox.Show(this, $"The file '{pEntry.TreeName}' already exists in the directory.\r\nIf you want to replace, select Yes\r\nIf you want to keep both, select No", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
-            if (result == DialogResult.Cancel) return;
+            if (result == DialogResult.Cancel) {
+                return;
+            }
 
             if (result == DialogResult.No) {
                 string sName = pEntry.TreeName.Split('.')[0];
@@ -551,13 +574,15 @@ public partial class MainWindow : Form {
             pNode = pNode?.Parent as PackNode;
         }
 
-        if (pNode.Tag is not PackNodeList pList) {
+        if (pNode?.Tag is not PackNodeList pList) {
             NotifyMessage("Please select a directory to add into!", MessageBoxIcon.Exclamation);
             return;
         }
 
         string nodeName = ShowDialog("Type the folder name");
-        if (string.IsNullOrEmpty(nodeName)) return;
+        if (string.IsNullOrEmpty(nodeName)) {
+            return;
+        }
         nodeName += "/";
 
         PackNodeList newNodeList = new PackNodeList(nodeName);
@@ -577,17 +602,22 @@ public partial class MainWindow : Form {
     } // Remove
 
     private void RemoveFileInternal(PackNode pNode) {
-        if (pTreeView.Nodes[0] is not PackNode pRoot || pNode == pRoot) return;
+        if (pTreeView.Nodes[0] is not PackNode pRoot || pNode == pRoot) {
+            return;
+        }
 
-        if (pRoot.Tag is not IPackStreamVerBase pStream) return;
+        if (pRoot.Tag is not IPackStreamVerBase pStream) {
+            return;
+        }
 
         switch (pNode.Tag) {
             case PackFileEntry pEntry: {
                     pStream.GetFileList().Remove(pEntry);
-                    if (pNode.Parent == pRoot)
+                    if (pNode.Parent == pRoot) {
                         pNodeList.Entries.Remove(pEntry.TreeName);
-                    else
-                        (pNode.Parent.Tag as PackNodeList).Entries.Remove(pEntry.TreeName);
+                    } else {
+                        (pNode.Parent.Tag as PackNodeList)?.Entries.Remove(pEntry.TreeName);
+                    }
                     pNode.Parent.Nodes.Remove(pNode);
                     break;
                 }
@@ -597,10 +627,11 @@ public partial class MainWindow : Form {
                                             "\r\n\r\nAre you sure you want to continue?";
                     if (MessageBox.Show(this, sWarning, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
                         RemoveDirectory(pNode, pStream);
-                        if (pNode.Parent == pRoot)
+                        if (pNode.Parent == pRoot) {
                             pNodeList.Children.Remove(pNode.Name);
-                        else
+                        } else {
                             (pNode.Parent.Tag as PackNodeList).Children.Remove(pNode.Name);
+                        }
                         pNode.Remove();
                     }
 
@@ -638,9 +669,13 @@ public partial class MainWindow : Form {
 
     private void OnPasteNode(object sender, EventArgs e) {
         IDataObject pData = Clipboard.GetDataObject();
-        if (pData == null) return;
+        if (pData == null) {
+            return;
+        }
 
-        if (pTreeView.SelectedNode is not PackNode pNode) return;
+        if (pTreeView.SelectedNode is not PackNode pNode) {
+            return;
+        }
 
         if (pNode.Tag is PackFileEntry) {
             NotifyMessage("Please select a directory to paste into!", MessageBoxIcon.Exclamation);
@@ -661,11 +696,15 @@ public partial class MainWindow : Form {
         if (pNode.Level == 0)
             // If they're trying to add to the root of the file,
             // then just use the root node list of this tree.
+        {
             pList = pNodeList;
-        else
+        } else {
             pList = pNode.Tag as PackNodeList;
+        }
 
-        if (pList == null || pObj == null) return;
+        if (pList == null || pObj == null) {
+            return;
+        }
         switch (pObj) {
             case PackFileEntry obj: {
                     if (pList.Entries.ContainsKey(obj.TreeName)) {
@@ -718,7 +757,7 @@ public partial class MainWindow : Form {
             case PackNodeList nodeList: {
                     FolderBrowserDialog pDialog = new FolderBrowserDialog {
                         Description = "Select the destination folder to export to",
-                        InitialDirectory = Properties.Settings.Default.LastExportFolder
+                        InitialDirectory = Properties.Settings.Default.LastExportFolder,
                     };
 
                     if (pDialog.ShowDialog() != DialogResult.OK) {
@@ -747,7 +786,7 @@ public partial class MainWindow : Form {
             case IPackStreamVerBase _: {
                     FolderBrowserDialog pDialog = new FolderBrowserDialog {
                         Description = "Select the destination folder to export to",
-                        InitialDirectory = Properties.Settings.Default.LastExportFolder
+                        InitialDirectory = Properties.Settings.Default.LastExportFolder,
                     };
 
                     if (pDialog.ShowDialog() != DialogResult.OK) {
@@ -762,12 +801,14 @@ public partial class MainWindow : Form {
                     outputDir.Append(pNode.Name);
                     outputDir.Append('/');
                     // Create root directory
-                    if (!Directory.Exists(outputDir.ToString())) Directory.CreateDirectory(outputDir.ToString());
+                    if (!Directory.Exists(outputDir.ToString())) {
+                        Directory.CreateDirectory(outputDir.ToString());
+                    }
 
                     progressWindow = new ProgressWindow(CurrentTheme) {
                         Path = outputDir.ToString(),
                         PackNode = pNode,
-                        Text = "Export"
+                        Text = "Export",
                     };
 
                     progressWindow.Show(this);
@@ -789,7 +830,7 @@ public partial class MainWindow : Form {
                         Title = "Select the destination to export the file",
                         FileName = sName,
                         Filter = $"{sExtension.ToUpper()} File|*.{sExtension}",
-                        InitialDirectory = Properties.Settings.Default.LastExportFolder
+                        InitialDirectory = Properties.Settings.Default.LastExportFolder,
                     };
 
                     if (pDialog.ShowDialog() != DialogResult.OK) {
@@ -842,7 +883,7 @@ public partial class MainWindow : Form {
             Title = "Select the destination to export the file",
             FileName = sName,
             Filter = $"mp4 File|*.mp4",
-            InitialDirectory = Properties.Settings.Default.LastExportFolder
+            InitialDirectory = Properties.Settings.Default.LastExportFolder,
         };
 
         if (pDialog.ShowDialog() != DialogResult.OK) {
@@ -879,7 +920,7 @@ public partial class MainWindow : Form {
         OpenFileDialog folderBrowserDialog = new OpenFileDialog {
             Title = "Select the Xml.m2d file",
             Filter = "MapleStory2 Files|*.m2d",
-            Multiselect = false
+            Multiselect = false,
         };
 
         string xmlFilePath = folderBrowserDialog.ShowDialog() == DialogResult.OK ? folderBrowserDialog.FileName : string.Empty;
@@ -931,23 +972,33 @@ public partial class MainWindow : Form {
     }
 
     private void OnChangeImage(object sender, EventArgs e) {
-        if (!pChangeImageBtn.Visible) return;
+        if (!pChangeImageBtn.Visible) {
+            return;
+        }
 
-        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) {
+            return;
+        }
 
-        if (pNode.Tag is not PackFileEntry pEntry) return;
+        if (pNode.Tag is not PackFileEntry pEntry) {
+            return;
+        }
 
         string sExtension = pEntry.TreeName.Split('.')[1];
         OpenFileDialog pDialog = new OpenFileDialog {
             Title = "Select the new image",
             Filter = string.Format("{0} Image|*.{0}",
                 sExtension.ToUpper()),
-            Multiselect = false
+            Multiselect = false,
         };
-        if (pDialog.ShowDialog() != DialogResult.OK) return;
+        if (pDialog.ShowDialog() != DialogResult.OK) {
+            return;
+        }
 
         byte[] pData = File.ReadAllBytes(pDialog.FileName);
-        if (pNode.Data == pData) return;
+        if (pNode.Data == pData) {
+            return;
+        }
 
         pEntry.Data = pData;
         pEntry.Changed = true;
@@ -960,27 +1011,27 @@ public partial class MainWindow : Form {
 
         webView.Size = new Size {
             Height = webView.Height + nHeight,
-            Width = webView.Width + nWidth
+            Width = webView.Width + nWidth,
         };
 
         pImagePanel.Size = new Size {
             Height = pImagePanel.Height + nHeight,
-            Width = pImagePanel.Width + nWidth
+            Width = pImagePanel.Width + nWidth,
         };
 
         videoView.Size = new Size {
             Height = videoView.Height + nHeight,
-            Width = videoView.Width + nWidth
+            Width = videoView.Width + nWidth,
         };
 
         pTreeView.Size = new Size {
             Height = pTreeView.Height + nHeight,
-            Width = pTreeView.Width
+            Width = pTreeView.Width,
         };
 
         pEntryValue.Location = new Point {
             X = pEntryValue.Location.X + nWidth,
-            Y = pEntryValue.Location.Y
+            Y = pEntryValue.Location.Y,
         };
 
         pPrevSize = Size;
@@ -994,9 +1045,13 @@ public partial class MainWindow : Form {
     }
 
     private void DoubleClickNode() {
-        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Nodes.Count != 0) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Nodes.Count != 0) {
+            return;
+        }
 
-        if (pNode.Tag is not PackNodeList pList) return;
+        if (pNode.Tag is not PackNodeList pList) {
+            return;
+        }
 
         // Iterate all further directories within the list
         foreach (KeyValuePair<string, PackNodeList> pChild in pList.Children) {
@@ -1013,15 +1068,19 @@ public partial class MainWindow : Form {
 
     private void OnWindowClosing(object sender, FormClosingEventArgs e) {
         // Only ask for confirmation when the user has files open.
-        if (pTreeView.Nodes.Count <= 0) return;
+        if (pTreeView.Nodes.Count <= 0) {
+            return;
+        }
 
-        if (MessageBox.Show(this, "Are you sure you want to exit?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.No) return;
+        if (MessageBox.Show(this, "Are you sure you want to exit?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.No) {
+            return;
+        }
 
         e.Cancel = true;
     }
 
     private static void RemoveDirectory(PackNode pNode, IPackStreamVerBase pStream) {
-        if (pNode.Nodes.Count == 0)
+        if (pNode.Nodes.Count == 0) {
             if (pNode.Tag is PackNodeList pList) {
                 foreach (KeyValuePair<string, PackNodeList> pChild in pList.Children) {
                     pNode.Nodes.Add(new PackNode(pChild.Value, pChild.Key));
@@ -1034,6 +1093,7 @@ public partial class MainWindow : Form {
                 pList.Children.Clear();
                 pList.Entries.Clear();
             }
+        }
 
         foreach (PackNode pChild in pNode.Nodes) {
             RemoveDirectory(pChild, pStream);
@@ -1047,7 +1107,9 @@ public partial class MainWindow : Form {
     private void RenderImageData(bool bChange) {
         pImageData.Visible = pImagePanel.Visible;
 
-        if (!pImageData.Visible) return;
+        if (!pImageData.Visible) {
+            return;
+        }
 
         // If the size of the bitmap image is bigger than the actual panel,
         // then we adjust the image sizing mode to zoom the image in order
@@ -1055,7 +1117,9 @@ public partial class MainWindow : Form {
         if (pImageData.Image.Size.Height > pImagePanel.Size.Height || pImageData.Image.Size.Width > pImagePanel.Size.Width) {
             // If we went from selecting a small image to selecting a big image,
             // then adjust the panel and data to fit the size of the new bitmap.
-            if (!bChange) OnChangeWindowSize(null, null);
+            if (!bChange) {
+                OnChangeWindowSize(null, null);
+            }
 
             // Since the image is too big, scale it in zoom mode to fit it.
             pImageData.SizeMode = PictureBoxSizeMode.Zoom;
@@ -1103,7 +1167,7 @@ public partial class MainWindow : Form {
                 "ini" => "ini",
                 "nt" => "txt",
                 "lua" => "lua",
-                _ => "xml"
+                _ => "xml",
             };
 
             JObject json = new()
@@ -1111,7 +1175,7 @@ public partial class MainWindow : Form {
                 { "type", "updateSettings" },
                 { "theme", editorTheme },
                 { "wordWrap", wordWrap },
-                { "language", language }
+                { "language", language },
             };
             webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
 
@@ -1121,13 +1185,13 @@ public partial class MainWindow : Form {
                 json = new JObject
                 {
                     { "type", "updateContent" },
-                    { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) }
+                    { "content", Encoding.GetEncoding("euc-kr").GetString(pBuffer) },
                 };
             } else {
                 json = new JObject
                 {
                     { "type", "updateContent" },
-                    { "content", content }
+                    { "content", content },
                 };
             }
 
@@ -1231,11 +1295,15 @@ public partial class MainWindow : Form {
     #region Helpers - Save
 
     private void OnSaveBegin(object sender, DoWorkEventArgs e) {
-        if (sender is not BackgroundWorker) return;
+        if (sender is not BackgroundWorker) {
+            return;
+        }
 
         IPackStreamVerBase pStream = progressWindow.Stream;
 
-        if (pStream == null) return;
+        if (pStream == null) {
+            return;
+        }
 
         progressWindow.Start();
         pStream.GetFileList().Sort();
@@ -1279,15 +1347,21 @@ public partial class MainWindow : Form {
     }
 
     private void OnSaveChanges(object sender, EventArgs e) {
-        if (!pUpdateDataBtn.Visible) return;
+        if (!pUpdateDataBtn.Visible) {
+            return;
+        }
 
-        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) return;
+        if (pTreeView.SelectedNode is not PackNode pNode || pNode.Data == null) {
+            return;
+        }
 
-        if (pNode.Tag is not PackFileEntry) return;
+        if (pNode.Tag is not PackFileEntry) {
+            return;
+        }
 
         JObject json = new JObject
         {
-            { "type", "saveFile" }
+            { "type", "saveFile" },
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
     }
@@ -1297,7 +1371,9 @@ public partial class MainWindow : Form {
     }
 
     private void OnSaveComplete(object sender, RunWorkerCompletedEventArgs e) {
-        if (e.Error != null) MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        if (e.Error != null) {
+            MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
         progressWindow.Finish();
         progressWindow.Close();
@@ -1321,7 +1397,9 @@ public partial class MainWindow : Form {
     }
 
     private void OnExtractComplete(object sender, RunWorkerCompletedEventArgs e) {
-        if (e.Error != null) MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        if (e.Error != null) {
+            MessageBox.Show(progressWindow, e.Error.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
         progressWindow.Finish();
         progressWindow.Close();
@@ -1358,12 +1436,13 @@ public partial class MainWindow : Form {
                 if (pHeader == null) {
                     // Hacky way of doing this, but this follows Nexon's current conventions.
                     uint dwBufferFlag;
-                    if (pEntry.Name.EndsWith(".usm"))
+                    if (pEntry.Name.EndsWith(".usm")) {
                         dwBufferFlag = BufferManipulation.XOR;
-                    else if (pEntry.Name.EndsWith(".png"))
+                    } else if (pEntry.Name.EndsWith(".png")) {
                         dwBufferFlag = BufferManipulation.AES;
-                    else
+                    } else {
                         dwBufferFlag = BufferManipulation.AES_ZLIB;
+                    }
 
                     switch (uVer) {
                         case PackVer.MS2F:
@@ -1407,16 +1486,22 @@ public partial class MainWindow : Form {
             // If the entry is unchanged, parse the block from the original offsets
 
             // Make sure the entry has a parsed file header from load
-            if (pHeader == null) continue;
+            if (pHeader == null) {
+                continue;
+            }
 
             // Update the initial versioning before any future crypto calls
-            if (pHeader.GetVer() != uVer) uVer = pHeader.GetVer();
+            if (pHeader.GetVer() != uVer) {
+                uVer = pHeader.GetVer();
+            }
 
             // Access the current encrypted block data from the memory map initially loaded
             using (MemoryMappedViewStream pBuffer = pDataMappedMemFile.CreateViewStream((long) pHeader.GetOffset(), pHeader.GetEncodedFileSize())) {
                 byte[] pSrc = new byte[pHeader.GetEncodedFileSize()];
 
-                if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) continue;
+                if (pBuffer.Read(pSrc, 0, (int) pHeader.GetEncodedFileSize()) != pHeader.GetEncodedFileSize()) {
+                    continue;
+                }
                 // Modify the header's file index to the updated offset after entry changes
                 pHeader.SetFileIndex(nCurIndex);
                 // Modify the header's offset to the updated offset after entry changes
@@ -1460,7 +1545,9 @@ public partial class MainWindow : Form {
 
         foreach (PackFileEntry pEntry in nodeList.Entries.Values) {
             IPackFileHeaderVerBase pFileHeader = pEntry.FileHeader;
-            if (pFileHeader == null) continue;
+            if (pFileHeader == null) {
+                continue;
+            }
 
             PackNode pChild = new PackNode(pEntry, pEntry.TreeName);
             if (pChild.Data == null) {
@@ -1477,11 +1564,15 @@ public partial class MainWindow : Form {
     }
 
     private void extractWorkerThread_DoWork(object sender, DoWorkEventArgs e) {
-        if (sender is not BackgroundWorker) return;
+        if (sender is not BackgroundWorker) {
+            return;
+        }
 
         string sPath = progressWindow.Path;
         PackNode pNode = progressWindow.PackNode;
-        if (pNode is null) return;
+        if (pNode is null) {
+            return;
+        }
 
         progressWindow.Start();
         int i = 0;
@@ -1492,7 +1583,9 @@ public partial class MainWindow : Form {
                     break;
                 case PackFileEntry fileEntry:
                     IPackFileHeaderVerBase pFileHeader = fileEntry.FileHeader;
-                    if (pFileHeader == null) continue;
+                    if (pFileHeader == null) {
+                        continue;
+                    }
 
                     PackNode pChild = new PackNode(fileEntry, fileEntry.TreeName);
                     if (pChild.Data is null) {
@@ -1522,7 +1615,7 @@ public partial class MainWindow : Form {
         JObject json = new JObject
         {
             { "type", "wordWrap" },
-            { "wordWrap", wordWrapValue }
+            { "wordWrap", wordWrapValue },
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
         Properties.Settings.Default.EditorWordWrap = wordWrapToolStripMenuItem.Checked;
@@ -1535,7 +1628,7 @@ public partial class MainWindow : Form {
         JObject json = new JObject
         {
             { "type", "theme" },
-            { "theme", "vs-dark" }
+            { "theme", "vs-dark" },
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
         Properties.Settings.Default.EditorTheme = "vs-dark";
@@ -1548,7 +1641,7 @@ public partial class MainWindow : Form {
         JObject json = new JObject
         {
             { "type", "theme" },
-            { "theme", "vs" }
+            { "theme", "vs" },
         };
         webView.CoreWebView2.PostWebMessageAsJson(json.ToString());
         Properties.Settings.Default.EditorTheme = "vs";
@@ -1569,7 +1662,9 @@ public partial class MainWindow : Form {
         // request focus
         BringToFront();
         string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
-        if (files is null) return;
+        if (files is null) {
+            return;
+        }
         if (files.Count(x => x.Contains(".m2d")) > 1) {
             NotifyMessage("Please select only one file to open.", MessageBoxIcon.Exclamation);
             return;
@@ -1628,7 +1723,9 @@ public partial class MainWindow : Form {
 
         // get the node that was clicked
         TreeNode node = pTreeView.GetNodeAt(e.Location);
-        if (node is null) return;
+        if (node is null) {
+            return;
+        }
 
         // select the node
         pTreeView.SelectedNode = node;
@@ -1644,7 +1741,7 @@ public partial class MainWindow : Form {
         // create a context menu
         ContextMenuStrip menu = new() {
             BackColor = theme.BackColor2,
-            Renderer = new CustomMenuRenderer(theme)
+            Renderer = new CustomMenuRenderer(theme),
         };
 
         AddItemToContextMenu(menu, "Remove", OnRemoveFile);
@@ -1732,7 +1829,7 @@ public partial class MainWindow : Form {
             pSaveMenuItem,
             pReloadMenuItem,
             pUnloadMenuItem,
-            exitToolStripMenuItem
+            exitToolStripMenuItem,
         ];
 
         // Apply color settings to all ToolStripItems

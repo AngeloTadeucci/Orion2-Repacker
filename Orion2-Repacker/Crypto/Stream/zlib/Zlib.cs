@@ -129,7 +129,7 @@ public enum FlushType {
     Full,
 
     /// <summary>Signals the end of the compression/decompression stream.</summary>
-    Finish
+    Finish,
 }
 
 /// <summary>
@@ -205,7 +205,7 @@ public enum CompressionLevel {
     /// <summary>
     ///     A synonym for BestCompression.
     /// </summary>
-    Level9 = 9
+    Level9 = 9,
 }
 
 /// <summary>
@@ -232,7 +232,7 @@ public enum CompressionStrategy {
     ///     Using <c>HuffmanOnly</c> will force the compressor to do Huffman encoding only, with no
     ///     string matching.
     /// </summary>
-    HuffmanOnly = 2
+    HuffmanOnly = 2,
 }
 
 /// <summary>
@@ -246,7 +246,7 @@ public enum CompressionMode {
     /// <summary>
     ///     Used to specify that the stream should decompress the data.
     /// </summary>
-    Decompress = 1
+    Decompress = 1,
 }
 
 /// <summary>
@@ -309,13 +309,17 @@ internal class SharedUtils {
     /// </returns>
     public static int ReadInput(TextReader sourceTextReader, byte[] target, int start, int count) {
         // Returns 0 bytes if not enough space in target
-        if (target.Length == 0) return 0;
+        if (target.Length == 0) {
+            return 0;
+        }
 
         char[] charArray = new char[target.Length];
         int bytesRead = sourceTextReader.Read(charArray, start, count);
 
         // Returns -1 if EOF
-        if (bytesRead == 0) return -1;
+        if (bytesRead == 0) {
+            return -1;
+        }
 
         for (int index = start; index < start + bytesRead; index++)
             target[index] = (byte) charArray[index];
@@ -931,7 +935,7 @@ internal sealed class StaticTree {
         99,
         8,
         227,
-        8
+        8,
     };
 
     internal static readonly short[] distTreeCodes =
@@ -995,7 +999,7 @@ internal sealed class StaticTree {
         7,
         5,
         23,
-        5
+        5,
     };
 
     internal static readonly StaticTree Literals;
@@ -1059,8 +1063,9 @@ public sealed class Adler {
     ///  </code>
     /// </example>
     public static uint Adler32(uint adler, byte[] buf, int index, int len) {
-        if (buf == null)
+        if (buf == null) {
             return 1;
+        }
 
         uint s1 = adler & 0xffff;
         uint s2 = (adler >> 16) & 0xffff;
@@ -1105,11 +1110,12 @@ public sealed class Adler {
                 k -= 16;
             }
 
-            if (k != 0)
+            if (k != 0) {
                 do {
                     s1 += buf[index++];
                     s2 += s1;
                 } while (--k != 0);
+            }
 
             s1 %= BASE;
             s2 %= BASE;

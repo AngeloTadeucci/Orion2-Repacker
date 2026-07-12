@@ -1617,7 +1617,7 @@ internal sealed class InfTree {
         79,
         0,
         9,
-        255
+        255,
     };
     //UPGRADE_NOTE: Final was removed from the declaration of 'fixed_td'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     internal static readonly int[] fixed_td =
@@ -1717,33 +1717,33 @@ internal sealed class InfTree {
         193,
         192,
         5,
-        24577
+        24577,
     };
 
     // Tables for deflate from PKZIP's appnote.txt.
     //UPGRADE_NOTE: Final was removed from the declaration of 'cplens'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     internal static readonly int[] cplens =
     {
-        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0
+        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0,
     };
 
     // see note #13 above about 258
     //UPGRADE_NOTE: Final was removed from the declaration of 'cplext'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     internal static readonly int[] cplext =
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 112, 112
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 112, 112,
     };
 
     //UPGRADE_NOTE: Final was removed from the declaration of 'cpdist'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     internal static readonly int[] cpdist =
     {
-        1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577
+        1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577,
     };
 
     //UPGRADE_NOTE: Final was removed from the declaration of 'cpdext'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     internal static readonly int[] cpdext =
     {
-        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13
+        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13,
     };
     internal int[] c; // bit length count table
 
@@ -1796,22 +1796,31 @@ internal sealed class InfTree {
         // Find minimum and maximum length, bound *m by those
         l = m[0];
         for (j = 1; j <= BMAX; j++)
-            if (c[j] != 0)
+            if (c[j] != 0) {
                 break;
+            }
         k = j; // minimum code length
-        if (l < j) l = j;
+        if (l < j) {
+            l = j;
+        }
         for (i = BMAX; i != 0; i--)
-            if (c[i] != 0)
+            if (c[i] != 0) {
                 break;
+            }
         g = i; // maximum code length
-        if (l > i) l = i;
+        if (l > i) {
+            l = i;
+        }
         m[0] = l;
 
         // Adjust last length count to fill out codes, if needed
         for (y = 1 << j; j < i; j++, y <<= 1)
-            if ((y -= c[j]) < 0)
+            if ((y -= c[j]) < 0) {
                 return Z_DATA_ERROR;
-        if ((y -= c[i]) < 0) return Z_DATA_ERROR;
+            }
+        if ((y -= c[i]) < 0) {
+            return Z_DATA_ERROR;
+        }
         c[i] += y;
 
         // Generate starting offsets into the value table for each length
@@ -1829,7 +1838,9 @@ internal sealed class InfTree {
         i = 0;
         p = 0;
         do {
-            if ((j = b[bindex + p]) != 0) v[x[j]++] = i;
+            if ((j = b[bindex + p]) != 0) {
+                v[x[j]++] = i;
+            }
             p++;
         } while (++i < n);
 
@@ -1861,13 +1872,15 @@ internal sealed class InfTree {
                         // too few codes for k-w bit table
                         f -= a + 1; // deduct codes from patterns left
                         xp = k;
-                        if (j < z)
+                        if (j < z) {
                             while (++j < z) {
                                 // try smaller tables up to z bits
-                                if ((f <<= 1) <= c[++xp])
+                                if ((f <<= 1) <= c[++xp]) {
                                     break; // enough codes to use up j bits
+                                }
                                 f -= c[xp]; // else deduct codes from patterns
                             }
+                        }
                     }
 
                     z = 1 << j; // table entries for j-bit table
@@ -1875,7 +1888,9 @@ internal sealed class InfTree {
                     // allocate new table
                     if (hn[0] + z > MANY)
                         // (note: doesn't matter for fixed)
+                    {
                         return Z_DATA_ERROR; // overflow of MANY
+                    }
                     u[h] = q = hn[0]; // DEBUG
                     hn[0] += z;
 
@@ -1998,7 +2013,9 @@ internal sealed class InfTree {
             u = new int[BMAX];
             x = new int[BMAX + 1];
         } else {
-            if (v.Length < vsize) v = new int[vsize];
+            if (v.Length < vsize) {
+                v = new int[vsize];
+            }
             Array.Clear(v, 0, vsize);
             Array.Clear(c, 0, BMAX + 1);
             r[0] = 0;

@@ -114,7 +114,7 @@ public class PackStreamVer2 : IPackStreamVerBase {
             dwHeaderSize = pReader.ReadUInt64(),
             dwCompressedHeaderSize = pReader.ReadUInt64(),
             dwEncodedHeaderSize = pReader.ReadUInt64(),
-            dwDataSize = pReader.ReadUInt64()
+            dwDataSize = pReader.ReadUInt64(),
         };
     }
 }

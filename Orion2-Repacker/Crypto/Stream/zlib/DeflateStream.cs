@@ -385,7 +385,9 @@ public class DeflateStream : System.IO.Stream {
     public virtual FlushType FlushMode {
         get => _baseStream._flushMode;
         set {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
+            if (_disposed) {
+                throw new ObjectDisposedException("DeflateStream");
+            }
             _baseStream._flushMode = value;
         }
     }
@@ -408,11 +410,15 @@ public class DeflateStream : System.IO.Stream {
     public int BufferSize {
         get => _baseStream._bufferSize;
         set {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
-            if (_baseStream._workingBuffer != null)
+            if (_disposed) {
+                throw new ObjectDisposedException("DeflateStream");
+            }
+            if (_baseStream._workingBuffer != null) {
                 throw new ZlibException("The working buffer is already set.");
-            if (value < ZlibConstants.WorkingBufferSizeMin)
+            }
+            if (value < ZlibConstants.WorkingBufferSizeMin) {
                 throw new ZlibException($"Don't be silly. {value} bytes?? Use a bigger buffer, at least {ZlibConstants.WorkingBufferSizeMin}.");
+            }
             _baseStream._bufferSize = value;
         }
     }
@@ -427,7 +433,9 @@ public class DeflateStream : System.IO.Stream {
     public CompressionStrategy Strategy {
         get => _baseStream.Strategy;
         set {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
+            if (_disposed) {
+                throw new ObjectDisposedException("DeflateStream");
+            }
             _baseStream.Strategy = value;
         }
     }
@@ -469,8 +477,9 @@ public class DeflateStream : System.IO.Stream {
     protected override void Dispose(bool disposing) {
         try {
             if (!_disposed) {
-                if (disposing && _baseStream != null)
+                if (disposing && _baseStream != null) {
                     _baseStream.Close();
+                }
                 _disposed = true;
             }
         } finally {
@@ -486,7 +495,9 @@ public class DeflateStream : System.IO.Stream {
     /// </remarks>
     public override bool CanRead {
         get {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
+            if (_disposed) {
+                throw new ObjectDisposedException("DeflateStream");
+            }
             return _baseStream._stream.CanRead;
         }
     }
@@ -507,7 +518,9 @@ public class DeflateStream : System.IO.Stream {
     /// </remarks>
     public override bool CanWrite {
         get {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
+            if (_disposed) {
+                throw new ObjectDisposedException("DeflateStream");
+            }
             return _baseStream._stream.CanWrite;
         }
     }
@@ -516,7 +529,9 @@ public class DeflateStream : System.IO.Stream {
     ///     Flush the stream.
     /// </summary>
     public override void Flush() {
-        if (_disposed) throw new ObjectDisposedException("DeflateStream");
+        if (_disposed) {
+            throw new ObjectDisposedException("DeflateStream");
+        }
         _baseStream.Flush();
     }
 
@@ -539,10 +554,12 @@ public class DeflateStream : System.IO.Stream {
     /// </remarks>
     public override long Position {
         get {
-            if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
+            if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer) {
                 return _baseStream._z.TotalBytesOut;
-            if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader)
+            }
+            if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader) {
                 return _baseStream._z.TotalBytesIn;
+            }
             return 0;
         }
         set => throw new NotImplementedException();
@@ -572,7 +589,9 @@ public class DeflateStream : System.IO.Stream {
     /// <param name="count">the number of bytes to read.</param>
     /// <returns>the number of bytes actually read</returns>
     public override int Read(byte[] buffer, int offset, int count) {
-        if (_disposed) throw new ObjectDisposedException("DeflateStream");
+        if (_disposed) {
+            throw new ObjectDisposedException("DeflateStream");
+        }
         return _baseStream.Read(buffer, offset, count);
     }
 
@@ -620,7 +639,9 @@ public class DeflateStream : System.IO.Stream {
     /// <param name="offset">the offset within that data array to find the first byte to write.</param>
     /// <param name="count">the number of bytes to write.</param>
     public override void Write(byte[] buffer, int offset, int count) {
-        if (_disposed) throw new ObjectDisposedException("DeflateStream");
+        if (_disposed) {
+            throw new ObjectDisposedException("DeflateStream");
+        }
         _baseStream.Write(buffer, offset, count);
     }
 

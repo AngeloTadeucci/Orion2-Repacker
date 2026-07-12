@@ -68,7 +68,7 @@ internal sealed class InflateBlocks {
     // Table for deflate from PKZIP's appnote.txt.
     internal static readonly int[] border =
     {
-        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15,
     };
 
     internal ZlibCodec _codec; // pointer back to this zlib stream
@@ -117,8 +117,9 @@ internal sealed class InflateBlocks {
         bitb = 0;
         readAt = writeAt = 0;
 
-        if (checkfn != null)
+        if (checkfn != null) {
             _codec._Adler32 = check = Adler.Adler32(0, null, 0, 0);
+        }
         return oldCheck;
     }
 
@@ -295,17 +296,20 @@ internal sealed class InflateBlocks {
                     r = ZlibConstants.Z_OK;
 
                     t = left;
-                    if (t > n)
+                    if (t > n) {
                         t = n;
-                    if (t > m)
+                    }
+                    if (t > m) {
                         t = m;
+                    }
                     Array.Copy(_codec.InputBuffer, p, window, q, t);
                     p += t;
                     n -= t;
                     q += t;
                     m -= t;
-                    if ((left -= t) != 0)
+                    if ((left -= t) != 0) {
                         break;
+                    }
                     mode = last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE;
                     break;
 
@@ -345,10 +349,11 @@ internal sealed class InflateBlocks {
                     }
 
                     t = 258 + (t & 0x1f) + ((t >> 5) & 0x1f);
-                    if (blens == null || blens.Length < t)
+                    if (blens == null || blens.Length < t) {
                         blens = new int[t];
-                    else
+                    } else {
                         Array.Clear(blens, 0, t);
+                    }
                     // for (int i = 0; i < t; i++)
                     // {
                     //     blens[i] = 0;
@@ -415,7 +420,9 @@ internal sealed class InflateBlocks {
                 case InflateBlockMode.DTREE:
                     while (true) {
                         t = table;
-                        if (!(index < 258 + (t & 0x1f) + ((t >> 5) & 0x1f))) break;
+                        if (!(index < 258 + (t & 0x1f) + ((t >> 5) & 0x1f))) {
+                            break;
+                        }
 
                         int i, j, c;
 
@@ -506,12 +513,12 @@ internal sealed class InflateBlocks {
                     tb[0] = -1; {
                         int[] bl =
                         {
-                        9
-                    }; // must be <= 9 for lookahead assumptions
+                        9,
+                        }; // must be <= 9 for lookahead assumptions
                         int[] bd =
                         {
-                        6
-                    }; // must be <= 9 for lookahead assumptions
+                        6,
+                        }; // must be <= 9 for lookahead assumptions
                         int[] tl = new int[1];
                         int[] td = new int[1];
 
@@ -549,7 +556,9 @@ internal sealed class InflateBlocks {
                     writeAt = q;
 
                     r = codes.Process(this, r);
-                    if (r != ZlibConstants.Z_STREAM_END) return Flush(r);
+                    if (r != ZlibConstants.Z_STREAM_END) {
+                        return Flush(r);
+                    }
 
                     r = ZlibConstants.Z_OK;
                     p = _codec.NextIn;
@@ -644,31 +653,38 @@ internal sealed class InflateBlocks {
         for (int pass = 0; pass < 2; pass++) {
             if (pass == 0)
                 // compute number of bytes to copy as far as end of window
+            {
                 nBytes = (readAt <= writeAt ? writeAt : end) - readAt;
-            else
+            } else
                 // compute bytes to copy
+            {
                 nBytes = writeAt - readAt;
+            }
 
             // workitem 8870
             if (nBytes == 0) {
-                if (r == ZlibConstants.Z_BUF_ERROR)
+                if (r == ZlibConstants.Z_BUF_ERROR) {
                     r = ZlibConstants.Z_OK;
+                }
                 return r;
             }
 
-            if (nBytes > _codec.AvailableBytesOut)
+            if (nBytes > _codec.AvailableBytesOut) {
                 nBytes = _codec.AvailableBytesOut;
+            }
 
-            if (nBytes != 0 && r == ZlibConstants.Z_BUF_ERROR)
+            if (nBytes != 0 && r == ZlibConstants.Z_BUF_ERROR) {
                 r = ZlibConstants.Z_OK;
+            }
 
             // update counters
             _codec.AvailableBytesOut -= nBytes;
             _codec.TotalBytesOut += nBytes;
 
             // update check information
-            if (checkfn != null)
+            if (checkfn != null) {
                 _codec._Adler32 = check = Adler.Adler32(check, window, readAt, nBytes);
+            }
 
             // copy as far as end of window
             Array.Copy(window, readAt, _codec.OutputBuffer, _codec.NextOut, nBytes);
@@ -679,8 +695,9 @@ internal sealed class InflateBlocks {
             if (readAt == end && pass == 0) {
                 // wrap pointers
                 readAt = 0;
-                if (writeAt == end)
+                if (writeAt == end) {
                     writeAt = 0;
+                }
             } else {
                 pass++;
             }
@@ -700,7 +717,7 @@ internal sealed class InflateBlocks {
         CODES = 6, // processing fixed or dynamic block
         DRY = 7, // output remaining window bytes
         DONE = 8, // finished last block, done
-        BAD = 9 // ot a data error--stuck here
+        BAD = 9, // ot a data error--stuck here
     }
 }
 
@@ -724,7 +741,7 @@ internal static class InternalInflateConstants {
         0x00001fff,
         0x00003fff,
         0x00007fff,
-        0x0000ffff
+        0x0000ffff,
     };
 }
 
@@ -1055,8 +1072,9 @@ internal sealed class InflateCodes {
                         blocks.window[q++] = blocks.window[f++];
                         m--;
 
-                        if (f == blocks.end)
+                        if (f == blocks.end) {
                             f = 0;
+                        }
                         len--;
                     }
 
@@ -1424,7 +1442,7 @@ internal sealed class InflateManager {
 
     private static readonly byte[] mark =
     {
-        0, 0, 0xff, 0xff
+        0, 0, 0xff, 0xff,
     };
     internal ZlibCodec _codec; // pointer back to this zlib stream
 
@@ -1464,8 +1482,9 @@ internal sealed class InflateManager {
     }
 
     internal int End() {
-        if (blocks != null)
+        if (blocks != null) {
             blocks.Free();
+        }
         blocks = null;
         return ZlibConstants.Z_OK;
     }
@@ -1505,8 +1524,9 @@ internal sealed class InflateManager {
     internal int Inflate(FlushType flush) {
         int b;
 
-        if (_codec.InputBuffer == null)
+        if (_codec.InputBuffer == null) {
             throw new ZlibException("InputBuffer is null. ");
+        }
 
         //             int f = (flush == FlushType.Finish)
         //                 ? ZlibConstants.Z_BUF_ERROR
@@ -1519,7 +1539,9 @@ internal sealed class InflateManager {
         while (true)
             switch (mode) {
                 case InflateManagerMode.METHOD:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1542,7 +1564,9 @@ internal sealed class InflateManager {
 
 
                 case InflateManagerMode.FLAG:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1561,7 +1585,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.DICT4:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1570,7 +1596,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.DICT3:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1580,7 +1608,9 @@ internal sealed class InflateManager {
 
                 case InflateManagerMode.DICT2:
 
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1590,7 +1620,9 @@ internal sealed class InflateManager {
 
 
                 case InflateManagerMode.DICT1:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1615,10 +1647,13 @@ internal sealed class InflateManager {
                         break;
                     }
 
-                    if (r == ZlibConstants.Z_OK) r = f;
+                    if (r == ZlibConstants.Z_OK) {
+                        r = f;
+                    }
 
-                    if (r != ZlibConstants.Z_STREAM_END)
+                    if (r != ZlibConstants.Z_STREAM_END) {
                         return r;
+                    }
 
                     r = f;
                     computedCheck = blocks.Reset();
@@ -1631,7 +1666,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.CHECK4:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1640,7 +1677,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.CHECK3:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1649,7 +1688,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.CHECK2:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1658,7 +1699,9 @@ internal sealed class InflateManager {
                     break;
 
                 case InflateManagerMode.CHECK1:
-                    if (_codec.AvailableBytesIn == 0) return r;
+                    if (_codec.AvailableBytesIn == 0) {
+                        return r;
+                    }
                     r = f;
                     _codec.AvailableBytesIn--;
                     _codec.TotalBytesIn++;
@@ -1687,10 +1730,13 @@ internal sealed class InflateManager {
     internal int SetDictionary(byte[] dictionary) {
         int index = 0;
         int length = dictionary.Length;
-        if (mode != InflateManagerMode.DICT0)
+        if (mode != InflateManagerMode.DICT0) {
             throw new ZlibException("Stream error.");
+        }
 
-        if (Adler.Adler32(1, dictionary, 0, dictionary.Length) != _codec._Adler32) return ZlibConstants.Z_DATA_ERROR;
+        if (Adler.Adler32(1, dictionary, 0, dictionary.Length) != _codec._Adler32) {
+            return ZlibConstants.Z_DATA_ERROR;
+        }
 
         _codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
@@ -1716,19 +1762,21 @@ internal sealed class InflateManager {
             marker = 0;
         }
 
-        if ((n = _codec.AvailableBytesIn) == 0)
+        if ((n = _codec.AvailableBytesIn) == 0) {
             return ZlibConstants.Z_BUF_ERROR;
+        }
         p = _codec.NextIn;
         m = marker;
 
         // search
         while (n != 0 && m < 4) {
-            if (_codec.InputBuffer[p] == mark[m])
+            if (_codec.InputBuffer[p] == mark[m]) {
                 m++;
-            else if (_codec.InputBuffer[p] != 0)
+            } else if (_codec.InputBuffer[p] != 0) {
                 m = 0;
-            else
+            } else {
                 m = 4 - m;
+            }
             p++;
             n--;
         }
@@ -1740,7 +1788,9 @@ internal sealed class InflateManager {
         marker = m;
 
         // return no joy or set up to restart on a new block
-        if (m != 4) return ZlibConstants.Z_DATA_ERROR;
+        if (m != 4) {
+            return ZlibConstants.Z_DATA_ERROR;
+        }
         r = _codec.TotalBytesIn;
         w = _codec.TotalBytesOut;
         Reset();
@@ -1774,6 +1824,6 @@ internal sealed class InflateManager {
         CHECK2 = 10, // two check bytes to go
         CHECK1 = 11, // one check byte to go
         DONE = 12, // finished check, done
-        BAD = 13 // got an error--stay here
+        BAD = 13, // got an error--stay here
     }
 }

@@ -3,6 +3,7 @@
         <TargetFramework>net8.0-windows</TargetFramework>
         <OutputType>WinExe</OutputType>
         <RootNamespace>Orion</RootNamespace>
+        <Nullable>true</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationIcon>Images\icon.ico</ApplicationIcon>

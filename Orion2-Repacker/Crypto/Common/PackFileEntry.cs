@@ -31,7 +31,9 @@ public class PackFileEntry : IComparable<PackFileEntry> {
     public bool Changed { get; set; } // If the data has been modified in the repacker
 
     public int CompareTo(PackFileEntry pObj) {
-        if (Index == pObj.Index) return 0;
+        if (Index == pObj.Index) {
+            return 0;
+        }
 
         return Index > pObj.Index ? 1 : -1;
     }
@@ -44,12 +46,14 @@ public class PackFileEntry : IComparable<PackFileEntry> {
             TreeName = TreeName,
             //FileHeader = FileHeader,
             Data = pData ?? Data,
-            Changed = true
+            Changed = true,
         };
     }
 
     public override string ToString() {
-        if (string.IsNullOrEmpty(Hash)) return $"{Index},{Name}\r\n";
+        if (string.IsNullOrEmpty(Hash)) {
+            return $"{Index},{Name}\r\n";
+        }
         return $"{Index},{Hash},{Name}\r\n";
     }
 
@@ -66,13 +70,14 @@ public class PackFileEntry : IComparable<PackFileEntry> {
 
         string[] aEntries = sFileString.Split(new[]
         {
-            "\r\n"
+            "\r\n",
         }, StringSplitOptions.RemoveEmptyEntries);
         foreach (string sEntry in aEntries) {
             int nProperties = 0;
             foreach (char c in sEntry)
-                if (c == ',')
+                if (c == ',') {
                     ++nProperties;
+                }
 
             string sIndex, sName;
             if (nProperties == 1) {
@@ -81,7 +86,7 @@ public class PackFileEntry : IComparable<PackFileEntry> {
 
                 aFileList.Add(new PackFileEntry {
                     Index = int.Parse(sIndex), //atoi(sIndex)
-                    Name = sName
+                    Name = sName,
                 });
             } else if (nProperties == 2) {
                 sIndex = sEntry.Split(',')[0]; //strtok(pStr, ",")
@@ -90,7 +95,7 @@ public class PackFileEntry : IComparable<PackFileEntry> {
                 aFileList.Add(new PackFileEntry {
                     Index = int.Parse(sIndex), //atoi(sIndex)
                     Hash = sEntry.Split(',')[1], //if (!nPropertyIdx)
-                    Name = sName
+                    Name = sName,
                 });
             }
         }

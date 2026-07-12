@@ -197,10 +197,14 @@ public sealed class ZlibCodec {
     public ZlibCodec(CompressionMode mode) {
         if (mode == CompressionMode.Compress) {
             int rc = InitializeDeflate();
-            if (rc != ZlibConstants.Z_OK) throw new ZlibException("Cannot initialize for deflate.");
+            if (rc != ZlibConstants.Z_OK) {
+                throw new ZlibException("Cannot initialize for deflate.");
+            }
         } else if (mode == CompressionMode.Decompress) {
             int rc = InitializeInflate();
-            if (rc != ZlibConstants.Z_OK) throw new ZlibException("Cannot initialize for inflate.");
+            if (rc != ZlibConstants.Z_OK) {
+                throw new ZlibException("Cannot initialize for inflate.");
+            }
         } else {
             throw new ZlibException("Invalid ZlibStreamFlavor.");
         }
@@ -288,7 +292,9 @@ public sealed class ZlibCodec {
     /// <returns>Z_OK if everything goes well.</returns>
     public int InitializeInflate(int windowBits, bool expectRfc1950Header) {
         WindowBits = windowBits;
-        if (dstate != null) throw new ZlibException("You may not call InitializeInflate() after calling InitializeDeflate().");
+        if (dstate != null) {
+            throw new ZlibException("You may not call InitializeInflate() after calling InitializeDeflate().");
+        }
         istate = new InflateManager(expectRfc1950Header);
         return istate.Initialize(this, windowBits);
     }
@@ -357,8 +363,9 @@ public sealed class ZlibCodec {
     /// <param name="flush">The flush to use when inflating.</param>
     /// <returns>Z_OK if everything goes well.</returns>
     public int Inflate(FlushType flush) {
-        if (istate == null)
+        if (istate == null) {
             throw new ZlibException("No Inflate State!");
+        }
         return istate.Inflate(flush);
     }
 
@@ -372,8 +379,9 @@ public sealed class ZlibCodec {
     /// </remarks>
     /// <returns>Z_OK if everything goes well.</returns>
     public int EndInflate() {
-        if (istate == null)
+        if (istate == null) {
             throw new ZlibException("No Inflate State!");
+        }
         int ret = istate.End();
         istate = null;
         return ret;
@@ -384,8 +392,9 @@ public sealed class ZlibCodec {
     /// </summary>
     /// <returns>Z_OK if everything goes well.</returns>
     public int SyncInflate() {
-        if (istate == null)
+        if (istate == null) {
             throw new ZlibException("No Inflate State!");
+        }
         return istate.Sync();
     }
 
@@ -502,7 +511,9 @@ public sealed class ZlibCodec {
     }
 
     private int _InternalInitializeDeflate(bool wantRfc1950Header) {
-        if (istate != null) throw new ZlibException("You may not call InitializeDeflate() after calling InitializeInflate().");
+        if (istate != null) {
+            throw new ZlibException("You may not call InitializeDeflate() after calling InitializeInflate().");
+        }
         dstate = new DeflateManager();
         dstate.WantRfc1950HeaderBytes = wantRfc1950Header;
 
@@ -579,8 +590,9 @@ public sealed class ZlibCodec {
     /// </param>
     /// <returns>Z_OK if all goes well.</returns>
     public int Deflate(FlushType flush) {
-        if (dstate == null)
+        if (dstate == null) {
             throw new ZlibException("No Deflate State!");
+        }
         return dstate.Deflate(flush);
     }
 
@@ -592,8 +604,9 @@ public sealed class ZlibCodec {
     /// </remarks>
     /// <returns>Z_OK if all goes well.</returns>
     public int EndDeflate() {
-        if (dstate == null)
+        if (dstate == null) {
             throw new ZlibException("No Deflate State!");
+        }
         // TODO: dinoch Tue, 03 Nov 2009  15:39 (test this)
         //int ret = dstate.End();
         dstate = null;
@@ -610,8 +623,9 @@ public sealed class ZlibCodec {
     /// </remarks>
     /// <returns>Z_OK if all goes well.</returns>
     public void ResetDeflate() {
-        if (dstate == null)
+        if (dstate == null) {
             throw new ZlibException("No Deflate State!");
+        }
         dstate.Reset();
     }
 
@@ -622,8 +636,9 @@ public sealed class ZlibCodec {
     /// <param name="strategy">the strategy to use for compression.</param>
     /// <returns>Z_OK if all goes well.</returns>
     public int SetDeflateParams(CompressionLevel level, CompressionStrategy strategy) {
-        if (dstate == null)
+        if (dstate == null) {
             throw new ZlibException("No Deflate State!");
+        }
         return dstate.SetParams(level, strategy);
     }
 
@@ -633,11 +648,13 @@ public sealed class ZlibCodec {
     /// <param name="dictionary">The dictionary bytes to use.</param>
     /// <returns>Z_OK if all goes well.</returns>
     public int SetDictionary(byte[] dictionary) {
-        if (istate != null)
+        if (istate != null) {
             return istate.SetDictionary(dictionary);
+        }
 
-        if (dstate != null)
+        if (dstate != null) {
             return dstate.SetDictionary(dictionary);
+        }
 
         throw new ZlibException("No Inflate or Deflate state!");
     }
@@ -649,16 +666,19 @@ public sealed class ZlibCodec {
     internal void flush_pending() {
         int len = dstate.pendingCount;
 
-        if (len > AvailableBytesOut)
+        if (len > AvailableBytesOut) {
             len = AvailableBytesOut;
-        if (len == 0)
+        }
+        if (len == 0) {
             return;
+        }
 
         if (dstate.pending.Length <= dstate.nextPending ||
             OutputBuffer.Length <= NextOut ||
             dstate.pending.Length < dstate.nextPending + len ||
-            OutputBuffer.Length < NextOut + len)
+            OutputBuffer.Length < NextOut + len) {
             throw new ZlibException($"Invalid State. (pending.Length={dstate.pending.Length}, pendingCount={dstate.pendingCount})");
+        }
 
         Array.Copy(dstate.pending, dstate.nextPending, OutputBuffer, NextOut, len);
 
@@ -667,7 +687,9 @@ public sealed class ZlibCodec {
         TotalBytesOut += len;
         AvailableBytesOut -= len;
         dstate.pendingCount -= len;
-        if (dstate.pendingCount == 0) dstate.nextPending = 0;
+        if (dstate.pendingCount == 0) {
+            dstate.nextPending = 0;
+        }
     }
 
     // Read a new buffer from the current input stream, update the adler32
@@ -678,14 +700,18 @@ public sealed class ZlibCodec {
     internal int read_buf(byte[] buf, int start, int size) {
         int len = AvailableBytesIn;
 
-        if (len > size)
+        if (len > size) {
             len = size;
-        if (len == 0)
+        }
+        if (len == 0) {
             return 0;
+        }
 
         AvailableBytesIn -= len;
 
-        if (dstate.WantRfc1950HeaderBytes) _Adler32 = Adler.Adler32(_Adler32, InputBuffer, NextIn, len);
+        if (dstate.WantRfc1950HeaderBytes) {
+            _Adler32 = Adler.Adler32(_Adler32, InputBuffer, NextIn, len);
+        }
         Array.Copy(InputBuffer, NextIn, buf, start, len);
         NextIn += len;
         TotalBytesIn += len;

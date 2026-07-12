@@ -38,7 +38,9 @@ public class PackNode : TreeNode {
                 aPath[i] = pNode.Name;
 
                 pNode = pNode.Parent;
-                if (pNode == null) break;
+                if (pNode == null) {
+                    break;
+                }
             }
 
             StringBuilder sPath = new StringBuilder();
@@ -52,10 +54,11 @@ public class PackNode : TreeNode {
     public byte[] Data {
         get => Tag is PackFileEntry ? (Tag as PackFileEntry).Data : pData;
         set {
-            if (Tag is PackFileEntry)
+            if (Tag is PackFileEntry) {
                 (Tag as PackFileEntry).Data = value;
-            else
+            } else {
                 pData = value;
+            }
         }
     }
 }
