@@ -1424,8 +1424,13 @@ public partial class MainWindow : Form {
         // Re-calculate all file indexes from start to finish
         int nCurIndex = 1;
         // dont create file yet, just create the memory stream
-        using MemoryStream memoryStream = new MemoryStream();
-        using BinaryWriter pWriter = new BinaryWriter(memoryStream);
+        //using MemoryStream memoryStream = new MemoryStream();
+        //using BinaryWriter pWriter = new BinaryWriter(memoryStream);
+
+        // FileStream instead of MemoryStream [Stream was too long problem fix, Auto-remove temporary m2d.]
+        using FileStream fileStream = new FileStream(Path.GetTempFileName(), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
+        using BinaryWriter pWriter = new BinaryWriter(fileStream);
+
         // Iterate all file entries that exist
         foreach (PackFileEntry pEntry in aEntry) {
             IPackFileHeaderVerBase pHeader = pEntry.FileHeader;
@@ -1523,10 +1528,13 @@ public partial class MainWindow : Form {
         // close mapped memory file since dont need it anymore
         pDataMappedMemFile.Dispose();
 
-        // write the memory stream to the file
+        // write the memory stream to the file [Stream was too long problem fix]
         using FileStream pFile = File.Create(sDataPath);
         pWriter.Flush();
-        memoryStream.WriteTo(pFile);
+        //memoryStream.WriteTo(pFile);
+        fileStream.Position = 0;
+        fileStream.CopyTo(pFile);
+        fileStream.Dispose();
     }
 
     #endregion
