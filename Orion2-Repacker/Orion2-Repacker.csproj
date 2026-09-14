@@ -3,7 +3,7 @@
         <TargetFramework>net8.0-windows</TargetFramework>
         <OutputType>WinExe</OutputType>
         <RootNamespace>Orion</RootNamespace>
-        <Nullable>true</Nullable>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationIcon>Images\icon.ico</ApplicationIcon>
@@ -90,13 +90,13 @@
     </ItemGroup>
     <PropertyGroup>
         <UseWindowsForms>True</UseWindowsForms>
-        <Version>2.4.2</Version>
+        <Version>2.4.3</Version>
         <Authors>Orion2-Repacker</Authors>
         <Company>Orion2-Repacker</Company>
         <Product>Orion2-Repacker</Product>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AssemblyVersion>2.4.2</AssemblyVersion>
-        <FileVersion>2.4.2</FileVersion>
+        <AssemblyVersion>2.4.3</AssemblyVersion>
+        <FileVersion>2.4.3</FileVersion>
         <PackageId>Orion2-Repacker</PackageId>
     </PropertyGroup>
     <PropertyGroup>
